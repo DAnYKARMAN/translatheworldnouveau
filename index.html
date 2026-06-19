@@ -1,0 +1,2260 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <!-- Favicon & PWA -->
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon.ico">
+  <link rel="apple-touch-icon" sizes="180x180" href="/favicon-180.png">
+  <link rel="manifest" href="/manifest.json">
+  <meta name="theme-color" content="#2dd4bf">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="TranslateTheWorld">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>TranslateTheWorld — Parlez et comprenez 70 langues</title>
+ 
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+<script src="https://js.stripe.com/v3/"></script>
+<style>
+:root{
+  --ink:#0a0a0a;--paper:#fff;--surface:#f7f5f0;
+  --gold:#d4a843;--gold-bg:#fff8e0;--gold-border:#f5c842;
+  --teal:#157a6e;--teal-dark:#085041;--teal-light:#e3f4f1;
+  --mid:#666;--border:rgba(0,0,0,0.1);--shadow:0 20px 60px rgba(0,0,0,0.07);
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{font-family:Arial,'Helvetica Neue',Helvetica,sans-serif;background:var(--paper);color:var(--ink);line-height:1.6;overflow-x:hidden}
+ 
+/* NAV */
+nav{position:fixed;top:0;left:0;right:0;z-index:200;display:flex;align-items:center;justify-content:space-between;padding:14px 36px;background:rgba(255,255,255,0.92);backdrop-filter:blur(16px);border-bottom:1px solid rgba(0,0,0,0.07)}
+.nav-logo{Arial,'Helvetica Neue',Helvetica,sans-serif;font-size:19px;font-weight:800;color:var(--ink);text-decoration:none;letter-spacing:-.02em}
+.nav-logo span{background:linear-gradient(110deg,#e8690a,#f5c842,#1a9e6e);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.nav-links{display:flex;gap:28px;list-style:none}
+.nav-links a{color:var(--mid);text-decoration:none;font-size:13px;font-weight:500;transition:color .2s}
+.nav-links a:hover{color:var(--ink)}
+.nav-right{display:flex;align-items:center;gap:12px}
+.lang-toggle{display:flex;gap:3px}
+.lang-btn{background:transparent;border:1px solid var(--border);color:var(--mid);padding:5px 12px;border-radius:999px;font-size:12px;font-weight:700;cursor:pointer;transition:all .2s;font-family:Arial,'Helvetica Neue',Helvetica,sans-serif}
+.lang-btn.active{background:var(--ink);color:#fff;border-color:var(--ink)}
+.lang-select{background:transparent;border:1px solid var(--border);color:var(--ink);padding:6px 10px;border-radius:999px;font-size:12px;font-weight:700;cursor:pointer;font-family:Arial,'Helvetica Neue',Helvetica,sans-serif;outline:none;max-width:110px}
+.nav-cta{background:var(--ink);color:#fff;border:none;padding:9px 22px;border-radius:999px;font-size:13px;font-weight:700;cursor:pointer;text-decoration:none;transition:opacity .2s;font-family:Arial,'Helvetica Neue',Helvetica,sans-serif}
+.nav-cta:hover{opacity:.8}
+@media(max-width:700px){.nav-links{display:none}.nav-right{gap:6px}nav{padding:10px 14px}.lang-select{max-width:80px;font-size:11px;padding:5px 6px}.nav-cta{padding:8px 14px;font-size:12px}}
+ 
+/* HERO */
+/* HERO */
+/* ── Bandeau de drapeaux en haut du hero ── */
+.flag-strip{
+  position:absolute;top:64px;left:0;right:0;z-index:1;
+  display:flex;align-items:center;justify-content:center;
+  gap:18px;padding:14px 24px;
+  background:rgba(255,255,255,0.82);
+  backdrop-filter:blur(8px);
+  border-bottom:1px solid rgba(0,0,0,0.06);
+  flex-wrap:nowrap;overflow:hidden;
+}
+.flag-item{
+  display:flex;flex-direction:column;align-items:center;gap:4px;
+  flex-shrink:0;
+}
+.fi-img{
+  width:56px;height:38px;
+  object-fit:cover;
+  border-radius:4px;
+  box-shadow:0 3px 10px rgba(0,0,0,0.18),0 1px 3px rgba(0,0,0,0.12);
+  animation:flagFloat ease-in-out infinite alternate;
+  display:block;
+}
+.flag-item .fn{
+  font-size:10px;font-weight:600;color:#666;letter-spacing:.04em;
+  text-transform:uppercase;font-family:Arial,'Helvetica Neue',Helvetica,sans-serif;
+}
+@keyframes flagFloat{0%{transform:translateY(0)}100%{transform:translateY(-4px)}}
+@media(max-width:700px){.flag-item .fi{font-size:30px}.flag-strip{gap:12px;padding:10px 16px}}
+@media(max-width:480px){.flag-item .fn{display:none}.flag-strip{gap:8px}}
+/* Hero padding-top pour laisser la place au bandeau */
+.hero{position:relative;min-height:100vh;background:#fff;display:flex;align-items:center;justify-content:center;padding:170px 32px 60px}
+/* Sur mobile, le smartphone passe en dessous du texte */
+@media(max-width:760px){
+  .hero-text-block{grid-template-columns:1fr !important;gap:28px !important}
+  .hero-text-block img{max-width:200px !important}
+}
+/* Bannière de drapeaux featured */
+.flag-banner{position:absolute;bottom:0;left:0;right:0;z-index:1;pointer-events:none;display:flex;align-items:flex-end;justify-content:center;gap:0;overflow:hidden}
+.flag-banner-inner{display:flex;gap:12px;padding:0 24px 0;align-items:flex-end;flex-wrap:nowrap}
+.fbf{font-size:clamp(52px,7vw,80px);line-height:1;filter:drop-shadow(0 4px 12px rgba(0,0,0,0.15));transition:transform .3s;animation:flagWave ease-in-out infinite alternate}
+@keyframes flagWave{0%{transform:translateY(0) rotate(-1deg)}100%{transform:translateY(-6px) rotate(1deg)}}
+/* Layout 2 colonnes */
+.hero-inner{position:relative;z-index:2;display:grid;grid-template-columns:1fr 420px;gap:60px;align-items:center;max-width:1080px;width:100%}
+@media(max-width:920px){.hero-inner{grid-template-columns:1fr;gap:40px}}
+/* Colonne gauche */
+.hero-left{display:flex;flex-direction:column;align-items:flex-start}
+@media(max-width:920px){.hero-left{align-items:center;text-align:center}}
+ 
+ 
+.hero-badge{display:inline-flex;align-items:center;gap:8px;background:var(--gold-bg);border:1.5px solid var(--gold-border);color:#a07000;font-size:11px;font-weight:700;letter-spacing:.15em;text-transform:uppercase;padding:10px 20px;border-radius:16px;margin-bottom:22px;animation:fadeUp .6s both;text-align:center;line-height:1.6;white-space:normal;max-width:100%}
+.hero-h1{Arial,'Helvetica Neue',Helvetica,sans-serif;font-size:clamp(30px,3.6vw,54px);font-weight:800;line-height:1.06;letter-spacing:-.03em;color:var(--ink);margin-bottom:16px;animation:fadeUp .7s .1s both}
+.hero-h1 .grd{background:linear-gradient(110deg,#e8690a 0%,#f5c842 45%,#1a9e6e 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.hero-sub{font-size:clamp(14px,1.4vw,16px);color:var(--mid);font-weight:300;line-height:1.7;margin-bottom:22px;animation:fadeUp .7s .2s both}
+.hero-sub strong{color:var(--ink);font-weight:600}
+.hero-link{font-size:13px;color:var(--mid);animation:fadeUp .7s .3s both}
+.hero-link a{color:var(--teal);font-weight:600;text-decoration:none}
+.hero-link a:hover{text-decoration:underline}
+.lang-pills{display:flex;flex-wrap:wrap;gap:6px;max-width:460px;margin-top:22px;animation:fadeUp .7s .4s both}
+.pill{background:#f5f5f5;border:1px solid #e8e8e8;border-radius:999px;padding:4px 12px;font-size:12px;color:#444;display:flex;align-items:center;gap:4px;transition:transform .15s,background .15s;cursor:default}
+.pill:hover{transform:scale(1.08);background:#fff8e0;border-color:var(--gold-border)}
+.pill img{border-radius:2px;flex-shrink:0}
+/* ─── Carte formulaire ─── */
+.hero-form-card{
+  background:#fff;
+  border:1.5px solid rgba(0,0,0,0.09);
+  border-radius:20px;
+  box-shadow:0 8px 40px rgba(0,0,0,0.10),0 1px 4px rgba(0,0,0,0.06);
+  animation:fadeUp .7s .15s both;
+  position:relative;
+}
+/* header et footer arrondis pour compenser overflow:hidden retiré */
+.hfc-header{border-radius:18px 18px 0 0}
+.hfc-footer{border-radius:0 0 18px 18px}
+/* En-tête de la carte */
+.hfc-header{
+  background:var(--ink);
+  padding:22px 28px 18px;
+}
+.hfc-title{Arial,'Helvetica Neue',Helvetica,sans-serif;font-size:18px;font-weight:800;color:#fff;margin-bottom:4px}
+.hfc-sub{display:flex;align-items:center;gap:10px;margin-top:10px;flex-wrap:wrap}
+.hfc-sub-word{
+  Arial,'Helvetica Neue',Helvetica,sans-serif;
+  font-size:clamp(20px,2.8vw,28px);
+  font-weight:800;
+  color:#fff;
+  letter-spacing:-.02em;
+  line-height:1.1;
+  background:linear-gradient(135deg,#f0d48a 0%,#d4a843 60%,#e8690a 100%);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+}
+.hfc-sub-sep{
+  font-size:18px;font-weight:300;
+  color:rgba(255,255,255,.3);
+}
+.hfc-pills{display:flex;gap:6px;margin-top:10px;flex-wrap:wrap}
+.hfc-pill{background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.18);border-radius:999px;padding:3px 10px;font-size:11px;color:rgba(255,255,255,.8);font-weight:600}
+.hfc-pill.gold{background:rgba(212,168,67,.2);border-color:rgba(212,168,67,.4);color:#f0d48a}
+/* Corps du formulaire */
+.hfc-body{padding:22px 28px 24px;overflow:visible}
+/* Sections du formulaire */
+.hfc-section{margin-bottom:18px;position:relative}
+.hfc-section-title{font-size:10px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:rgba(0,0,0,.35);margin-bottom:10px;padding-bottom:6px;border-bottom:1px solid #f0f0f0;display:flex;align-items:center;gap:6px}
+/* Grille de champs */
+.hfc-grid{display:grid;gap:10px;overflow:visible}
+.hfc-grid.cols2{grid-template-columns:1fr 1fr}
+.hfc-grid.cols3{grid-template-columns:1fr 1fr 1fr}
+@media(max-width:440px){.hfc-grid.cols2{grid-template-columns:1fr}.hfc-grid.cols3{grid-template-columns:1fr}}
+.hfc-field{display:flex;flex-direction:column;gap:4px;position:relative}
+/* ── Selects natifs langues ── */
+.sel-label{
+  font-size:11px;font-weight:700;color:rgba(0,0,0,.45);
+  letter-spacing:.05em;text-transform:uppercase;
+  display:block;margin-bottom:5px;
+}
+.sel-wrap{
+  display:flex;align-items:center;gap:6px;
+  background:#f9f9f9;border:1.5px solid #b8b8b8;border-radius:8px;
+  padding:0 8px;transition:border-color .18s;min-width:0;
+}
+.sel-wrap:focus-within{border-color:#157a6e;background:#fff}
+.sel-flag{
+  width:26px;height:18px;border-radius:3px;flex-shrink:0;
+  object-fit:cover;box-shadow:0 1px 4px rgba(0,0,0,.15);
+}
+.sel-flag-none{display:none}
+.native-sel{
+  flex:1;min-width:0;border:none;background:transparent;
+  padding:10px 2px;font-size:13px;color:#222;
+  font-family:Arial,'Helvetica Neue',Helvetica,sans-serif;cursor:pointer;
+  outline:none;appearance:auto;-webkit-appearance:auto;
+  min-height:42px;font-weight:500;width:100%;
+}
+.hfc-field label{font-size:11px;font-weight:600;color:rgba(0,0,0,.45);letter-spacing:.04em}
+.hfc-field input,.hfc-field select{
+  background:#f9f9f9;border:1.5px solid #b8b8b8;border-radius:8px;
+  padding:10px 12px;color:var(--ink);font-size:13.5px;
+  font-family:Arial,'Helvetica Neue',Helvetica,sans-serif;outline:none;
+  transition:border-color .18s,background .18s;width:100%;
+}
+.hfc-field input::placeholder{color:#c0c0c0}
+.hfc-field input:focus,.hfc-field select:focus{border-color:var(--teal);background:#fff}
+.hfc-field select option{background:#fff;color:var(--ink)}
+.room-error{display:none;color:#c0392b;font-size:11.5px;margin-top:2px;line-height:1.4}
+/* Bouton */
+.hfc-footer{padding:0 28px 24px}
+.hfc-submit{
+  width:100%;padding:14px;border-radius:12px;
+  background:var(--teal);color:#fff;border:none;
+  font-size:15px;font-weight:700;cursor:pointer;
+  transition:opacity .18s,transform .18s;
+  font-family:Arial,'Helvetica Neue',Helvetica,sans-serif;letter-spacing:.01em;
+}
+.hfc-submit:hover{opacity:.88;transform:translateY(-1px)}
+.hfc-note{font-size:11px;color:var(--mid);text-align:center;margin-top:10px;line-height:1.6}
+.hfc-note strong{color:var(--teal)}
+/* Résultat */
+.result-box{display:none;margin:0 28px 24px;background:#f0faf7;border:1.5px solid rgba(21,122,110,.2);border-radius:12px;padding:18px;text-align:center}
+.result-box h3{Arial,'Helvetica Neue',Helvetica,sans-serif;font-size:16px;color:var(--teal);margin-bottom:8px}
+.result-box p{color:var(--mid);font-size:12.5px;margin-bottom:10px}
+.result-link{background:#fff;border:1px solid rgba(21,122,110,.2);border-radius:7px;padding:8px 12px;font-family:monospace;font-size:10.5px;color:var(--teal-dark);word-break:break-all;display:block;margin-bottom:12px}
+#qrcode{display:inline-block;background:#fff;padding:8px;border-radius:8px;border:1px solid #e5e5e5}
+.btn-light{background:#fff;color:var(--ink);border:1.5px solid #ddd;padding:14px 36px;border-radius:999px;font-size:15px;font-weight:500;cursor:pointer;transition:border-color .18s;text-decoration:none;display:inline-block;font-family:Arial,'Helvetica Neue',Helvetica,sans-serif}
+.btn-light:hover{border-color:#999}
+ 
+/* TICKER APPLE STYLE + PAUSE HOVER */
+.ticker-wrap{
+  background:var(--ink);
+  padding:13px 0;
+  overflow:hidden;
+  white-space:nowrap;
+  position:relative;
+}
+.ticker-wrap::before,
+.ticker-wrap::after{
+  content:"";
+  position:absolute;
+  top:0;
+  width:80px;
+  height:100%;
+  z-index:2;
+  pointer-events:none;
+}
+.ticker-wrap::before{
+  left:0;
+  background:linear-gradient(to right, #0a0a0a 0%, transparent 100%);
+}
+.ticker-wrap::after{
+  right:0;
+  background:linear-gradient(to left, #0a0a0a 0%, transparent 100%);
+}
+.ticker-inner{
+  display:inline-flex;
+  gap:10px;
+  animation:tickerSmooth 120s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+}
+.ticker-wrap:hover .ticker-inner{
+  animation-play-state: paused;
+}
+.ticker-item{
+  display:inline-flex;
+  align-items:center;
+  gap:9px;
+  padding:0 18px;
+  font-size:13px;
+  color:rgba(255,255,255,.65);
+  transition:transform .3s;
+}
+.ticker-item:hover{
+  transform:scale(1.08);
+}
+.ticker-item em{
+  font-style:normal;
+  font-size:17px;
+}
+@keyframes tickerSmooth{
+  0%{transform:translateX(0)}
+  100%{transform:translateX(-50%)}
+}
+ 
+/* SECTIONS */
+.section{padding:96px 24px;max-width:1100px;margin:0 auto}
+.section-label{font-size:11px;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:var(--teal);margin-bottom:14px}
+.section-title{Arial,'Helvetica Neue',Helvetica,sans-serif;font-size:clamp(28px,4vw,50px);font-weight:800;line-height:1.1;letter-spacing:-.02em;max-width:700px}
+.steps{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:26px;margin-top:54px}
+.step{background:var(--surface);border:1px solid var(--border);border-radius:20px;padding:30px 24px;transition:transform .2s,box-shadow .2s}
+.step:hover{transform:translateY(-4px);box-shadow:var(--shadow)}
+.step-num{Arial,'Helvetica Neue',Helvetica,sans-serif;font-size:42px;font-weight:800;color:var(--gold);opacity:.4;line-height:1;margin-bottom:12px}
+.step h3{font-size:16px;font-weight:700;margin-bottom:7px}
+.step p{font-size:13.5px;color:var(--mid);line-height:1.65}
+ 
+/* FORMULAIRE (section supprimée - formulaire dans hero) */
+.form-inner{max-width:800px;margin:0 auto}
+.form-inner .section-label{color:rgba(212,168,67,.8)}
+.form-inner .section-title{color:#fff}
+.form-inner .section-title em{font-style:normal;color:var(--gold)}
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:42px}
+@media(max-width:580px){.form-grid{grid-template-columns:1fr}}
+.form-group{display:flex;flex-direction:column;gap:7px}
+.form-group.full{grid-column:1/-1}
+.form-group label{font-size:11px;font-weight:700;color:rgba(255,255,255,.5);letter-spacing:.07em;text-transform:uppercase}
+.form-group input,.form-group select{background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.12);border-radius:10px;padding:13px 15px;color:#fff;font-size:14.5px;font-family:Arial,'Helvetica Neue',Helvetica,sans-serif;transition:border-color .2s;outline:none;width:100%}
+.form-group input::placeholder{color:rgba(255,255,255,.25)}
+.form-group input:focus,.form-group select:focus{border-color:var(--gold);background:rgba(255,255,255,.1)}
+.form-group select option{background:#111;color:#fff}
+.room-error{display:none;color:#ff7070;font-size:12px;margin-top:5px;line-height:1.4}
+ 
+ 
+.form-submit{margin-top:28px;display:flex;gap:16px;align-items:center;flex-wrap:wrap}
+.btn-gold{background:var(--gold);color:var(--ink);border:none;padding:15px 38px;border-radius:999px;font-size:15px;font-weight:700;cursor:pointer;transition:transform .18s,box-shadow .18s;font-family:Arial,'Helvetica Neue',Helvetica,sans-serif}
+.btn-gold:hover{transform:translateY(-2px);box-shadow:0 12px 32px rgba(212,168,67,.4)}
+.form-note{font-size:12px;color:rgba(255,255,255,.35);line-height:1.65}
+.result-box{display:none;margin-top:16px;background:#f8fff6;border:1px solid rgba(21,122,110,.2);border-radius:14px;padding:20px;text-align:center}
+.result-box h3{Arial,'Helvetica Neue',Helvetica,sans-serif;font-size:18px;color:var(--teal);margin-bottom:8px}
+.result-box p{color:var(--mid);font-size:13px;margin-bottom:12px}
+.result-link{background:#f0f9f7;border:1px solid rgba(21,122,110,.2);border-radius:8px;padding:10px 14px;font-family:monospace;font-size:11px;color:var(--teal-dark);word-break:break-all;display:block;margin-bottom:14px}
+#qrcode{display:inline-block;background:#fff;padding:8px;border-radius:8px;border:1px solid #e5e5e5}
+ 
+/* PRICING */
+.pricing-section{background:var(--surface);padding:96px 24px}
+.pricing-inner{max-width:1100px;margin:0 auto}
+.pricing-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:24px;margin-top:54px;max-width:900px;margin-left:auto;margin-right:auto}@media(max-width:700px){.pricing-grid{grid-template-columns:1fr}}
+.pricing-card{border:1px solid var(--border);border-radius:22px;padding:38px 28px;position:relative;transition:transform .2s,box-shadow .2s;background:#fff}
+.pricing-card:hover{transform:translateY(-5px);box-shadow:var(--shadow)}
+.pricing-card.featured{background:var(--ink);color:#fff;border-color:var(--gold);box-shadow:0 28px 70px rgba(0,0,0,.15)}
+.featured-badge{position:absolute;top:-12px;left:50%;transform:translateX(-50%);background:var(--gold);color:var(--ink);font-size:10px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;padding:5px 16px;border-radius:999px;white-space:nowrap}
+.plan-name{font-size:11px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:var(--teal);margin-bottom:14px}
+.pricing-card.featured .plan-name{color:#f0d48a}
+.plan-price{Arial,'Helvetica Neue',Helvetica,sans-serif;font-size:54px;font-weight:800;line-height:1}
+.plan-price sup{font-size:22px;font-family:Arial,'Helvetica Neue',Helvetica,sans-serif;font-weight:600;vertical-align:top;margin-top:8px;display:inline-block}
+.plan-price sub{font-size:13px;font-weight:400;opacity:.6;font-family:Arial,'Helvetica Neue',Helvetica,sans-serif}
+.per-lang{display:inline-block;background:var(--teal-light);color:var(--teal-dark);font-size:11px;font-weight:700;padding:3px 10px;border-radius:999px;margin-top:6px;letter-spacing:.04em}
+.pricing-card.featured .per-lang{background:rgba(212,168,67,.2);color:#f0d48a}
+.plan-free{Arial,'Helvetica Neue',Helvetica,sans-serif;font-size:42px;font-weight:800;color:var(--teal)}
+.plan-desc{font-size:13px;color:var(--mid);margin-top:8px;line-height:1.5}
+.pricing-card.featured .plan-desc{color:rgba(255,255,255,.5)}
+.plan-ht{font-size:11.5px;color:var(--mid);margin-top:4px;font-style:italic}
+.pricing-card.featured .plan-ht{color:rgba(255,255,255,.32)}
+.plan-divider{border:none;border-top:1px solid var(--border);margin:22px 0}
+.pricing-card.featured .plan-divider{border-color:rgba(255,255,255,.1)}
+.plan-features{list-style:none;display:flex;flex-direction:column;gap:10px}
+.plan-feature{font-size:13px;color:var(--mid);display:flex;align-items:flex-start;gap:10px}
+.plan-feature::before{content:'✓';color:var(--teal);font-weight:800;flex-shrink:0}
+.pricing-card.featured .plan-feature{color:rgba(255,255,255,.62)}
+.pricing-card.featured .plan-feature::before{color:var(--gold)}
+.plan-feature strong{font-weight:700;color:var(--ink)}
+.pricing-card.featured .plan-feature strong{color:#fff}
+.plan-cta{margin-top:26px;width:100%;padding:13px;border-radius:999px;border:1px solid var(--border);background:transparent;font-size:14px;font-weight:700;cursor:pointer;transition:all .2s;font-family:Arial,'Helvetica Neue',Helvetica,sans-serif;color:var(--ink)}
+.plan-cta:hover{background:var(--ink);color:#fff;border-color:var(--ink)}
+.pricing-card.featured .plan-cta{background:var(--gold);color:var(--ink);border-color:var(--gold)}
+.pricing-card.featured .plan-cta:hover{background:#e8c85a}
+ 
+/* CALCULATEUR */
+.calc-box{margin-top:48px;background:#fff;border:1px solid var(--border);border-radius:22px;padding:36px 32px}
+.calc-title{Arial,'Helvetica Neue',Helvetica,sans-serif;font-size:20px;font-weight:800;margin-bottom:6px;color:var(--ink)}
+.calc-sub{font-size:13px;color:var(--mid);margin-bottom:24px}
+.calc-plan-btns{display:flex;gap:8px;margin-bottom:20px;flex-wrap:wrap}
+.calc-plan-btn{padding:8px 20px;border-radius:999px;font-size:13px;font-weight:600;cursor:pointer;font-family:Arial,'Helvetica Neue',Helvetica,sans-serif;transition:all .2s;border:1.5px solid var(--border);background:transparent;color:var(--ink)}
+.calc-plan-btn.active{background:var(--teal);color:#fff;border-color:var(--teal)}
+.calc-lang-grid{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:20px}
+.calc-lang-btn{display:inline-flex;align-items:center;gap:5px;padding:5px 12px;border-radius:999px;font-size:12px;cursor:pointer;transition:all .15s;border:1px solid var(--border);background:transparent;color:var(--mid);font-family:Arial,'Helvetica Neue',Helvetica,sans-serif}
+.calc-lang-btn.on{border-color:var(--teal);background:var(--teal-light);color:var(--teal-dark);font-weight:600}
+.calc-lang-btn em{font-style:normal;font-size:15px}
+.calc-lines{border-top:1px solid var(--border);padding-top:16px;display:flex;flex-direction:column;gap:8px;margin-bottom:12px}
+.calc-line{display:flex;justify-content:space-between;align-items:center;font-size:13px}
+.calc-line span:first-child{color:var(--mid)}
+.calc-line span:last-child{color:var(--ink);font-weight:500}
+.calc-total-row{display:flex;justify-content:space-between;align-items:center;border-top:1.5px solid var(--ink);padding-top:14px;margin-top:4px}
+.calc-total-label{font-size:15px;font-weight:700;color:var(--ink)}
+.calc-total-val{Arial,'Helvetica Neue',Helvetica,sans-serif;font-size:28px;font-weight:800;color:var(--ink)}
+.calc-ht-row{display:flex;justify-content:space-between;font-size:12px;color:var(--mid);margin-top:4px}
+.calc-hue-note{display:none!important;margin-top:12px;padding:10px 14px;background:var(--teal-light);border-radius:10px;font-size:12px;color:var(--teal-dark);line-height:1.5}
+.calc-hue-check{display:none}
+.calc-hue-check input{cursor:pointer}
+ 
+.tva-note{display:none}
+ 
+/* MODAL */
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.76);z-index:999;align-items:center;justify-content:center;padding:24px}
+.modal-overlay.active{display:flex}
+.modal-card{background:var(--ink);border:1px solid rgba(212,168,67,.3);border-radius:24px;padding:44px 38px;max-width:510px;width:100%;text-align:center;color:#fff}
+.modal-card h2{Arial,'Helvetica Neue',Helvetica,sans-serif;font-size:25px;color:#f0d48a;margin-bottom:13px}
+.modal-card p{color:rgba(255,255,255,.62);line-height:1.7;margin-bottom:10px;font-size:13.5px}
+.modal-link-display{background:rgba(212,168,67,.1);border:1px solid rgba(212,168,67,.28);border-radius:8px;padding:10px 14px;font-family:monospace;font-size:11px;color:#f0d48a;word-break:break-all;margin:13px 0}
+.modal-qr{display:inline-block;background:#fff;padding:10px;border-radius:10px;margin:13px 0}
+.modal-close{background:var(--gold);color:var(--ink);border:none;padding:12px 32px;border-radius:999px;font-size:14px;font-weight:700;cursor:pointer;margin-top:6px;font-family:Arial,'Helvetica Neue',Helvetica,sans-serif}
+ 
+footer{background:var(--ink);color:rgba(255,255,255,.42);text-align:center;padding:44px 24px;font-size:13px}
+footer strong{color:rgba(255,255,255,.78)}
+footer a{color:rgba(255,255,255,.42);text-decoration:none}
+ 
+@keyframes fadeUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+ 
+/* FAQ */
+.faq-section{background:#fff;padding:96px 24px;border-top:1px solid var(--border)}
+.faq-inner{max-width:820px;margin:0 auto}
+.faq-intro{font-size:clamp(14px,1.4vw,16px);color:var(--mid);margin-top:14px;margin-bottom:48px;line-height:1.7}
+.faq-list{display:flex;flex-direction:column;gap:0}
+.faq-item{border-bottom:1px solid var(--border)}
+.faq-q{width:100%;text-align:left;background:none;border:none;padding:20px 0;font-size:15px;font-weight:700;cursor:pointer;display:flex;justify-content:space-between;align-items:center;gap:16px;color:var(--ink);font-family:Arial,'Helvetica Neue',Helvetica,sans-serif;line-height:1.4}
+.faq-q-icon{flex-shrink:0;width:26px;height:26px;border-radius:50%;background:var(--teal-light);display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:400;color:var(--teal);transition:transform .2s,background .2s}
+.faq-item.open .faq-q-icon{background:var(--teal);color:#fff;transform:rotate(45deg)}
+.faq-a{display:none;padding:0 0 20px 0;font-size:14px;color:var(--mid);line-height:1.8;max-width:700px}
+.faq-a strong{color:var(--ink)}
+.faq-item.open .faq-a{display:block}
+ 
+/* ── PURCHASE MODAL ── */
+#purchaseOverlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.82);z-index:1000;align-items:center;justify-content:center;padding:20px}
+#purchaseOverlay.active{display:flex}
+.purchase-card{background:#fff;border-radius:24px;padding:36px 32px;max-width:560px;width:100%;max-height:92vh;overflow-y:auto;box-shadow:0 30px 80px rgba(0,0,0,.3)}
+.purchase-card h2{font-size:20px;font-weight:800;color:var(--ink);margin-bottom:4px}
+.purchase-plan-badge{display:inline-block;background:var(--teal);color:#fff;font-size:11px;font-weight:700;padding:3px 12px;border-radius:999px;letter-spacing:.06em;text-transform:uppercase;margin-bottom:18px}
+.purchase-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px}
+@media(max-width:480px){.purchase-grid{grid-template-columns:1fr}}
+.purchase-field{display:flex;flex-direction:column;gap:5px}
+.purchase-field.full{grid-column:1/-1}
+.purchase-field label{font-size:12px;font-weight:700;color:var(--mid);text-transform:uppercase;letter-spacing:.06em}
+.purchase-field input,.purchase-field select{padding:11px 14px;border:1.5px solid #b8b8b8;border-radius:10px;font-size:14px;font-family:inherit;outline:none;transition:border-color .18s;background:#fff;color:var(--ink)}
+.purchase-field input:focus,.purchase-field select:focus{border-color:var(--teal)}
+.purchase-field input::placeholder{color:#bbb}
+.purchase-langs-title{font-size:12px;font-weight:700;color:var(--mid);text-transform:uppercase;letter-spacing:.06em;margin:14px 0 8px}
+.purchase-langs-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:7px;margin-bottom:16px}
+@media(max-width:400px){.purchase-langs-grid{grid-template-columns:1fr 1fr}}
+.purchase-lang-btn{border:1.5px solid #b8b8b8;border-radius:10px;padding:8px 6px;background:#fff;cursor:pointer;font-size:12px;font-weight:600;display:flex;align-items:center;gap:5px;transition:all .15s;color:var(--mid);font-family:inherit}
+.purchase-lang-btn img{border-radius:2px;flex-shrink:0}
+.purchase-lang-btn.selected{border-color:var(--teal);background:var(--teal-light);color:var(--teal-dark)}
+.purchase-summary{background:var(--surface);border-radius:12px;padding:14px 16px;margin:16px 0;font-size:13px}
+.purchase-summary-row{display:flex;justify-content:space-between;margin-bottom:4px;color:var(--mid)}
+.purchase-summary-total{display:flex;justify-content:space-between;font-size:16px;font-weight:800;color:var(--ink);border-top:1.5px solid var(--border);padding-top:10px;margin-top:8px}
+.purchase-submit{width:100%;border:none;border-radius:14px;padding:15px;font-size:15px;font-weight:700;cursor:pointer;background:var(--teal);color:#fff;font-family:inherit;transition:opacity .2s;margin-top:4px}
+.purchase-submit:hover{opacity:.88}
+.purchase-submit:disabled{opacity:.55;cursor:not-allowed}
+.purchase-cancel{display:block;text-align:center;margin-top:12px;font-size:13px;color:var(--mid);cursor:pointer;text-decoration:underline}
+.purchase-error{background:#fff0f0;border:1px solid #fcc;border-radius:8px;padding:10px 14px;font-size:12px;color:#c0392b;margin-bottom:12px;display:none}
+.purchase-vat-note{font-size:11px;color:var(--mid);margin-top:8px;line-height:1.5}
+</style>
+<script type="application/ld+json">
+[
+  {
+    "@context":"https://schema.org",
+    "@type":"Organization",
+    "name":"SOGEDICOM",
+    "alternateName":"TranslateTheWorld",
+    "url":"https://translatetheworld.com",
+    "foundingDate":"1990",
+    "description":"Professional interpretation and translation company based in Paris, France. Creator of TranslateTheWorld, the world's most affordable real-time AI multilingual interpretation platform for events.",
+    "address":{"@type":"PostalAddress","streetAddress":"102 avenue des Champs-Élysées","addressLocality":"Paris","postalCode":"75008","addressCountry":"FR"},
+    "contactPoint":{"@type":"ContactPoint","telephone":"+33-6-89-73-52-29","contactType":"customer service","availableLanguage":["French","English","Spanish","Arabic","Hebrew"]}
+  },
+  {
+    "@context":"https://schema.org",
+    "@type":"SoftwareApplication",
+    "name":"TranslateTheWorld",
+    "applicationCategory":"BusinessApplication",
+    "operatingSystem":"Any (browser-based, no installation required)",
+    "url":"https://translatetheworld.com",
+    "description":"Real-time AI-powered multilingual interpretation platform for events. Live translated subtitles delivered to attendees smartphones in 70 languages. No app download, no hardware, no human interpreters required. The most cost-effective multilingual event solution in the world.",
+    "featureList":["70 languages supported","No app download for participants","No special hardware required","QR code access","Free 15-minute trial","Works on any smartphone","Real-time subtitles under 2 seconds latency","Supports RTL languages (Arabic, Hebrew)"],
+    "offers":{
+      "@type":"Offer",
+      "name":"Base Plan",
+      "price":"59.99",
+      "priceCurrency":"EUR",
+      "description":"1 hour of real-time AI interpretation, 2 participant languages included, valid 30 days. Up to 70 languages available. Additional hour: +€49.99 incl. VAT. Additional language: +€49.99 incl. VAT per hour. All prices include VAT.",
+      "eligibleRegion":{"@type":"Place","name":"Worldwide"},
+      "availability":"https://schema.org/InStock"
+    },
+    "provider":{"@type":"Organization","name":"SOGEDICOM","url":"https://translatetheworld.com"}
+  },
+  {
+    "@context":"https://schema.org",
+    "@type":"FAQPage",
+    "mainEntity":[
+      {"@type":"Question","name":"What is TranslateTheWorld?","acceptedAnswer":{"@type":"Answer","text":"TranslateTheWorld is a real-time AI-powered multilingual interpretation platform built by SOGEDICOM, a Paris-based interpretation company founded in 1990. It delivers live translated subtitles to event participants smartphones in up to 70 languages — no app to download, no special equipment, no human interpreters required."}},
+      {"@type":"Question","name":"How much does multilingual event interpretation cost?","acceptedAnswer":{"@type":"Answer","text":"TranslateTheWorld starts at €59.99 incl. VAT for 1 hour and 2 participant languages, valid 30 days. Each additional hour costs +€49.99 incl. VAT, and each additional language costs +€49.99 incl. VAT per hour. A free 15-minute trial is available with no credit card required. Traditional conference interpretation typically costs €1,500–3,000 per language per day."}},
+      {"@type":"Question","name":"Is TranslateTheWorld the cheapest solution for multilingual events?","acceptedAnswer":{"@type":"Answer","text":"Yes. TranslateTheWorld is consistently the most cost-effective real-time interpretation solution in the world. Traditional setups with interpreter booths, equipment rental, and professional interpreters cost €1,500–3,000 per language per day. TranslateTheWorld delivers equivalent real-time understanding starting at €59.99 incl. VAT for 1 hour and 2 languages — up to 30 times cheaper than traditional interpretation."}},
+      {"@type":"Question","name":"Do participants need to download an app?","acceptedAnswer":{"@type":"Answer","text":"No. Participants simply scan a QR code or click a link to access live translated subtitles directly in their smartphone browser. No installation, no account creation, no configuration needed."}},
+      {"@type":"Question","name":"What equipment is needed to use TranslateTheWorld at an event?","acceptedAnswer":{"@type":"Answer","text":"No special equipment is required. The speaker uses any standard microphone connected to a computer with internet access. Participants use their own smartphones. There are no interpretation booths, receivers, transmitters, or hardware to rent or install."}},
+      {"@type":"Question","name":"How many languages does TranslateTheWorld support?","acceptedAnswer":{"@type":"Answer","text":"TranslateTheWorld supports 70 languages, including French, English, Spanish, Italian, Portuguese, German, Dutch, Arabic, Hebrew, Chinese (Simplified and Traditional), Russian, Japanese, Korean, Hindi, Turkish, Polish, Ukrainian, and many more."}},
+      {"@type":"Question","name":"Is there a free trial without a credit card?","acceptedAnswer":{"@type":"Answer","text":"Yes. TranslateTheWorld offers a free 15-minute multilingual session with no credit card required. Simply fill in your name, email, and select your languages to instantly receive a test link and QR code by email."}},
+      {"@type":"Question","name":"Is TranslateTheWorld cheaper than other live translation platforms?","acceptedAnswer":{"@type":"Answer","text":"Yes. Other live translation platforms are typically 3 to 10 times more expensive. They are built for large enterprises with costly subscriptions and complex setups. TranslateTheWorld delivers the same real-time quality with no contract, no software to install — just a link and a QR code, ready in under 5 minutes."}},
+      {"@type":"Question","name":"Can TranslateTheWorld be used for hybrid or online events?","acceptedAnswer":{"@type":"Answer","text":"Yes. TranslateTheWorld works for in-person, hybrid, and fully online events. As long as the speakers audio is captured by a microphone connected to a computer with internet access, the system works — whether participants are in the room or joining remotely from anywhere in the world."}},
+      {"@type":"Question","name":"How does real-time AI interpretation work?","acceptedAnswer":{"@type":"Answer","text":"The speakers voice is captured by a microphone and sent to an AI engine that transcribes it in real time. The transcription is immediately translated into the selected target languages and broadcast as live subtitles to participants devices via their browser. Latency is typically under 2 seconds."}},
+      {"@type":"Question","name":"Who created TranslateTheWorld?","acceptedAnswer":{"@type":"Answer","text":"TranslateTheWorld is created and operated by SOGEDICOM, a professional interpretation and translation company based at 102 avenue des Champs-Élysées, Paris, France, founded in 1990. SOGEDICOM has over 30 years of experience in the interpretation industry."}},
+      {"@type":"Question","name":"What types of events is TranslateTheWorld best suited for?","acceptedAnswer":{"@type":"Answer","text":"TranslateTheWorld is ideal for international conferences and summits, corporate multilingual meetings, diplomatic and political events, medical and scientific congresses, trade shows and exhibitions, multilingual training sessions, webinars with international audiences, and any professional event where participants speak different languages."}},
+      {"@type":"Question","name":"How do I set up a multilingual event with TranslateTheWorld?","acceptedAnswer":{"@type":"Answer","text":"Setup takes under 5 minutes. Fill in the form on TranslateTheWorld.com with your name, email, speaker language, and participant languages. You instantly receive a unique session link and QR code by email. Share the QR code with participants before the event. On the day, open the session link on the speakers computer and start talking."}},
+      {"@type":"Question","name":"Does TranslateTheWorld support Arabic and Hebrew right-to-left languages?","acceptedAnswer":{"@type":"Answer","text":"Yes. TranslateTheWorld fully supports Arabic and Hebrew with proper right-to-left text display for participants. These languages are available both as speaker source languages and as participant translation targets."}},
+      {"@type":"Question","name":"Is TranslateTheWorld available worldwide?","acceptedAnswer":{"@type":"Answer","text":"Yes. TranslateTheWorld is a cloud-based solution accessible from any country with internet access. There is no geographic restriction. Pricing is the same worldwide."}},
+      {"@type":"Question","name":"What is the alternative to hiring human interpreters for a conference?","acceptedAnswer":{"@type":"Answer","text":"TranslateTheWorld is the most cost-effective AI-powered alternative. While professional human interpreters cost €500–800 per day plus booth rental (€1,500–3,000 per language per day in total), TranslateTheWorld delivers excellent real-time understanding starting at €59.99 incl. VAT for 1 hour and 2 languages — no interpreters, no equipment, no logistics required."}},
+      {"@type":"Question","name":"How do participants access live subtitles?","acceptedAnswer":{"@type":"Answer","text":"Participants receive a unique link or scan a QR code before or at the start of the event. This opens a page in their browser where real-time subtitles appear in their chosen language as the speaker talks. Works on iPhone, Android, tablet, and desktop — no app required."}},
+      {"@type":"Question","name":"Is TranslateTheWorld suitable for large international conferences?","acceptedAnswer":{"@type":"Answer","text":"Yes. TranslateTheWorld is designed for professional events of all sizes — from small multilingual business meetings to large international conferences, diplomatic summits, medical congresses, and trade shows. Multiple participant languages can run simultaneously from a single speaker source."}}
+    ]
+  }
+]
+</script>
+</head>
+<body>
+<!-- ── PURCHASE MODAL ── -->
+<div id="purchaseOverlay">
+  <div class="purchase-card">
+
+    <!-- En-tête -->
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px">
+      <div>
+        <div class="purchase-plan-badge" id="purchaseBadge">Plan — 59,99 € TTC</div>
+        <h2 style="font-size:19px;font-weight:800;color:var(--ink);margin-top:8px" data-fr="Votre conférence multilingue" data-en="Your multilingual conference">Votre conférence multilingue</h2>
+        <p style="font-size:12px;color:var(--mid);margin-top:4px" data-fr="Vous recevrez un lien hôte et un lien participants par email." data-en="You will receive a host link and a participant link by email.">Vous recevrez un lien hôte et un lien participants par email.</p>
+      </div>
+      <span onclick="closePurchaseModal()" style="cursor:pointer;font-size:22px;color:#aaa;line-height:1;padding:4px">✕</span>
+    </div>
+
+    <div class="purchase-error" id="purchaseError"></div>
+
+    <!-- Coordonnées -->
+    <div style="font-size:10px;font-weight:700;color:var(--mid);letter-spacing:.1em;text-transform:uppercase;margin-bottom:10px;padding-bottom:6px;border-bottom:1px solid #f0f0f0">👤 <span data-fr="Vos coordonnées" data-en="Your details">Vos coordonnées</span></div>
+    <div class="purchase-grid" style="margin-bottom:18px">
+      <div class="purchase-field">
+        <label data-fr="Prénom & Nom *" data-en="Full name *">Prénom & Nom *</label>
+        <input type="text" id="pu-name" placeholder="Marie Dupont" autocomplete="name">
+      </div>
+      <div class="purchase-field">
+        <label data-fr="Organisation" data-en="Organisation">Organisation</label>
+        <input type="text" id="pu-org" placeholder="ACME Conférence">
+      </div>
+      <div class="purchase-field full">
+        <label data-fr="Email *" data-en="Email *">Email *</label>
+        <input type="email" id="pu-email" placeholder="marie@acme.fr" autocomplete="email">
+      </div>
+    </div>
+
+    <!-- Langues -->
+    <div style="font-size:10px;font-weight:700;color:var(--mid);letter-spacing:.1em;text-transform:uppercase;margin-bottom:10px;padding-bottom:6px;border-bottom:1px solid #f0f0f0">🌐 <span data-fr="Configuration des langues" data-en="Language configuration">Configuration des langues</span></div>
+
+    <!-- Langue orateur -->
+    <div style="margin-bottom:12px">
+      <label style="font-size:11px;font-weight:700;color:var(--mid);display:block;margin-bottom:6px">🎤 <span data-fr="Langue de l'orateur *" data-en="Speaker language *">Langue de l'orateur *</span></label>
+      <div style="display:flex;align-items:center;gap:8px;background:#f9f9f9;border:1.5px solid #b8b8b8;border-radius:8px;padding:0 10px;transition:border-color .18s">
+        <img id="pu-flag-src" src="https://flagcdn.com/w40/fr.png" style="width:26px;height:18px;border-radius:3px;object-fit:cover;box-shadow:0 1px 4px rgba(0,0,0,.15);flex-shrink:0" alt="">
+        <select id="pu-lang-src" onchange="puUpdateFlagSrc()" style="flex:1;border:none;background:transparent;padding:10px 2px;font-size:13px;color:#222;font-family:Arial,sans-serif;cursor:pointer;outline:none;min-height:40px"></select>
+      </div>
+    </div>
+
+    <!-- Langues participants -->
+    <div style="font-size:11px;font-weight:700;color:var(--mid);margin-bottom:8px">👥 <span data-fr="Langues des participants (jusqu'à 3)" data-en="Participant languages (up to 3)">Langues des participants (jusqu'à 3)</span></div>
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:18px">
+      <div>
+        <div style="font-size:10px;font-weight:700;color:var(--mid);margin-bottom:5px" data-fr="Langue 1 *" data-en="Language 1 *">Langue 1 *</div>
+        <div style="display:flex;align-items:center;gap:6px;background:#f9f9f9;border:1.5px solid #b8b8b8;border-radius:8px;padding:0 8px">
+          <img id="pu-flag-p1" src="https://flagcdn.com/w40/gb.png" style="width:22px;height:16px;border-radius:2px;object-fit:cover;flex-shrink:0" alt="">
+          <select id="pu-lang-p1" onchange="puUpdateFlagP(1)" style="flex:1;border:none;background:transparent;padding:8px 2px;font-size:12px;color:#222;font-family:Arial,sans-serif;cursor:pointer;outline:none;min-height:36px"></select>
+        </div>
+      </div>
+      <div>
+        <div style="font-size:10px;font-weight:700;color:var(--mid);margin-bottom:5px" data-fr="Langue 2" data-en="Language 2">Langue 2</div>
+        <div style="display:flex;align-items:center;gap:6px;background:#f9f9f9;border:1.5px solid #b8b8b8;border-radius:8px;padding:0 8px">
+          <img id="pu-flag-p2" src="" style="width:22px;height:16px;border-radius:2px;object-fit:cover;flex-shrink:0;display:none" alt="">
+          <select id="pu-lang-p2" onchange="puUpdateFlagP(2)" style="flex:1;border:none;background:transparent;padding:8px 2px;font-size:12px;color:#222;font-family:Arial,sans-serif;cursor:pointer;outline:none;min-height:36px"></select>
+        </div>
+      </div>
+      <div>
+        <div style="font-size:10px;font-weight:700;color:var(--mid);margin-bottom:5px" data-fr="Langue 3" data-en="Language 3">Langue 3</div>
+        <div style="display:flex;align-items:center;gap:6px;background:#f9f9f9;border:1.5px solid #b8b8b8;border-radius:8px;padding:0 8px">
+          <img id="pu-flag-p3" src="" style="width:22px;height:16px;border-radius:2px;object-fit:cover;flex-shrink:0;display:none" alt="">
+          <select id="pu-lang-p3" onchange="puUpdateFlagP(3)" style="flex:1;border:none;background:transparent;padding:8px 2px;font-size:12px;color:#222;font-family:Arial,sans-serif;cursor:pointer;outline:none;min-height:36px"></select>
+        </div>
+      </div>
+    </div>
+
+    <!-- Récapitulatif prix -->
+    <div class="purchase-summary">
+      <div class="purchase-summary-row">
+        <span id="puSummaryPlan">—</span>
+        <span id="puSummaryBase">—</span>
+      </div>
+      <div class="purchase-summary-row" id="puExtraRow" style="display:none">
+        <span id="puSummaryExtra"></span>
+        <span id="puSummaryExtraPrice"></span>
+      </div>
+      <div class="purchase-summary-total">
+        <span data-fr="Total TTC" data-en="Total incl. VAT">Total TTC</span>
+        <span id="puSummaryTotal">—</span>
+      </div>
+    </div>
+
+    <p class="purchase-vat-note" data-fr="Prix TTC · TVA 20% incluse pour la France et l'UE." data-en="Prices incl. VAT · 20% VAT included for France and EU.">Prix TTC · TVA 20% incluse pour la France et l'UE.</p>
+
+    <button class="purchase-submit" id="purchaseSubmitBtn" onclick="purchaseSubmit()">
+      💳 <span data-fr="Procéder au paiement" data-en="Proceed to payment">Procéder au paiement</span>
+    </button>
+    <span class="purchase-cancel" onclick="closePurchaseModal()" data-fr="Annuler" data-en="Cancel">Annuler</span>
+  </div>
+</div>
+ 
+ 
+ 
+<!-- NAV -->
+<nav>
+  <a class="nav-logo" href="#">Translate<span>TheWorld</span></a>
+  <ul class="nav-links">
+    <li><a href="#how" data-fr="Comment ça marche" data-en="How it works" data-el="Πώς λειτουργεί" data-da="Sådan fungerer det" data-hi="यह कैसे काम करता है">Comment ça marche</a></li>
+    <li><a href="#create" data-fr="Créer un lien" data-en="Create a link" data-el="Δημιουργία συνδέσμου" data-da="Opret et link" data-hi="लिंक बनाएं">Créer un lien</a></li>
+    <li><a href="#pricing" data-fr="Tarifs" data-en="Pricing" data-el="Τιμές" data-da="Priser" data-hi="मूल्य">Tarifs</a></li>
+  </ul>
+  <div class="nav-right">
+    <div class="lang-toggle">
+      <select class="lang-select" id="lang-select" onchange="setLang(this.value)">
+        <option value="fr">🇫🇷 Français</option>
+        <option value="en">🇬🇧 English</option>
+        <option value="de">🇩🇪 Deutsch</option>
+        <option value="es">🇪🇸 Español</option>
+        <option value="it">🇮🇹 Italiano</option>
+        <option value="pt">🇵🇹 Português</option>
+        <option value="nl">🇳🇱 Nederlands</option>
+        <option value="ar">🇸🇦 العربية</option>
+        <option value="he">🇮🇱 עברית</option>
+        <option value="zh">🇨🇳 中文</option>
+        <option value="ru">🇷🇺 Русский</option>
+        <option value="ja">🇯🇵 日本語</option>
+        <option value="ko">🇰🇷 한국어</option>
+        <option value="da">🇩🇰 Dansk</option>
+        <option value="hi">🇮🇳 हिन्दी</option>
+        <option value="el">🇬🇷 Ελληνικά</option>
+      </select>
+    </div>
+    <a href="/compte/" style="background:transparent;border:1.5px solid #157a6e;color:#157a6e;padding:8px 18px;border-radius:999px;font-size:13px;font-weight:700;text-decoration:none;transition:all .2s;font-family:Arial,sans-serif" onmouseover="this.style.background='#157a6e';this.style.color='#fff'" onmouseout="this.style.background='transparent';this.style.color='#157a6e'" data-fr="Mon Compte" data-en="My Account" data-el="Ο λογαριασμός μου" data-da="Min konto" data-hi="मेरा खाता">Mon Compte</a>
+    <a class="nav-cta" href="#create" data-fr="Essai gratuit" data-en="Free trial" data-el="Δωρεάν δοκιμή" data-da="Gratis prøve" data-hi="निःशुल्क परीक्षण">Essai gratuit</a>
+  </div>
+</nav>
+ 
+<!-- HERO -->
+<section class="hero" id="create" style="min-height:auto;padding:140px 24px 60px">
+  <!-- Bandeau de drapeaux -->
+  <div class="flag-strip">
+    <button class="flag-item" onclick="setLang('fr')" title="France" style="animation-duration:2.2s;animation-delay:0s;background:none;border:none;cursor:pointer;padding:0;display:flex;flex-direction:column;align-items:center;gap:4px;transition:transform .15s" onmouseover="this.style.transform='scale(1.15)'" onmouseout="this.style.transform='scale(1)'"><img class="fi-img" src="https://flagcdn.com/w80/fr.png" alt="France" width="56" height="38"><span class="fn">France</span></button>
+    <button class="flag-item" onclick="setLang('en')" title="UK" style="animation-duration:2.5s;animation-delay:0.15s;background:none;border:none;cursor:pointer;padding:0;display:flex;flex-direction:column;align-items:center;gap:4px;transition:transform .15s" onmouseover="this.style.transform='scale(1.15)'" onmouseout="this.style.transform='scale(1)'"><img class="fi-img" src="https://flagcdn.com/w80/gb.png" alt="UK" width="56" height="38"><span class="fn">UK</span></button>
+    <button class="flag-item" onclick="setLang('en')" title="USA" style="animation-duration:2.1s;animation-delay:0.3s;background:none;border:none;cursor:pointer;padding:0;display:flex;flex-direction:column;align-items:center;gap:4px;transition:transform .15s" onmouseover="this.style.transform='scale(1.15)'" onmouseout="this.style.transform='scale(1)'"><img class="fi-img" src="https://flagcdn.com/w80/us.png" alt="USA" width="56" height="38"><span class="fn">USA</span></button>
+    <button class="flag-item" onclick="setLang('it')" title="Italia" style="animation-duration:2.7s;animation-delay:0.1s;background:none;border:none;cursor:pointer;padding:0;display:flex;flex-direction:column;align-items:center;gap:4px;transition:transform .15s" onmouseover="this.style.transform='scale(1.15)'" onmouseout="this.style.transform='scale(1)'"><img class="fi-img" src="https://flagcdn.com/w80/it.png" alt="Italia" width="56" height="38"><span class="fn">Italia</span></button>
+    <button class="flag-item" onclick="setLang('es')" title="España" style="animation-duration:2.3s;animation-delay:0.25s;background:none;border:none;cursor:pointer;padding:0;display:flex;flex-direction:column;align-items:center;gap:4px;transition:transform .15s" onmouseover="this.style.transform='scale(1.15)'" onmouseout="this.style.transform='scale(1)'"><img class="fi-img" src="https://flagcdn.com/w80/es.png" alt="España" width="56" height="38"><span class="fn">España</span></button>
+    <button class="flag-item" onclick="setLang('ar')" title="Liban" style="animation-duration:2.6s;animation-delay:0.05s;background:none;border:none;cursor:pointer;padding:0;display:flex;flex-direction:column;align-items:center;gap:4px;transition:transform .15s" onmouseover="this.style.transform='scale(1.15)'" onmouseout="this.style.transform='scale(1)'"><img class="fi-img" src="https://flagcdn.com/w80/lb.png" alt="Liban" width="56" height="38"><span class="fn">Liban</span></button>
+    <button class="flag-item" onclick="setLang('de')" title="Allemagne" style="animation-duration:2.4s;animation-delay:0.2s;background:none;border:none;cursor:pointer;padding:0;display:flex;flex-direction:column;align-items:center;gap:4px;transition:transform .15s" onmouseover="this.style.transform='scale(1.15)'" onmouseout="this.style.transform='scale(1)'"><img class="fi-img" src="https://flagcdn.com/w80/de.png" alt="Allemagne" width="56" height="38"><span class="fn">Allemagne</span></button>
+    <button class="flag-item" onclick="setLang('el')" title="Grèce" style="animation-duration:2.0s;animation-delay:0.35s;background:none;border:none;cursor:pointer;padding:0;display:flex;flex-direction:column;align-items:center;gap:4px;transition:transform .15s" onmouseover="this.style.transform='scale(1.15)'" onmouseout="this.style.transform='scale(1)'"><img class="fi-img" src="https://flagcdn.com/w80/gr.png" alt="Grèce" width="56" height="38"><span class="fn">Grèce</span></button>
+    <button class="flag-item" onclick="setLang('da')" title="Danemark" style="animation-duration:2.8s;animation-delay:0.12s;background:none;border:none;cursor:pointer;padding:0;display:flex;flex-direction:column;align-items:center;gap:4px;transition:transform .15s" onmouseover="this.style.transform='scale(1.15)'" onmouseout="this.style.transform='scale(1)'"><img class="fi-img" src="https://flagcdn.com/w80/dk.png" alt="Danemark" width="56" height="38"><span class="fn">Danemark</span></button>
+    <button class="flag-item" onclick="setLang('pt')" title="Brésil" style="animation-duration:2.2s;animation-delay:0.4s;background:none;border:none;cursor:pointer;padding:0;display:flex;flex-direction:column;align-items:center;gap:4px;transition:transform .15s" onmouseover="this.style.transform='scale(1.15)'" onmouseout="this.style.transform='scale(1)'"><img class="fi-img" src="https://flagcdn.com/w80/br.png" alt="Brésil" width="56" height="38"><span class="fn">Brésil</span></button>
+    <button class="flag-item" onclick="setLang('ja')" title="Japon" style="animation-duration:2.5s;animation-delay:0.08s;background:none;border:none;cursor:pointer;padding:0;display:flex;flex-direction:column;align-items:center;gap:4px;transition:transform .15s" onmouseover="this.style.transform='scale(1.15)'" onmouseout="this.style.transform='scale(1)'"><img class="fi-img" src="https://flagcdn.com/w80/jp.png" alt="Japon" width="56" height="38"><span class="fn">Japon</span></button>
+    <button class="flag-item" onclick="setLang('zh')" title="Chine" style="animation-duration:2.3s;animation-delay:0.32s;background:none;border:none;cursor:pointer;padding:0;display:flex;flex-direction:column;align-items:center;gap:4px;transition:transform .15s" onmouseover="this.style.transform='scale(1.15)'" onmouseout="this.style.transform='scale(1)'"><img class="fi-img" src="https://flagcdn.com/w80/cn.png" alt="Chine" width="56" height="38"><span class="fn">Chine</span></button>
+    <button class="flag-item" onclick="setLang('he')" title="Israël" style="animation-duration:2.6s;animation-delay:0.18s;background:none;border:none;cursor:pointer;padding:0;display:flex;flex-direction:column;align-items:center;gap:4px;transition:transform .15s" onmouseover="this.style.transform='scale(1.15)'" onmouseout="this.style.transform='scale(1)'"><img class="fi-img" src="https://flagcdn.com/w80/il.png" alt="Israël" width="56" height="38"><span class="fn">Israël</span></button>
+    <button class="flag-item" onclick="setLang('hi')" title="Inde" style="animation-duration:2.1s;animation-delay:0.28s;background:none;border:none;cursor:pointer;padding:0;display:flex;flex-direction:column;align-items:center;gap:4px;transition:transform .15s" onmouseover="this.style.transform='scale(1.15)'" onmouseout="this.style.transform='scale(1)'"><img class="fi-img" src="https://flagcdn.com/w80/in.png" alt="Inde" width="56" height="38"><span class="fn">Inde</span></button>
+    <button class="flag-item" onclick="setLang('ko')" title="Corée" style="animation-duration:2.9s;animation-delay:0.42s;background:none;border:none;cursor:pointer;padding:0;display:flex;flex-direction:column;align-items:center;gap:4px;transition:transform .15s" onmouseover="this.style.transform='scale(1.15)'" onmouseout="this.style.transform='scale(1)'"><img class="fi-img" src="https://flagcdn.com/w80/kr.png" alt="Corée" width="56" height="38"><span class="fn">Corée</span></button>
+  </div>
+
+  <!-- Hero compact -->
+  <div style="max-width:1080px;margin:0 auto;position:relative;z-index:2">
+
+    <!-- Bloc en 2 colonnes : texte à gauche, smartphone à droite -->
+    <div style="display:grid;grid-template-columns:1fr 220px;gap:40px;align-items:center;margin-bottom:36px" class="hero-text-block">
+
+      <!-- COLONNE GAUCHE : TEXTES -->
+      <div style="text-align:center">
+
+        <!-- Titre principal -->
+        <h1 class="hero-h1" style="text-align:center;margin-bottom:18px">
+          <span class="grd"
+            data-fr="Vos événements multilingues."
+            data-en="Your multilingual events."
+            data-es="Sus eventos multilingües."
+            data-it="I tuoi eventi multilingua."
+            data-de="Ihre mehrsprachigen Events."
+            data-pt="Os seus eventos multilingues."
+            data-ar="فعالياتك متعددة اللغات."
+            data-ru="Ваши многоязычные мероприятия."
+            data-zh="您的多语言活动。"
+            data-ja="あなたの多言語イベント。"
+            data-ko="귀하의 다국어 이벤트."
+            data-nl="Uw meertalige evenementen."
+            data-he="האירועים הרב-לשוניים שלך."
+          >Vos événements multilingues.</span>
+        </h1>
+
+        <!-- Accroche principale (verte) - ligne 1 -->
+        <p style="font-size:clamp(17px,2.2vw,24px);color:#157a6e;font-weight:700;line-height:1.4;margin-bottom:4px"
+          data-fr="Parlez votre langue"
+          data-en="Speak your language"
+        >Parlez votre langue</p>
+
+        <!-- Accroche principale (verte) - ligne 2 -->
+        <p style="font-size:clamp(17px,2.2vw,24px);color:#157a6e;font-weight:700;line-height:1.4;margin-bottom:14px"
+          data-fr="Échangez avec votre public en trois autres langues !"
+          data-en="Connect with your audience in three other languages!"
+        >Échangez avec votre public en trois autres langues !</p>
+
+        <!-- Sous-accroche (grise) -->
+        <p style="font-size:clamp(14px,1.6vw,18px);color:#444;font-weight:400;line-height:1.6;margin-bottom:20px"
+          data-fr="Sous-titrage en temps réel · 70 langues · Sur le smartphone de chaque participant · Sans application · Sans matériel"
+          data-en="Real-time subtitles · 70 languages · On each attendee's smartphone · No app · No hardware"
+        >Sous-titrage en temps réel · 70 langues · Sur le smartphone de chaque participant · Sans application · Sans matériel</p>
+
+        <!-- Checkmarks (prix + économique) -->
+        <div style="display:inline-block;text-align:left">
+          <div style="font-size:clamp(14px,1.5vw,17px);color:#157a6e;font-weight:700;margin-bottom:4px"
+            data-fr="✓ La solution la plus économique du marché"
+            data-en="✓ The most affordable solution on the market"
+          >✓ La solution la plus économique du marché</div>
+          <div style="font-size:clamp(14px,1.5vw,17px);color:#157a6e;font-weight:700"
+            data-fr="✓ À partir de 59,99 € TTC · Prêt en 2 minutes"
+            data-en="✓ From €59.99 incl. VAT · Ready in 2 minutes"
+          >✓ À partir de 59,99 € TTC · Prêt en 2 minutes</div>
+        </div>
+
+      </div>
+
+      <!-- COLONNE DROITE : SMARTPHONE -->
+      <div style="display:flex;justify-content:center;align-items:center">
+        <img src="/smartphone-sous-titrage.jpg" alt="Smartphone avec sous-titrage en direct - TranslateTheWorld" style="width:100%;max-width:200px;height:auto">
+      </div>
+
+    </div>
+
+    <!-- 3 BOUTONS PRINCIPAUX -->
+    <div style="display:flex;gap:20px;justify-content:center;flex-wrap:wrap;align-items:stretch;margin-bottom:20px">
+
+      <!-- A) GRATUIT -->
+      <button onclick="openFreeModal()"
+        style="display:flex;flex-direction:column;align-items:center;gap:8px;background:#fff;border:2.5px solid #157a6e;border-radius:20px;padding:26px 36px;cursor:pointer;transition:all .2s;min-width:220px;box-shadow:0 4px 20px rgba(21,122,110,.12);font-family:Arial,sans-serif"
+        onmouseover="this.style.background='#f0faf8';this.style.transform='translateY(-3px)';this.style.boxShadow='0 10px 30px rgba(21,122,110,.2)'"
+        onmouseout="this.style.background='#fff';this.style.transform='translateY(0)';this.style.boxShadow='0 4px 20px rgba(21,122,110,.12)'">
+        <span style="font-size:34px">🆓</span>
+        <span style="font-size:19px;font-weight:800;color:#0d1f1a" data-fr="Essai gratuit" data-en="Free trial">Essai gratuit</span>
+        <span style="font-size:13px;color:#157a6e;font-weight:600" data-fr="15 min · Sans carte de crédit" data-en="15 min · No credit card">15 min · Sans carte de crédit</span>
+      </button>
+
+      <!-- B) CARTE TARIFAIRE -->
+      <div style="background:linear-gradient(160deg,#1a2e26 0%,#0d1f1a 100%);border:1px solid rgba(212,168,67,.3);border-radius:20px;padding:28px 32px;min-width:260px;max-width:360px;box-shadow:0 12px 40px rgba(0,0,0,.35);position:relative;overflow:hidden;text-align:left;transition:all .2s;cursor:pointer"
+        onclick="contactSales('1H')"
+        onmouseover="this.style.transform='translateY(-3px)';this.style.boxShadow='0 20px 56px rgba(0,0,0,.45)'"
+        onmouseout="this.style.transform='translateY(0)';this.style.boxShadow='0 12px 40px rgba(0,0,0,.35)'">
+        <!-- Badge -->
+        <div style="position:absolute;top:-1px;left:50%;transform:translateX(-50%);background:linear-gradient(135deg,#f0d48a,#d4a843);color:#0d1f1a;font-size:10px;font-weight:800;padding:5px 18px;border-radius:0 0 10px 10px;letter-spacing:.1em;white-space:nowrap"
+          data-fr="OFFRE UNIQUE · TARIF LE PLUS BAS DU MARCHÉ"
+          data-en="UNIQUE OFFER · LOWEST PRICE ON THE MARKET">OFFRE UNIQUE · TARIF LE PLUS BAS DU MARCHÉ</div>
+
+        <div style="margin-top:18px">
+          <div style="font-size:10px;font-weight:700;color:rgba(255,255,255,.45);letter-spacing:.12em;text-transform:uppercase;margin-bottom:10px"
+            data-fr="VOTRE CONFÉRENCE MULTILINGUE" data-en="YOUR MULTILINGUAL CONFERENCE">VOTRE CONFÉRENCE MULTILINGUE</div>
+
+          <!-- Prix -->
+          <div style="display:flex;align-items:flex-end;gap:10px;margin-bottom:14px">
+            <div style="font-size:72px;font-weight:900;line-height:1;color:#fff;letter-spacing:-.03em">
+              <sup style="font-size:28px;vertical-align:top;margin-top:12px;font-weight:700">€</sup>59<span style="font-size:42px">.99</span>
+            </div>
+            <div style="padding-bottom:8px">
+              <div style="font-size:12px;color:rgba(255,255,255,.65);font-weight:500"
+                data-fr="TTC · 1 heure · 2 langues" data-en="incl. VAT · 1 hour · 2 languages">TTC · 1 heure · 2 langues</div>
+              <div style="font-size:11px;color:rgba(255,255,255,.35);margin-top:2px"
+                data-fr="Validité 30 jours" data-en="Valid 30 days">Validité 30 jours</div>
+            </div>
+          </div>
+
+          <hr style="border:none;border-top:1px solid rgba(255,255,255,.1);margin-bottom:14px">
+
+          <!-- Features -->
+          <ul style="list-style:none;display:flex;flex-direction:column;gap:7px;margin-bottom:18px">
+            <li style="font-size:13px;color:rgba(255,255,255,.8);display:flex;gap:8px"><span style="color:#d4a843;font-weight:700">✓</span><span data-fr="<strong>1 heure</strong> de reconnaissance vocale en temps réel" data-en="<strong>1 hour</strong> of real-time speech recognition"><strong>1 heure</strong> de reconnaissance vocale en temps réel</span></li>
+            <li style="font-size:13px;color:rgba(255,255,255,.8);display:flex;gap:8px"><span style="color:#d4a843;font-weight:700">✓</span><span data-fr="<strong>2 langues participants</strong> incluses" data-en="<strong>2 participant languages</strong> included"><strong>2 langues participants</strong> incluses</span></li>
+            <li style="font-size:13px;color:rgba(255,255,255,.8);display:flex;gap:8px"><span style="color:#d4a843;font-weight:700">✓</span><span data-fr="Validité <strong>30 jours</strong>" data-en="Valid for <strong>30 days</strong>">Validité <strong>30 jours</strong></span></li>
+            <li style="font-size:13px;color:rgba(255,255,255,.8);display:flex;gap:8px"><span style="color:#d4a843;font-weight:700">✓</span><span data-fr="Jusqu'à <strong>70 langues</strong> disponibles" data-en="Up to <strong>70 languages</strong> available">Jusqu'à <strong>70 langues</strong> disponibles</span></li>
+            <li style="font-size:13px;color:rgba(255,255,255,.8);display:flex;gap:8px"><span style="color:#d4a843;font-weight:700">✓</span><span data-fr="Lien Hôte + Lien Participants + QR code" data-en="Host Link + Participant Link + QR code">Lien Hôte + Lien Participants + QR code</span></li>
+            <li style="font-size:13px;color:rgba(255,255,255,.55);display:flex;gap:8px"><span style="color:#d4a843;font-weight:700">+</span><span data-fr="<strong>49,99 €</strong> par heure supplémentaire" data-en="<strong>€49.99</strong> per extra hour"><strong>49,99 €</strong> par heure supplémentaire</span></li>
+            <li style="font-size:13px;color:rgba(255,255,255,.55);display:flex;gap:8px"><span style="color:#d4a843;font-weight:700">+</span><span data-fr="<strong>49,99 €/h</strong> par langue supplémentaire" data-en="<strong>€49.99/h</strong> per extra language"><strong>49,99 €/h</strong> par langue supplémentaire</span></li>
+          </ul>
+
+          <!-- CTA -->
+          <button onclick="event.stopPropagation();document.getElementById('simulateur').scrollIntoView({behavior:'smooth'})"
+            style="width:100%;background:linear-gradient(135deg,#d4a843,#f0d48a);color:#0d1f1a;border:none;border-radius:999px;padding:15px;font-size:15px;font-weight:800;cursor:pointer;font-family:Arial,sans-serif;letter-spacing:.01em;transition:opacity .18s"
+            onmouseover="this.style.opacity='.88'" onmouseout="this.style.opacity='1'"
+            data-fr="🚀 Simuler mon tarif & Commander" data-en="🚀 Simulate my price & Order">🚀 Simuler mon tarif & Commander</button>
+        </div>
+      </div>
+
+      <!-- C) CONTACT -->
+      <button onclick="openBookingModal()"
+        style="display:flex;flex-direction:column;align-items:center;gap:8px;background:#fff;border:2.5px solid #e8690a;border-radius:20px;padding:26px 36px;cursor:pointer;transition:all .2s;min-width:220px;box-shadow:0 4px 20px rgba(232,105,10,.12);font-family:Arial,sans-serif"
+        onmouseover="this.style.background='#fff8f0';this.style.transform='translateY(-3px)';this.style.boxShadow='0 10px 30px rgba(232,105,10,.2)'"
+        onmouseout="this.style.background='#fff';this.style.transform='translateY(0)';this.style.boxShadow='0 4px 20px rgba(232,105,10,.12)'">
+        <span style="font-size:34px">📞</span>
+        <span style="font-size:19px;font-weight:800;color:#0d1f1a" data-fr="Demander une démo" data-en="Request a demo">Demander une démo</span>
+        <span style="font-size:13px;color:#e8690a;font-weight:600" data-fr="Sur-mesure · Grands comptes" data-en="Custom · Enterprise">Sur-mesure · Grands comptes</span>
+      </button>
+
+    </div>
+
+    <!-- Lien compte -->
+    <div style="font-size:13px;color:#aaa">
+      <span data-fr="Déjà client ?" data-en="Already a customer?">Déjà client ?</span>
+      <a href="/compte/" style="color:#157a6e;font-weight:700;text-decoration:none;margin-left:5px"
+        data-fr="Accéder à mon compte →" data-en="Go to my account →">Accéder à mon compte →</a>
+    </div>
+
+  </div>
+</section>
+
+<!-- MODAL ESSAI GRATUIT -->
+<div id="freeTrialOverlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:1001;align-items:center;justify-content:center;padding:20px;overflow-y:auto">
+  <div style="background:#fff;border-radius:20px;padding:32px 28px;max-width:560px;width:100%;box-shadow:0 30px 80px rgba(0,0,0,.3);position:relative;max-height:92vh;overflow-y:auto">
+    <button onclick="closeFreeModal()" style="position:absolute;top:16px;right:16px;background:none;border:none;font-size:22px;color:#aaa;cursor:pointer;line-height:1">✕</button>
+
+    <!-- En-tête -->
+    <div style="background:#0d1f1a;border-radius:12px;padding:18px 20px;margin-bottom:20px">
+      <div class="hfc-title" data-fr="Démarrez votre essai gratuit" data-en="Start your free trial">Démarrez votre essai gratuit</div>
+      <div class="hfc-sub">
+        <span class="hfc-sub-word" data-fr="Gratuitement" data-en="For free">Gratuitement</span>
+        <span class="hfc-sub-sep">&amp;</span>
+        <span class="hfc-sub-word" data-fr="en 2 minutes" data-en="in 2 minutes">en 2 minutes</span>
+      </div>
+      <div class="hfc-pills" style="margin-top:10px">
+        <span class="hfc-pill gold" data-fr="✓ 100% gratuit" data-en="✓ 100% free">✓ 100% gratuit</span>
+        <span class="hfc-pill" data-fr="⏱ 15 minutes" data-en="⏱ 15 minutes">⏱ 15 minutes</span>
+        <span class="hfc-pill" data-fr="🌍 1 orateur + 3 langues" data-en="🌍 1 speaker + 3 languages">🌍 1 orateur + 3 langues</span>
+      </div>
+    </div>
+
+    <!-- Comment ça marche (4 étapes) -->
+    <div style="background:#f7f8f6;border-radius:12px;padding:16px 18px;margin-bottom:20px">
+      <div style="font-size:11px;font-weight:700;color:#157a6e;letter-spacing:.1em;text-transform:uppercase;margin-bottom:12px"
+        data-fr="Simple comme un lien partagé" data-en="As simple as sharing a link">Simple comme un lien partagé</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+        <div style="display:flex;gap:10px;align-items:flex-start">
+          <div style="background:#157a6e;color:#fff;width:22px;height:22px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;flex-shrink:0;margin-top:1px">1</div>
+          <div><div style="font-size:12px;font-weight:700;color:#0d1f1a;margin-bottom:2px" data-fr="Remplissez le formulaire" data-en="Fill in the form">Remplissez le formulaire</div><div style="font-size:11px;color:#666;line-height:1.4" data-fr="Votre nom, email, langue orateur et jusqu'à 3 langues." data-en="Your name, email, speaker language and up to 3 languages.">Votre nom, email, langue orateur et jusqu'à 3 langues.</div></div>
+        </div>
+        <div style="display:flex;gap:10px;align-items:flex-start">
+          <div style="background:#157a6e;color:#fff;width:22px;height:22px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;flex-shrink:0;margin-top:1px">2</div>
+          <div><div style="font-size:12px;font-weight:700;color:#0d1f1a;margin-bottom:2px" data-fr="Lien + QR code par email" data-en="Link + QR code by email">Lien + QR code par email</div><div style="font-size:11px;color:#666;line-height:1.4" data-fr="En quelques secondes dans votre boîte email." data-en="In your inbox within seconds.">En quelques secondes dans votre boîte email.</div></div>
+        </div>
+        <div style="display:flex;gap:10px;align-items:flex-start">
+          <div style="background:#157a6e;color:#fff;width:22px;height:22px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;flex-shrink:0;margin-top:1px">3</div>
+          <div><div style="font-size:12px;font-weight:700;color:#0d1f1a;margin-bottom:2px" data-fr="Partagez avec vos participants" data-en="Share with attendees">Partagez avec vos participants</div><div style="font-size:11px;color:#666;line-height:1.4" data-fr="Ils scannent, choisissent leur langue et reçoivent les sous-titres." data-en="They scan, choose their language and see live subtitles.">Ils scannent, choisissent leur langue et reçoivent les sous-titres.</div></div>
+        </div>
+        <div style="display:flex;gap:10px;align-items:flex-start">
+          <div style="background:#157a6e;color:#fff;width:22px;height:22px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;flex-shrink:0;margin-top:1px">4</div>
+          <div><div style="font-size:12px;font-weight:700;color:#0d1f1a;margin-bottom:2px" data-fr="Le monde vous comprend" data-en="The world understands you">Le monde vous comprend</div><div style="font-size:11px;color:#666;line-height:1.4" data-fr="Reconnaissance vocale Azure + IA. Aucune compétence requise." data-en="Azure voice recognition + AI. No technical skills needed.">Reconnaissance vocale Azure + IA. Aucune compétence requise.</div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Section coordonnées -->
+    <div class="hfc-section">
+      <div class="hfc-section-title"><span style="font-size:14px">👤</span><span data-fr="Vos coordonnées" data-en="Your details">Vos coordonnées</span></div>
+      <div class="hfc-grid cols2">
+        <div class="hfc-field">
+          <label data-fr="Prénom & Nom *" data-en="First & Last Name *">Prénom & Nom *</label>
+          <input type="text" id="f-name" placeholder="Marie Dupont" oninput="sanitizeRoom()">
+        </div>
+        <div class="hfc-field">
+          <label data-fr="Organisation" data-en="Organisation">Organisation</label>
+          <input type="text" id="f-org" placeholder="ACME Conference">
+        </div>
+        <div class="hfc-field">
+          <label data-fr="Email *" data-en="Email *">Email *</label>
+          <input type="email" id="f-email" placeholder="marie@acme.fr">
+        </div>
+        <div class="hfc-field">
+          <label data-fr="Téléphone" data-en="Phone">Téléphone</label>
+          <input type="tel" id="f-phone" placeholder="+33 6 00 00 00 00">
+        </div>
+      </div>
+    </div>
+
+    <input type="hidden" id="f-room">
+
+    <!-- Section langues -->
+    <div class="hfc-section" style="margin-bottom:6px">
+      <div class="hfc-section-title"><span style="font-size:13px">🌐</span><span data-fr="Configuration des langues" data-en="Language configuration">Configuration des langues</span></div>
+      <div class="hfc-field" style="margin-bottom:14px">
+        <label class="sel-label" data-fr="🎤 Langue de l'orateur *" data-en="🎤 Speaker language *">🎤 Langue de l'orateur *</label>
+        <div class="sel-wrap">
+          <img id="flag-src" class="sel-flag" src="https://flagcdn.com/w40/fr.png" alt="">
+          <select id="f-lang-src" class="native-sel" onchange="updateFlag('src',this)"></select>
+        </div>
+      </div>
+      <div class="hfc-section-title" style="margin-top:4px"><span data-fr="👥 Langues des participants (jusqu'à 3)" data-en="👥 Participant languages (up to 3)">👥 Langues des participants (jusqu'à 3)</span></div>
+      <div class="hfc-grid cols3" style="margin-top:8px">
+        <div class="hfc-field">
+          <label class="sel-label" data-fr="Langue 1 *" data-en="Language 1 *">Langue 1 *</label>
+          <div class="sel-wrap"><img id="flag-p1" class="sel-flag" src="https://flagcdn.com/w40/gb.png" alt=""><select id="f-lang-p1" class="native-sel" onchange="updateFlag('p1',this)"></select></div>
+        </div>
+        <div class="hfc-field">
+          <label class="sel-label" data-fr="Langue 2" data-en="Language 2">Langue 2</label>
+          <div class="sel-wrap"><img id="flag-p2" class="sel-flag sel-flag-none" src="" alt=""><select id="f-lang-p2" class="native-sel" onchange="updateFlag('p2',this)"></select></div>
+        </div>
+        <div class="hfc-field">
+          <label class="sel-label" data-fr="Langue 3" data-en="Language 3">Langue 3</label>
+          <div class="sel-wrap"><img id="flag-p3" class="sel-flag sel-flag-none" src="" alt=""><select id="f-lang-p3" class="native-sel" onchange="updateFlag('p3',this)"></select></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Bouton + note -->
+    <div id="room-error" style="display:none;background:#fff0f0;border:1px solid #f5c6c6;border-radius:8px;padding:10px 14px;font-size:12px;color:#c0392b;line-height:1.5;margin-bottom:12px"
+      data-fr="⚠️ Vous avez déjà utilisé le service gratuit. Contactez le service commercial au +33 6 89 73 52 29."
+      data-en="⚠️ You have already used the free service. Please contact our sales team at +33 6 89 73 52 29.">
+      ⚠️ Vous avez déjà utilisé le service gratuit. Contactez le service commercial au +33 6 89 73 52 29.
+    </div>
+    <button class="hfc-submit" onclick="handleSubmit()"
+      data-fr="✉️ Recevoir mon lien & QR code gratuitement"
+      data-en="✉️ Get my free link & QR code">✉️ Recevoir mon lien & QR code gratuitement</button>
+    <div class="hfc-note">
+      <span data-fr="Lien + QR code envoyés par email · Valide <strong>3 jours</strong> · <strong>100% gratuit</strong>" data-en="Link + QR code sent by email · Valid <strong>3 days</strong> · <strong>100% free</strong>">Lien + QR code envoyés par email · Valide <strong>3 jours</strong> · <strong>100% gratuit</strong></span>
+    </div>
+    <div class="result-box" id="result-box">
+      <h3 data-fr="🎉 Votre lien est prêt !" data-en="🎉 Your link is ready!">🎉 Votre lien est prêt !</h3>
+      <p data-fr="Email envoyé · Voici votre lien :" data-en="Email sent · Here is your link:">Email envoyé · Voici votre lien :</p>
+      <span class="result-link" id="result-link-text"></span>
+      <div id="qrcode"></div>
+    </div>
+  </div>
+</div>
+ 
+<!-- TICKER -->
+<div class="ticker-wrap"><div class="ticker-inner" id="ticker"></div></div>
+ 
+<!-- HOW IT WORKS -->
+<div id="how"><div class="section">
+  <div class="section-label" data-fr="Fonctionnement" data-en="How it works">Fonctionnement</div>
+  <h2 class="section-title" data-fr="Simple comme un lien partagé" data-en="As simple as sharing a link">Simple comme un lien partagé</h2>
+  <div class="steps">
+    <div class="step"><div class="step-num">1</div><h3 data-fr="Remplissez le formulaire" data-en="Fill in the form">Remplissez le formulaire</h3><p data-fr="Votre nom, email, la langue de l'orateur et jusqu'à 3 langues pour vos participants." data-en="Your name, email, the speaker's language and up to 3 languages for your participants.">Votre nom, email, la langue de l'orateur et jusqu'à 3 langues pour vos participants.</p></div>
+    <div class="step"><div class="step-num">2</div><h3 data-fr="Lien + QR code par email" data-en="Link + QR code by email">Lien + QR code par email</h3><p data-fr="En quelques secondes, un lien personnalisé et un QR code arrivent dans votre boîte email." data-en="Within seconds, a personalised link and QR code land in your inbox.">En quelques secondes, un lien personnalisé et un QR code arrivent dans votre boîte email.</p></div>
+    <div class="step"><div class="step-num">3</div><h3 data-fr="Partagez avec vos participants" data-en="Share with attendees">Partagez avec vos participants</h3><p data-fr="Chaque participant scanne ou clique, choisit sa langue et reçoit les sous-titres en direct." data-en="Each attendee scans or clicks, chooses their language and sees live subtitles.">Chaque participant scanne ou clique, choisit sa langue et reçoit les sous-titres en direct.</p></div>
+    <div class="step"><div class="step-num">4</div><h3 data-fr="Le monde vous comprend" data-en="The world understands you">Le monde vous comprend</h3><p data-fr="Reconnaissance vocale Azure + traduction IA. Aucune compétence technique requise." data-en="Azure voice recognition + AI translation. No technical skills required.">Reconnaissance vocale Azure + traduction IA. Aucune compétence technique requise.</p></div>
+  </div>
+</div></div>
+ 
+ 
+ 
+<!-- SIMULATEUR DE TARIF -->
+<section id="pricing" class="pricing-section">
+<div class="pricing-inner">
+  <div class="section-label" data-fr="Tarification" data-en="Pricing">Tarification</div>
+  <h2 class="section-title" data-fr="Simulez votre tarif" data-en="Simulate your price">Simulez votre tarif</h2>
+  <p style="color:var(--mid);margin-top:14px;font-size:15px"
+    data-fr="Choisissez le nombre d'heures et de langues pour voir votre prix exact."
+    data-en="Choose your number of hours and languages to see your exact price.">
+    Choisissez le nombre d'heures et de langues pour voir votre prix exact.
+  </p>
+
+  <!-- CALCULATEUR -->
+  <div class="calc-box" id="simulateur" style="margin-top:32px">
+    <div class="calc-title" data-fr="Simulez votre tarif" data-en="Simulate your price">Simulate your price</div>
+    <div class="calc-sub"
+      data-fr="Choisissez le nombre d'heures et de langues pour voir votre prix exact."
+      data-en="Choose your number of hours and languages to see your exact price.">
+      Choose your number of hours and languages to see your exact price.
+    </div>
+ 
+    <!-- Sélecteur heures -->
+    <div style="margin-bottom:18px">
+      <div style="font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:rgba(0,0,0,.35);margin-bottom:10px"
+        data-fr="Nombre d'heures" data-en="Number of hours">Number of hours</div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap" id="calcHoursGrid"></div>
+    </div>
+ 
+    <!-- Sélecteur langues supplémentaires -->
+    <div style="margin-bottom:18px">
+      <div style="font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:rgba(0,0,0,.35);margin-bottom:10px"
+        data-fr="Langues supplémentaires (au-delà des 2 incluses)" data-en="Extra languages (beyond the 2 included)">Extra languages (beyond the 2 included)</div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap" id="calcExtraLangsGrid"></div>
+    </div>
+ 
+    <!-- Détail du calcul -->
+    <div class="calc-lines" id="calcLines"></div>
+ 
+    <div class="calc-total-row">
+      <span class="calc-total-label" data-fr="Total TTC" data-en="Total incl. VAT">Total incl. VAT</span>
+      <span class="calc-total-val" id="calcTotal">59,99 €</span>
+    </div>
+    <div class="calc-ht-row">
+      <span data-fr="Total HT (TVA 20% — UE)" data-en="Total excl. VAT (20% VAT — EU)">Total excl. VAT (20% VAT — EU)</span>
+      <span id="calcTTC">49,99 €</span>
+    </div>
+    <div class="calc-hue-note" id="calcHueNote"
+      data-fr="Facturation hors UE : exonération de TVA (art. 259 B CGI). Prix facturé hors taxe."
+      data-en="Non-EU billing: VAT exemption (art. 259 B CGI). Price invoiced excluding tax.">
+      Non-EU billing: VAT exemption (art. 259 B CGI). Price invoiced excluding tax.
+    </div>
+    <label class="calc-hue-check">
+      <input type="checkbox" id="calcHue" onchange="calcRender()">
+      <span data-fr="Adresse de facturation hors Union européenne (exonération TVA)" data-en="Billing address outside the EU (VAT exemption)">Billing address outside the EU (VAT exemption)</span>
+    </label>
+
+    <!-- Bouton Commander -->
+    <div style="margin-top:28px;text-align:center">
+      <button id="calcOrderBtn" onclick="launchOrderFromCalc()"
+        style="background:linear-gradient(135deg,#157a6e,#2dd4bf);color:#fff;border:none;border-radius:14px;padding:16px 48px;font-size:17px;font-weight:800;cursor:pointer;font-family:Arial,sans-serif;box-shadow:0 6px 24px rgba(21,122,110,.3);transition:all .2s;letter-spacing:.01em"
+        onmouseover="this.style.transform='translateY(-2px)';this.style.boxShadow='0 10px 32px rgba(21,122,110,.45)'"
+        onmouseout="this.style.transform='translateY(0)';this.style.boxShadow='0 6px 24px rgba(21,122,110,.3)'"
+        data-fr="💳 Commander — Créer mon compte" data-en="💳 Order — Create my account">💳 Commander — Créer mon compte</button>
+      <p style="font-size:12px;color:#aaa;margin-top:10px"
+        data-fr="Paiement sécurisé · Liens envoyés par email immédiatement après paiement"
+        data-en="Secure payment · Links sent by email immediately after payment">
+        Paiement sécurisé · Liens envoyés par email immédiatement après paiement</p>
+    </div>
+  </div>
+ 
+  <div class="tva-note">
+    <strong data-fr="🌍 Facturation hors Union européenne — Exonération de TVA" data-en="🌍 Billing outside the EU — VAT exemption">🌍 Billing outside the EU — VAT exemption</strong><br>
+    <span data-fr="Pour les clients hors UE, la TVA n'est pas applicable conformément à l'<strong>article 259 B du Code Général des Impôts (CGI)</strong>. Le prix est facturé hors taxe." data-en="For customers outside the EU, VAT does not apply pursuant to <strong>Article 259 B of the French General Tax Code (CGI)</strong>. The price is invoiced excluding tax.">For customers outside the EU, VAT does not apply pursuant to <strong>Article 259 B of the French General Tax Code (CGI)</strong>. The price is invoiced excluding tax.</span>
+  </div>
+</div>
+</section>
+ 
+<!-- CONTACT COMMERCIAL -->
+<section style="background:#0d1f1a;padding:72px 24px">
+  <div style="max-width:720px;margin:0 auto;text-align:center">
+
+    <div style="font-size:11px;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:#2dd4bf;margin-bottom:14px">
+      SOGEDICOM · Experts de la traduction événementielle
+    </div>
+
+    <h2 style="font-family:Arial,sans-serif;font-size:clamp(22px,3vw,36px);font-weight:800;color:#fff;margin-bottom:16px;line-height:1.2"
+      data-fr="Vous avez un besoin spécifique ?"
+      data-en="Do you have a specific request?">
+      Vous avez un besoin spécifique ?
+    </h2>
+
+    <!-- Message expertise -->
+    <div style="background:rgba(45,212,191,.08);border:1px solid rgba(45,212,191,.2);border-radius:14px;padding:24px 28px;margin-bottom:28px;text-align:left">
+      <p style="color:#fff;font-size:16px;font-weight:500;line-height:1.8;margin-bottom:16px">
+        Nous sommes spécialistes de la <strong style="color:#2dd4bf">traduction événementielle par IA</strong>.<br>
+        Pour un grand événement ou une réunion plus confidentielle,
+        nous vous apportons une <strong style="color:#2dd4bf">solution sur mesure, dans toutes les langues</strong>.<br>
+        Parlez à votre public, partout, sans barrière.
+        <strong style="color:#f0d48a">Budget maîtrisé.</strong>
+      </p>
+      <div style="display:flex;flex-wrap:wrap;gap:16px;justify-content:center">
+        <a href="tel:+33149260526" style="display:inline-flex;align-items:center;gap:8px;background:rgba(45,212,191,.15);border:1px solid rgba(45,212,191,.35);color:#2dd4bf;font-size:15px;font-weight:700;padding:10px 20px;border-radius:10px;text-decoration:none;transition:background .2s"
+          onmouseover="this.style.background='rgba(45,212,191,.25)'" onmouseout="this.style.background='rgba(45,212,191,.15)'">
+          📞 +33 1 49 26 05 26
+        </a>
+        <a href="mailto:dnb@sogedicom.com" style="display:inline-flex;align-items:center;gap:8px;background:rgba(45,212,191,.15);border:1px solid rgba(45,212,191,.35);color:#2dd4bf;font-size:15px;font-weight:700;padding:10px 20px;border-radius:10px;text-decoration:none;transition:background .2s"
+          onmouseover="this.style.background='rgba(45,212,191,.25)'" onmouseout="this.style.background='rgba(45,212,191,.15)'">
+          ✉️ dnb@sogedicom.com
+        </a>
+      </div>
+    </div>
+
+    <p style="color:rgba(255,255,255,.5);font-size:14px;margin-bottom:28px">
+      Ou remplissez le formulaire ci-dessous — nous vous répondons sous 24 heures.
+    </p>
+ 
+    <form id="contactForm" onsubmit="sendContactForm(event)"
+      style="background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);border-radius:18px;padding:32px;text-align:left">
+ 
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px">
+        <div>
+          <label style="font-size:11px;font-weight:700;color:rgba(255,255,255,.5);letter-spacing:.08em;text-transform:uppercase;display:block;margin-bottom:6px">Full name *</label>
+          <input id="c-name" type="text" placeholder="Marie Dupont" required
+            style="width:100%;padding:11px 14px;border-radius:10px;border:1px solid rgba(255,255,255,.15);background:rgba(255,255,255,.08);color:#fff;font-size:14px;font-family:Arial,sans-serif;box-sizing:border-box;outline:none">
+        </div>
+        <div>
+          <label style="font-size:11px;font-weight:700;color:rgba(255,255,255,.5);letter-spacing:.08em;text-transform:uppercase;display:block;margin-bottom:6px">Organisation</label>
+          <input id="c-org" type="text" placeholder="ACME Corp"
+            style="width:100%;padding:11px 14px;border-radius:10px;border:1px solid rgba(255,255,255,.15);background:rgba(255,255,255,.08);color:#fff;font-size:14px;font-family:Arial,sans-serif;box-sizing:border-box;outline:none">
+        </div>
+      </div>
+ 
+      <div style="margin-bottom:14px">
+        <label style="font-size:11px;font-weight:700;color:rgba(255,255,255,.5);letter-spacing:.08em;text-transform:uppercase;display:block;margin-bottom:6px">Email *</label>
+        <input id="c-email" type="email" placeholder="marie@acme.com" required
+          style="width:100%;padding:11px 14px;border-radius:10px;border:1px solid rgba(255,255,255,.15);background:rgba(255,255,255,.08);color:#fff;font-size:14px;font-family:Arial,sans-serif;box-sizing:border-box;outline:none">
+      </div>
+ 
+      <div style="margin-bottom:14px">
+        <label style="font-size:11px;font-weight:700;color:rgba(255,255,255,.5);letter-spacing:.08em;text-transform:uppercase;display:block;margin-bottom:6px">Your request</label>
+        <textarea id="c-msg" rows="4" placeholder="Describe your project, event size, languages needed..."
+          style="width:100%;padding:11px 14px;border-radius:10px;border:1px solid rgba(255,255,255,.15);background:rgba(255,255,255,.08);color:#fff;font-size:14px;font-family:Arial,sans-serif;box-sizing:border-box;outline:none;resize:vertical"></textarea>
+      </div>
+ 
+      <button type="submit" id="c-btn"
+        style="width:100%;background:#2dd4bf;color:#0d1f1a;border:none;border-radius:10px;padding:14px;font-size:15px;font-weight:800;cursor:pointer;font-family:Arial,sans-serif;transition:opacity .2s">
+        ✉️ Send message
+      </button>
+ 
+      <div id="c-success" style="display:none;margin-top:16px;background:rgba(45,212,191,.15);border:1px solid #2dd4bf;border-radius:10px;padding:14px;color:#2dd4bf;text-align:center;font-weight:600">
+        ✅ Message sent! We'll get back to you within 24 hours.
+      </div>
+      <div id="c-error" style="display:none;margin-top:16px;background:rgba(239,68,68,.15);border:1px solid #ef4444;border-radius:10px;padding:14px;color:#ef4444;text-align:center;font-size:13px">
+        ❌ Error sending message. Please email us directly: <a href="/cdn-cgi/l/email-protection#62060c0022110d0507060b010d0f4c010d0f" style="color:#ef4444"><span class="__cf_email__" data-cfemail="e98d878ba99a868e8c8d808a8684c78a8684">[email&#160;protected]</span></a>
+      </div>
+ 
+    </form>
+  </div>
+</section>
+ 
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
+async function sendContactForm(e){
+  e.preventDefault();
+  var btn = document.getElementById('c-btn');
+  btn.textContent = '⏳ Sending...';
+  btn.disabled = true;
+ 
+  var name  = document.getElementById('c-name').value.trim();
+  var org   = document.getElementById('c-org').value.trim();
+  var email = document.getElementById('c-email').value.trim();
+  var msg   = document.getElementById('c-msg').value.trim();
+ 
+  try {
+    await emailjs.send('service_98a5sho', 'template_ofhz8y6', {
+      to_email: 'dnb@sogedicom.com',
+      from_name: name,
+      from_org:  org || '—',
+      from_email: email,
+      message:   msg || '(no message)',
+      reply_to:  email
+    });
+    document.getElementById('c-success').style.display = 'block';
+    document.getElementById('contactForm').reset();
+  } catch(err) {
+    console.error(err);
+    document.getElementById('c-error').style.display = 'block';
+  }
+ 
+  btn.textContent = '✉️ Send message';
+  btn.disabled = false;
+}
+</script>
+ 
+ 
+<!-- FAQ -->
+<section class="faq-section" id="faq">
+  <div class="faq-inner">
+    <div class="section-label" data-fr="Questions fréquentes" data-en="Frequently Asked Questions">Frequently Asked Questions</div>
+    <h2 class="section-title" data-fr="Tout ce que vous devez savoir" data-en="Everything you need to know">Everything you need to know</h2>
+    <p class="faq-intro" data-fr="Réponses aux questions les plus posées sur TranslateTheWorld et l'interprétation multilingue en temps réel pour les événements professionnels." data-en="Answers to the most common questions about TranslateTheWorld and real-time AI interpretation for professional multilingual events.">Answers to the most common questions about TranslateTheWorld and real-time AI interpretation for professional multilingual events.</p>
+ 
+    <div class="faq-list">
+ 
+      <div class="faq-item">
+        <button class="faq-q" onclick="toggleFaq(this)">
+          <span data-fr="Qu'est-ce que TranslateTheWorld ?" data-en="What is TranslateTheWorld?">What is TranslateTheWorld?</span>
+          <span class="faq-q-icon">+</span>
+        </button>
+        <div class="faq-a"><span data-fr="TranslateTheWorld est une plateforme d'interprétation multilingue propulsée par l'IA, créée par SOGEDICOM, société parisienne fondée en 1990. Elle diffuse des sous-titres traduits en temps réel sur le smartphone des participants — dans jusqu'à <strong>70 langues</strong>, sans application à télécharger, sans matériel spécifique, sans interprète humain." data-en="TranslateTheWorld is a real-time AI-powered multilingual interpretation platform built by SOGEDICOM, a Paris-based interpretation company founded in 1990. It delivers live translated subtitles to attendees' smartphones in up to <strong>70 languages</strong> — no app to download, no special equipment, no human interpreters required.">TranslateTheWorld is a real-time AI-powered multilingual interpretation platform built by SOGEDICOM, a Paris-based interpretation company founded in 1990. It delivers live translated subtitles to attendees' smartphones in up to <strong>70 languages</strong> — no app to download, no special equipment, no human interpreters required.</span></div>
+      </div>
+ 
+      <div class="faq-item">
+        <button class="faq-q" onclick="toggleFaq(this)">
+          <span data-fr="Combien coûte l'interprétation multilingue d'un événement ?" data-en="How much does multilingual event interpretation cost?">How much does multilingual event interpretation cost?</span>
+          <span class="faq-q-icon">+</span>
+        </button>
+        <div class="faq-a"><span
+          data-fr="TranslateTheWorld propose une formule unique et transparente : <strong>59,99 € TTC</strong> pour 1 heure de conférence avec 2 langues participants incluses, valable 30 jours. Chaque heure supplémentaire coûte <strong>49,99 € TTC</strong>. Chaque langue supplémentaire coûte <strong>49,99 € TTC par heure</strong>. Exemple : 1 heure en anglais, français et espagnol = 59,99 € + 49,99 € = 109,98 € TTC. Un essai gratuit de 15 minutes est disponible sans carte de crédit. À titre de comparaison, l'interprétation classique coûte entre 1 500 et 3 000 € par langue et par jour."
+          data-en="TranslateTheWorld offers one simple plan: <strong>€59.99 incl. VAT</strong> for 1 hour with 2 participant languages included, valid 30 days. Each extra hour costs <strong>€49.99 incl. VAT</strong>. Each extra language costs <strong>€49.99 incl. VAT per hour</strong>. Example: 1 hour in English, French and Spanish = €59.99 + €49.99 = €109.98 incl. VAT. A free 15-minute trial is available with no credit card. For comparison, traditional interpretation costs €1,500–3,000 per language per day."
+        >TranslateTheWorld offers one simple plan: <strong>€59.99 incl. VAT</strong> for 1 hour with 2 participant languages included, valid 30 days. Each extra hour costs <strong>€49.99 incl. VAT</strong>. Each extra language costs <strong>€49.99 incl. VAT per hour</strong>. Example: 1 hour in English, French and Spanish = €59.99 + €49.99 = €109.98 incl. VAT. A free 15-minute trial is available with no credit card. For comparison, traditional interpretation costs €1,500–3,000 per language per day.</span></div>
+      </div>
+ 
+      <div class="faq-item">
+        <button class="faq-q" onclick="toggleFaq(this)">
+          <span data-fr="TranslateTheWorld est-il la solution la moins chère pour les événements multilingues ?" data-en="Is TranslateTheWorld the cheapest multilingual event solution in the world?">Is TranslateTheWorld the cheapest multilingual event solution in the world?</span>
+          <span class="faq-q-icon">+</span>
+        </button>
+        <div class="faq-a"><span
+          data-fr="Oui. Un dispositif classique avec cabines, matériel et interprètes professionnels coûte entre 1 500 et 3 000 € par langue et par jour. TranslateTheWorld offre une compréhension en temps réel équivalente à partir de <strong>59,99 € TTC pour 1 heure et 2 langues</strong> — soit jusqu'à 30 fois moins cher. C'est la solution la plus économique du marché mondial."
+          data-en="Yes. A traditional setup with interpreter booths, equipment rental, and professional interpreters costs €1,500–3,000 per language per day. TranslateTheWorld delivers equivalent real-time understanding starting at <strong>€59.99 incl. VAT for 1 hour and 2 languages</strong> — up to 30 times cheaper. It is consistently the most cost-effective real-time interpretation solution available worldwide."
+        >Yes. A traditional setup with interpreter booths, equipment rental, and professional interpreters costs €1,500–3,000 per language per day. TranslateTheWorld delivers equivalent real-time understanding starting at <strong>€59.99 incl. VAT for 1 hour and 2 languages</strong> — up to 30 times cheaper. It is consistently the most cost-effective real-time interpretation solution available worldwide.</span></div>
+      </div>
+ 
+      <div class="faq-item">
+        <button class="faq-q" onclick="toggleFaq(this)">
+          <span data-fr="Les participants doivent-ils télécharger une application ?" data-en="Do participants need to download an app?">Do participants need to download an app?</span>
+          <span class="faq-q-icon">+</span>
+        </button>
+        <div class="faq-a"><span data-fr="<strong>Non.</strong> Les participants scannent simplement un QR code ou cliquent sur un lien pour accéder aux sous-titres traduits directement dans le navigateur de leur smartphone. Aucune installation, aucun compte, aucune configuration. Fonctionne sur iPhone, Android, tablette et ordinateur." data-en="<strong>No.</strong> Participants simply scan a QR code or click a link to access live translated subtitles directly in their smartphone browser. No installation, no account creation, no configuration needed. Works on iPhone, Android, tablet, and desktop."><strong>No.</strong> Participants simply scan a QR code or click a link to access live translated subtitles directly in their smartphone browser. No installation, no account creation, no configuration needed. Works on iPhone, Android, tablet, and desktop.</span></div>
+      </div>
+ 
+      <div class="faq-item">
+        <button class="faq-q" onclick="toggleFaq(this)">
+          <span data-fr="Quel équipement faut-il pour utiliser TranslateTheWorld ?" data-en="What equipment is needed to use TranslateTheWorld at an event?">What equipment is needed to use TranslateTheWorld at an event?</span>
+          <span class="faq-q-icon">+</span>
+        </button>
+        <div class="faq-a"><span data-fr="<strong>Aucun matériel spécifique.</strong> L'orateur utilise n'importe quel microphone standard connecté à un ordinateur avec accès internet. Les participants utilisent leur propre smartphone. Il n'y a pas de cabines, de récepteurs, d'émetteurs ni de matériel à louer ou à installer." data-en="<strong>No special equipment.</strong> The speaker uses any standard microphone connected to a computer with internet access. Participants use their own smartphones. There are no interpretation booths, no receivers, no transmitters, and no hardware to rent or install."><strong>No special equipment.</strong> The speaker uses any standard microphone connected to a computer with internet access. Participants use their own smartphones. There are no interpretation booths, no receivers, no transmitters, and no hardware to rent or install.</span></div>
+      </div>
+ 
+      <div class="faq-item">
+        <button class="faq-q" onclick="toggleFaq(this)">
+          <span data-fr="Combien de langues TranslateTheWorld supporte-t-il ?" data-en="How many languages does TranslateTheWorld support?">How many languages does TranslateTheWorld support?</span>
+          <span class="faq-q-icon">+</span>
+        </button>
+        <div class="faq-a"><span data-fr="TranslateTheWorld supporte <strong>70 langues</strong>, dont le français, l'anglais, l'espagnol, l'italien, le portugais, l'allemand, le néerlandais, l'arabe, l'hébreu, le chinois simplifié et traditionnel, le russe, le japonais, le coréen, le hindi, le turc, le polonais, l'ukrainien et bien d'autres." data-en="TranslateTheWorld supports <strong>70 languages</strong>, including French, English, Spanish, Italian, Portuguese, German, Dutch, Arabic, Hebrew, Chinese (Simplified and Traditional), Russian, Japanese, Korean, Hindi, Turkish, Polish, Ukrainian, and many more.">TranslateTheWorld supports <strong>70 languages</strong>, including French, English, Spanish, Italian, Portuguese, German, Dutch, Arabic, Hebrew, Chinese (Simplified and Traditional), Russian, Japanese, Korean, Hindi, Turkish, Polish, Ukrainian, and many more.</span></div>
+      </div>
+ 
+      <div class="faq-item">
+        <button class="faq-q" onclick="toggleFaq(this)">
+          <span data-fr="Puis-je essayer gratuitement sans carte de crédit ?" data-en="Is there a free trial with no credit card required?">Is there a free trial with no credit card required?</span>
+          <span class="faq-q-icon">+</span>
+        </button>
+        <div class="faq-a"><span data-fr="<strong>Oui.</strong> TranslateTheWorld offre une session d'essai gratuite de 15 minutes, sans carte de crédit. Il suffit de renseigner votre nom, votre email et de choisir vos langues pour recevoir immédiatement un lien de test et un QR code par email. L'essai est fonctionnel à 100% — c'est la version complète du service." data-en="<strong>Yes.</strong> TranslateTheWorld offers a free 15-minute multilingual session with no credit card required. Simply fill in your name, email, and select your languages to instantly receive a test link and QR code by email. The trial is fully functional — it is the complete version of the service."><strong>Yes.</strong> TranslateTheWorld offers a free 15-minute multilingual session with no credit card required. Simply fill in your name, email, and select your languages to instantly receive a test link and QR code by email. The trial is fully functional — it is the complete version of the service.</span></div>
+      </div>
+ 
+      <div class="faq-item">
+        <button class="faq-q" onclick="toggleFaq(this)">
+          <span data-fr="Comment les participants reçoivent-ils la traduction en direct ?" data-en="How do participants receive live translation during an event?">How do participants receive live translation during an event?</span>
+          <span class="faq-q-icon">+</span>
+        </button>
+        <div class="faq-a"><span data-fr="Avant ou au début de l'événement, les participants reçoivent un lien unique ou scannent un QR code. Cela ouvre une page dans leur navigateur où les sous-titres en temps réel apparaissent dans leur langue au fur et à mesure que l'orateur parle. La latence est généralement <strong>inférieure à 2 secondes</strong>. Aucune application nécessaire." data-en="Before or at the start of the event, participants receive a unique link or scan a QR code. This opens a page in their browser where real-time subtitles appear in their chosen language as the speaker talks. Latency is typically <strong>under 2 seconds</strong>. No app required.">Before or at the start of the event, participants receive a unique link or scan a QR code. This opens a page in their browser where real-time subtitles appear in their chosen language as the speaker talks. Latency is typically <strong>under 2 seconds</strong>. No app required.</span></div>
+      </div>
+ 
+      <div class="faq-item">
+        <button class="faq-q" onclick="toggleFaq(this)">
+          <span data-fr="TranslateTheWorld est-il moins cher que les autres plateformes de traduction en direct ?" data-en="Is TranslateTheWorld cheaper than other live translation platforms?">Is TranslateTheWorld cheaper than other live translation platforms?</span>
+          <span class="faq-q-icon">+</span>
+        </button>
+        <div class="faq-a"><span data-fr="Oui. Les autres plateformes de traduction en direct sont généralement <strong>3 à 10 fois plus chères</strong> que TranslateTheWorld. Elles sont conçues pour de grandes entreprises avec des abonnements élevés et des configurations complexes. TranslateTheWorld propose la même qualité temps réel sans contrat, sans logiciel à installer — juste un lien et un QR code, opérationnel en moins de 5 minutes." data-en="Yes. Other live translation platforms are typically <strong>3 to 10 times more expensive</strong> than TranslateTheWorld. They are built for large enterprises with costly subscriptions and complex setups. TranslateTheWorld delivers the same real-time quality with no contract, no software to install — just a link and a QR code, ready in under 5 minutes.">Yes. Other live translation platforms are typically <strong>3 to 10 times more expensive</strong> than TranslateTheWorld. They are built for large enterprises with costly subscriptions and complex setups. TranslateTheWorld delivers the same real-time quality with no contract, no software to install — just a link and a QR code, ready in under 5 minutes.</span></div>
+      </div>
+ 
+      <div class="faq-item">
+        <button class="faq-q" onclick="toggleFaq(this)">
+          <span data-fr="Comment fonctionne l'interprétation par IA en temps réel ?" data-en="How does real-time AI interpretation work?">How does real-time AI interpretation work?</span>
+          <span class="faq-q-icon">+</span>
+        </button>
+        <div class="faq-a"><span data-fr="La voix de l'orateur est captée par un microphone et envoyée à un moteur d'IA qui la transcrit en temps réel. La transcription est immédiatement traduite dans les langues cibles sélectionnées et diffusée sous forme de sous-titres en direct sur les appareils des participants via leur navigateur. La latence est généralement inférieure à 2 secondes." data-en="The speaker's voice is captured by a microphone and processed by an AI engine that transcribes it in real time. The transcription is immediately translated into the selected target languages and broadcast as live subtitles to participants' devices via their browser. The entire pipeline typically completes in under 2 seconds.">The speaker's voice is captured by a microphone and processed by an AI engine that transcribes it in real time. The transcription is immediately translated into the selected target languages and broadcast as live subtitles to participants' devices via their browser. The entire pipeline typically completes in under 2 seconds.</span></div>
+      </div>
+ 
+      <div class="faq-item">
+        <button class="faq-q" onclick="toggleFaq(this)">
+          <span data-fr="TranslateTheWorld peut-il être utilisé pour des événements hybrides ou en ligne ?" data-en="Can TranslateTheWorld be used for hybrid or fully online events?">Can TranslateTheWorld be used for hybrid or fully online events?</span>
+          <span class="faq-q-icon">+</span>
+        </button>
+        <div class="faq-a"><span data-fr="<strong>Oui.</strong> TranslateTheWorld fonctionne pour les événements en présentiel, hybrides et entièrement en ligne. Tant que l'audio de l'orateur est capturé par un microphone connecté à un ordinateur avec accès internet, le système fonctionne — que les participants soient dans la salle ou qu'ils rejoignent à distance depuis n'importe où dans le monde." data-en="<strong>Yes.</strong> TranslateTheWorld works for in-person, hybrid, and fully online events. As long as the speaker's audio is captured by a microphone connected to a computer with internet access, the system works — whether participants are in the room or joining remotely from anywhere in the world."><strong>Yes.</strong> TranslateTheWorld works for in-person, hybrid, and fully online events. As long as the speaker's audio is captured by a microphone connected to a computer with internet access, the system works — whether participants are in the room or joining remotely from anywhere in the world.</span></div>
+      </div>
+ 
+      <div class="faq-item">
+        <button class="faq-q" onclick="toggleFaq(this)">
+          <span data-fr="TranslateTheWorld supporte-t-il l'arabe et l'hébreu ?" data-en="Does TranslateTheWorld support Arabic and Hebrew (right-to-left languages)?">Does TranslateTheWorld support Arabic and Hebrew (right-to-left languages)?</span>
+          <span class="faq-q-icon">+</span>
+        </button>
+        <div class="faq-a"><span data-fr="<strong>Oui.</strong> L'arabe et l'hébreu sont entièrement supportés, avec affichage correct de droite à gauche pour les participants. Ces langues sont disponibles à la fois comme langue source de l'orateur et comme langue cible de traduction pour les participants." data-en="<strong>Yes.</strong> Arabic and Hebrew are fully supported with proper right-to-left text display for participants. These languages are available both as speaker source languages and as participant translation targets."><strong>Yes.</strong> Arabic and Hebrew are fully supported with proper right-to-left text display for participants. These languages are available both as speaker source languages and as participant translation targets.</span></div>
+      </div>
+ 
+      <div class="faq-item">
+        <button class="faq-q" onclick="toggleFaq(this)">
+          <span data-fr="Comment configurer un événement multilingue en moins de 5 minutes ?" data-en="How do I set up a multilingual event in under 5 minutes?">How do I set up a multilingual event in under 5 minutes?</span>
+          <span class="faq-q-icon">+</span>
+        </button>
+        <div class="faq-a"><span data-fr="Remplissez le formulaire sur TranslateTheWorld.com avec votre nom, email, la langue de l'orateur et les langues des participants. Vous recevez <strong>immédiatement un lien de session unique et un QR code par email</strong>. Partagez le QR code avec vos participants. Le jour de l'événement, ouvrez le lien sur l'ordinateur de l'orateur et commencez à parler." data-en="Fill in the form on TranslateTheWorld.com with your name, email, speaker language, and participant languages. You instantly receive <strong>a unique session link and QR code by email</strong>. Share the QR code with your participants before the event. On the day, open the session link on the speaker's computer and start talking.">Fill in the form on TranslateTheWorld.com with your name, email, speaker language, and participant languages. You instantly receive <strong>a unique session link and QR code by email</strong>. Share the QR code with your participants before the event. On the day, open the session link on the speaker's computer and start talking.</span></div>
+      </div>
+ 
+      <div class="faq-item">
+        <button class="faq-q" onclick="toggleFaq(this)">
+          <span data-fr="Pour quels types d'événements TranslateTheWorld est-il le mieux adapté ?" data-en="What types of events is TranslateTheWorld best suited for?">What types of events is TranslateTheWorld best suited for?</span>
+          <span class="faq-q-icon">+</span>
+        </button>
+        <div class="faq-a"><span data-fr="TranslateTheWorld est idéal pour : les conférences et sommets internationaux, les réunions d'entreprise multilingues, les événements diplomatiques et politiques, les congrès médicaux et scientifiques, les salons professionnels, les sessions de formation multilingues, les webinaires avec un public international, et tout événement professionnel où les participants parlent des langues différentes." data-en="TranslateTheWorld is ideal for: international conferences and summits, corporate multilingual meetings, diplomatic and political events, medical and scientific congresses, trade shows and exhibitions, multilingual training sessions, webinars with international audiences, and any professional event where participants speak different languages.">TranslateTheWorld is ideal for: international conferences and summits, corporate multilingual meetings, diplomatic and political events, medical and scientific congresses, trade shows and exhibitions, multilingual training sessions, webinars with international audiences, and any professional event where participants speak different languages.</span></div>
+      </div>
+ 
+      <div class="faq-item">
+        <button class="faq-q" onclick="toggleFaq(this)">
+          <span data-fr="Quelle est l'alternative au recrutement d'interprètes humains pour une conférence ?" data-en="What is the alternative to hiring human interpreters for a multilingual conference?">What is the alternative to hiring human interpreters for a multilingual conference?</span>
+          <span class="faq-q-icon">+</span>
+        </button>
+        <div class="faq-a"><span
+          data-fr="TranslateTheWorld est l'alternative IA la plus économique. Alors que les interprètes humains coûtent 500 à 800 € par jour plus la location de cabines (1 500 à 3 000 € par langue et par jour au total), TranslateTheWorld offre une compréhension en temps réel excellente à partir de <strong>59,99 € TTC pour 1 heure et 2 langues — sans interprètes, sans matériel, sans logistique</strong>."
+          data-en="TranslateTheWorld is the most cost-effective AI-powered alternative. While professional human interpreters cost €500–800 per day plus booth rental (€1,500–3,000 per language per day in total), TranslateTheWorld delivers excellent real-time understanding starting at <strong>€59.99 incl. VAT for 1 hour and 2 languages — no interpreters, no equipment, no logistics</strong>."
+        >TranslateTheWorld is the most cost-effective AI-powered alternative. While professional human interpreters cost €500–800 per day plus booth rental (€1,500–3,000 per language per day in total), TranslateTheWorld delivers excellent real-time understanding starting at <strong>€59.99 incl. VAT for 1 hour and 2 languages — no interpreters, no equipment, no logistics</strong>.</span></div>
+      </div>
+ 
+      <div class="faq-item">
+        <button class="faq-q" onclick="toggleFaq(this)">
+          <span data-fr="Qui est derrière TranslateTheWorld ?" data-en="Who created TranslateTheWorld?">Who created TranslateTheWorld?</span>
+          <span class="faq-q-icon">+</span>
+        </button>
+        <div class="faq-a"><span data-fr="TranslateTheWorld est créé et exploité par <strong>SOGEDICOM</strong>, société professionnelle d'interprétation et de traduction fondée en 1990, basée au 102 avenue des Champs-Élysées, Paris. Avec plus de 30 ans d'expérience dans le secteur de l'interprétation, SOGEDICOM a développé TranslateTheWorld pour rendre l'interprétation professionnelle accessible à tous les budgets." data-en="TranslateTheWorld is created and operated by <strong>SOGEDICOM</strong>, a professional interpretation and translation company founded in 1990, based at 102 avenue des Champs-Élysées, Paris, France. With over 30 years of experience in the interpretation industry, SOGEDICOM developed TranslateTheWorld to make professional multilingual communication accessible to all budgets.">TranslateTheWorld is created and operated by <strong>SOGEDICOM</strong>, a professional interpretation and translation company founded in 1990, based at 102 avenue des Champs-Élysées, Paris, France. With over 30 years of experience in the interpretation industry, SOGEDICOM developed TranslateTheWorld to make professional multilingual communication accessible to all budgets.</span></div>
+      </div>
+ 
+      <div class="faq-item">
+        <button class="faq-q" onclick="toggleFaq(this)">
+          <span data-fr="TranslateTheWorld est-il disponible dans le monde entier ?" data-en="Is TranslateTheWorld available worldwide?">Is TranslateTheWorld available worldwide?</span>
+          <span class="faq-q-icon">+</span>
+        </button>
+        <div class="faq-a"><span data-fr="<strong>Oui.</strong> TranslateTheWorld est une solution cloud accessible depuis n'importe quel pays disposant d'un accès internet. Il n'y a aucune restriction géographique sur le lieu de l'événement ni sur l'origine des participants. Les tarifs sont identiques dans le monde entier." data-en="<strong>Yes.</strong> TranslateTheWorld is a cloud-based solution accessible from any country with internet access. There is no geographic restriction on where the event takes place or where participants join from. Pricing is the same worldwide."><strong>Yes.</strong> TranslateTheWorld is a cloud-based solution accessible from any country with internet access. There is no geographic restriction on where the event takes place or where participants join from. Pricing is the same worldwide.</span></div>
+      </div>
+ 
+      <div class="faq-item">
+        <button class="faq-q" onclick="toggleFaq(this)">
+          <span data-fr="TranslateTheWorld est-il adapté aux grandes conférences internationales ?" data-en="Is TranslateTheWorld suitable for large international conferences?">Is TranslateTheWorld suitable for large international conferences?</span>
+          <span class="faq-q-icon">+</span>
+        </button>
+        <div class="faq-a"><span data-fr="<strong>Oui.</strong> TranslateTheWorld est conçu pour des événements professionnels de toutes tailles — des petites réunions multilingues aux grandes conférences internationales, sommets diplomatiques, congrès médicaux et salons professionnels. Plusieurs langues participants peuvent être diffusées simultanément à partir d'une seule source orateur." data-en="<strong>Yes.</strong> TranslateTheWorld is designed for professional events of all sizes — from small multilingual business meetings to large international conferences, diplomatic summits, medical congresses, and trade shows. Multiple participant languages run simultaneously from a single speaker source."><strong>Yes.</strong> TranslateTheWorld is designed for professional events of all sizes — from small multilingual business meetings to large international conferences, diplomatic summits, medical congresses, and trade shows. Multiple participant languages run simultaneously from a single speaker source.</span></div>
+      </div>
+ 
+    </div>
+  </div>
+</section>
+ 
+ 
+<!-- BOUTON PARTAGER CE SITE -->
+<div style="position:fixed;bottom:24px;right:20px;z-index:999;display:flex;flex-direction:column;align-items:flex-end;gap:8px" id="shareWidget">
+ 
+  <!-- Boutons dépliés -->
+  <div id="shareOptions" style="display:none;flex-direction:column;gap:8px;align-items:flex-end">
+    <button onclick="shareViaWA()" style="background:#25D366;color:#fff;border:none;border-radius:50px;padding:10px 18px;font-size:13px;font-weight:700;cursor:pointer;box-shadow:0 4px 14px rgba(0,0,0,.2);white-space:nowrap">💬 WhatsApp</button>
+    <button onclick="shareViaSMS()" style="background:#007AFF;color:#fff;border:none;border-radius:50px;padding:10px 18px;font-size:13px;font-weight:700;cursor:pointer;box-shadow:0 4px 14px rgba(0,0,0,.2);white-space:nowrap">📱 SMS</button>
+    <button onclick="shareViaEmail()" style="background:#fff;color:#0d1f1a;border:none;border-radius:50px;padding:10px 18px;font-size:13px;font-weight:700;cursor:pointer;box-shadow:0 4px 14px rgba(0,0,0,.2);white-space:nowrap">✉️ Email</button>
+  </div>
+ 
+  <!-- Bouton principal -->
+  <button onclick="toggleShare()" id="shareMainBtn"
+    style="background:#0d1f1a;color:#fff;border:2px solid #2dd4bf;border-radius:50px;padding:12px 20px;font-size:13px;font-weight:800;cursor:pointer;box-shadow:0 4px 20px rgba(0,0,0,.25);display:flex;align-items:center;gap:8px;white-space:nowrap">
+    <span style="font-size:16px">📤</span>
+    <span id="shareBtnLabel">Envoyer à un ami</span>
+  </button>
+</div>
+ 
+<script>
+var shareOpen = false;
+var SHARE_URL = 'https://translatetheworld.com';
+var SHARE_MSGS = {
+  fr: 'Découvrez TranslateTheWorld — sous-titres multilingues en temps réel pour vos conférences, 100% gratuit à tester : ' + SHARE_URL,
+  en: 'Discover TranslateTheWorld — real-time multilingual subtitles for your conferences, free to try: ' + SHARE_URL,
+  de: 'Entdecken Sie TranslateTheWorld — Echtzeit-Untertitel für Konferenzen, kostenlos testen: ' + SHARE_URL,
+  es: 'Descubre TranslateTheWorld — subtítulos multilingüe en tiempo real, prueba gratuita: ' + SHARE_URL,
+  it: 'Scopri TranslateTheWorld — sottotitoli multilingue in tempo reale, prova gratuita: ' + SHARE_URL,
+  pt: 'Descubra o TranslateTheWorld — legendas multilingues em tempo real, teste gratuito: ' + SHARE_URL,
+  nl: 'Ontdek TranslateTheWorld — meertalige ondertitels in realtime, gratis te proberen: ' + SHARE_URL,
+  ar: 'اكتشف TranslateTheWorld — ترجمة فورية لمؤتمراتك، تجربة مجانية: ' + SHARE_URL,
+  he: 'גלה את TranslateTheWorld — כתוביות רב-לשוניות בזמן אמת, ניסיון חינם: ' + SHARE_URL,
+  zh: '发现 TranslateTheWorld — 实时多语言字幕，免费试用: ' + SHARE_URL,
+  ru: 'Откройте TranslateTheWorld — субтитры в реальном времени, бесплатный тест: ' + SHARE_URL,
+  ja: 'TranslateTheWorldを試してみて — リアルタイム字幕、無料: ' + SHARE_URL,
+  ko: 'TranslateTheWorld를 친구에게 알려주세요 — 실시간 자막, 무료 체험: ' + SHARE_URL,
+  da: 'Opdage TranslateTheWorld — realtids undertekster, gratis at prøve: ' + SHARE_URL,
+  hi: 'TranslateTheWorld देखें — रियल-टाइम सबटाइटल, मुफ़्त आज़माएं: ' + SHARE_URL
+};
+ 
+function getShareMsg(){
+  return SHARE_MSGS[currentLang] || SHARE_MSGS['en'];
+}
+ 
+function toggleShare(){
+  shareOpen = !shareOpen;
+  var opts = document.getElementById('shareOptions');
+  var lbl  = document.getElementById('shareBtnLabel');
+  opts.style.display = shareOpen ? 'flex' : 'none';
+  lbl.textContent    = shareOpen ? 'Fermer' : 'Envoyer à un ami';
+}
+ 
+function shareViaWA(){
+  window.open('https://wa.me/?text=' + encodeURIComponent(getShareMsg()), '_blank');
+}
+function shareViaSMS(){
+  window.location.href = 'sms:?body=' + encodeURIComponent(getShareMsg());
+}
+function shareViaEmail(){
+  var sub = encodeURIComponent('Découvrez TranslateTheWorld — traduction en direct pour vos conférences');
+  window.location.href = 'mailto:?subject=' + sub + '&body=' + encodeURIComponent(getShareMsg());
+}
+</script>
+ 
+<footer>
+
+  <p><strong>TranslateTheWorld</strong> — <span data-fr="une solution" data-en="a solution by">une solution</span> SOGEDICOM</p>
+  <p style="margin-top:8px"><a href="tel:+33689735229">+33 6 89 73 52 29</a> &nbsp;·&nbsp; <a href="mailto:dnb@sogedicom.com">dnb@sogedicom.com</a></p>
+  <p style="margin-top:14px;font-size:11px;opacity:.55">© 2025 SOGEDICOM · Tous droits réservés</p>
+  <p style="margin-top:10px;font-size:13px">
+    <a href="/mentions-legales.html" style="color:rgba(255,255,255,.55);text-decoration:none;border-bottom:1px solid rgba(255,255,255,.25);padding-bottom:2px"
+      onmouseover="this.style.color='#2dd4bf';this.style.borderBottomColor='#2dd4bf'"
+      onmouseout="this.style.color='rgba(255,255,255,.55)';this.style.borderBottomColor='rgba(255,255,255,.25)'">
+      📄 Mentions légales · Legal Notice
+    </a>
+  </p>
+  <p style="margin-top:20px;padding-top:16px;border-top:1px solid rgba(255,255,255,.08);font-size:10px;opacity:.28;line-height:1.8;max-width:700px;margin-left:auto;margin-right:auto">
+    <strong style="opacity:.7">Mentions légales</strong> —
+    SOGEDICOM SARL · Capital 40 000 € · RCS 378 740 328 · N° TVA intracommunautaire FR50378740328 ·
+    Siège social : 102 avenue des Champs-Élysées, 75008 Paris ·
+    Tél. : <a href="tel:+33149260526" style="color:rgba(255,255,255,.35);text-decoration:none">+33 1 49 26 05 26</a> · <a href="mailto:dnb@sogedicom.com" style="color:rgba(255,255,255,.35);text-decoration:none">dnb@sogedicom.com</a> ·
+    Directeur de la publication : David BARCHMANN
+  </p>
+</footer>
+ 
+<!-- MODAL -->
+<div class="modal-overlay" id="modal">
+  <div class="modal-card" style="max-width:560px;padding:32px 28px;text-align:left">
+    <h2 style="text-align:center;margin-bottom:6px">📬 Vos liens sont prêts !</h2>
+    <p style="text-align:center;margin-bottom:20px">Envoyés par email à <strong id="modal-email" style="color:#f0d48a"></strong></p>
+    <!-- Lien Hôte -->
+    <div style="background:rgba(212,168,67,.1);border:1.5px solid rgba(212,168,67,.4);border-radius:12px;padding:16px;margin-bottom:14px">
+      <div style="font-size:10px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:#f0d48a;margin-bottom:6px">🎙️ Lien Hôte — gardez-le pour vous</div>
+      <div id="modal-host-link" style="background:rgba(0,0,0,.3);border-radius:7px;padding:8px 10px;font-family:monospace;font-size:10px;color:#f0d48a;word-break:break-all;margin-bottom:8px"></div>
+      <button onclick="copyLink('modal-host-link',this)" style="background:rgba(212,168,67,.2);border:1px solid rgba(212,168,67,.4);color:#f0d48a;border-radius:6px;padding:5px 14px;font-size:11px;font-weight:700;cursor:pointer;font-family:Arial,sans-serif">📋 Copier</button>
+    </div>
+    <!-- Lien Participants -->
+    <div style="background:rgba(45,212,191,.08);border:1.5px solid rgba(45,212,191,.35);border-radius:12px;padding:16px;margin-bottom:14px">
+      <div style="font-size:10px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:#2dd4bf;margin-bottom:6px">👥 Lien Participants — à partager avec vos invités</div>
+      <div id="modal-participant-link" style="background:rgba(0,0,0,.3);border-radius:7px;padding:8px 10px;font-family:monospace;font-size:10px;color:#2dd4bf;word-break:break-all;margin-bottom:8px"></div>
+      <button onclick="copyLink('modal-participant-link',this)" style="background:rgba(45,212,191,.15);border:1px solid rgba(45,212,191,.35);color:#2dd4bf;border-radius:6px;padding:5px 14px;font-size:11px;font-weight:700;cursor:pointer;font-family:Arial,sans-serif">📋 Copier</button>
+      <div style="margin-top:12px;text-align:center"><div class="modal-qr" id="modal-qr" style="display:inline-block;background:#fff;padding:8px;border-radius:10px"></div></div>
+    </div>
+    <p style="font-size:11px;color:rgba(255,255,255,.4);text-align:center;margin:0">Valide 3 jours · 15 min · 1 orateur + jusqu'à 3 langues participants</p>
+    <button class="modal-close" onclick="closeModal()" style="display:block;margin:16px auto 0">Fermer</button>
+  </div>
+</div>
+ 
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
+let currentLang='fr'; // declared early so populate() can use it
+const LANGS=[
+  {code:'fr',flag:'🇫🇷',name:'Français / French'},
+  {code:'en',flag:'🇬🇧',name:'Anglais / English'},
+  {code:'de',flag:'🇩🇪',name:'Allemand / German'},
+  {code:'es',flag:'🇪🇸',name:'Espagnol / Spanish'},
+  {code:'it',flag:'🇮🇹',name:'Italien / Italian'},
+  {code:'pt',flag:'🇵🇹',name:'Portugais / Portuguese'},
+  {code:'nl',flag:'🇳🇱',name:'Néerlandais / Dutch'},
+  {code:'pl',flag:'🇵🇱',name:'Polonais / Polish'},
+  {code:'ru',flag:'🇷🇺',name:'Russe / Russian'},
+  {code:'uk',flag:'🇺🇦',name:'Ukrainien / Ukrainian'},
+  {code:'cs',flag:'🇨🇿',name:'Tchèque / Czech'},
+  {code:'sk',flag:'🇸🇰',name:'Slovaque / Slovak'},
+  {code:'hu',flag:'🇭🇺',name:'Hongrois / Hungarian'},
+  {code:'ro',flag:'🇷🇴',name:'Roumain / Romanian'},
+  {code:'bg',flag:'🇧🇬',name:'Bulgare / Bulgarian'},
+  {code:'hr',flag:'🇭🇷',name:'Croate / Croatian'},
+  {code:'sl',flag:'🇸🇮',name:'Slovène / Slovenian'},
+  {code:'sr',flag:'🇷🇸',name:'Serbe / Serbian'},
+  {code:'el',flag:'🇬🇷',name:'Grec / Greek'},
+  {code:'tr',flag:'🇹🇷',name:'Turc / Turkish'},
+  {code:'ar',flag:'🇸🇦',name:'Arabe / Arabic'},
+  {code:'he',flag:'🇮🇱',name:'Hébreu / Hebrew'},
+  {code:'fa',flag:'🇮🇷',name:'Persan / Persian'},
+  {code:'ur',flag:'🇵🇰',name:'Ourdou / Urdu'},
+  {code:'hi',flag:'🇮🇳',name:'Hindi'},
+  {code:'bn',flag:'🇧🇩',name:'Bengali'},
+  {code:'pa',flag:'🇮🇳',name:'Pendjabi / Punjabi'},
+  {code:'gu',flag:'🇮🇳',name:'Gujarati'},
+  {code:'mr',flag:'🇮🇳',name:'Marathi'},
+  {code:'ta',flag:'🇮🇳',name:'Tamoul / Tamil'},
+  {code:'te',flag:'🇮🇳',name:'Télougou / Telugu'},
+  {code:'kn',flag:'🇮🇳',name:'Kannada'},
+  {code:'ml',flag:'🇮🇳',name:'Malayalam'},
+  {code:'si',flag:'🇱🇰',name:'Cingalais / Sinhala'},
+  {code:'th',flag:'🇹🇭',name:'Thaï / Thai'},
+  {code:'vi',flag:'🇻🇳',name:'Vietnamien / Vietnamese'},
+  {code:'id',flag:'🇮🇩',name:'Indonésien / Indonesian'},
+  {code:'ms',flag:'🇲🇾',name:'Malais / Malay'},
+  {code:'tl',flag:'🇵🇭',name:'Filipino'},
+  {code:'km',flag:'🇰🇭',name:'Khmer'},
+  {code:'lo',flag:'🇱🇦',name:'Laotien / Lao'},
+  {code:'my',flag:'🇲🇲',name:'Birman / Burmese'},
+  {code:'zh',flag:'🇨🇳',name:'Chinois simplifié / Chinese (S)'},
+  {code:'zh-tw',flag:'🇹🇼',name:'Chinois traditionnel / Chinese (T)'},
+  {code:'ja',flag:'🇯🇵',name:'Japonais / Japanese'},
+  {code:'ko',flag:'🇰🇷',name:'Coréen / Korean'},
+  {code:'mn',flag:'🇲🇳',name:'Mongol / Mongolian'},
+  {code:'ka',flag:'🇬🇪',name:'Géorgien / Georgian'},
+  {code:'hy',flag:'🇦🇲',name:'Arménien / Armenian'},
+  {code:'az',flag:'🇦🇿',name:'Azerbaïdjanais / Azerbaijani'},
+  {code:'kk',flag:'🇰🇿',name:'Kazakh'},
+  {code:'uz',flag:'🇺🇿',name:'Ouzbek / Uzbek'},
+  {code:'sw',flag:'🇰🇪',name:'Swahili'},
+  {code:'am',flag:'🇪🇹',name:'Amharique / Amharic'},
+  {code:'ha',flag:'🇳🇬',name:'Haoussa / Hausa'},
+  {code:'yo',flag:'🇳🇬',name:'Yoruba'},
+  {code:'ig',flag:'🇳🇬',name:'Igbo'},
+  {code:'zu',flag:'🇿🇦',name:'Zoulou / Zulu'},
+  {code:'xh',flag:'🇿🇦',name:'Xhosa'},
+  {code:'af',flag:'🇿🇦',name:'Afrikaans'},
+  {code:'sq',flag:'🇦🇱',name:'Albanais / Albanian'},
+  {code:'lv',flag:'🇱🇻',name:'Letton / Latvian'},
+  {code:'lt',flag:'🇱🇹',name:'Lituanien / Lithuanian'},
+  {code:'et',flag:'🇪🇪',name:'Estonien / Estonian'},
+  {code:'fi',flag:'🇫🇮',name:'Finnois / Finnish'},
+  {code:'sv',flag:'🇸🇪',name:'Suédois / Swedish'},
+  {code:'da',flag:'🇩🇰',name:'Danois / Danish'},
+  {code:'no',flag:'🇳🇴',name:'Norvégien / Norwegian'},
+  {code:'is',flag:'🇮🇸',name:'Islandais / Icelandic'},
+  {code:'ga',flag:'🇮🇪',name:'Irlandais / Irish'},
+  {code:'cy',flag:'🏴󠁧󠁢󠁷󠁬󠁳󠁿',name:'Gallois / Welsh'},
+];
+ 
+/* Drapeaux featured (bannière) */
+(function(){
+  const featured=[
+    {f:'🇫🇷',n:'France'},{f:'🇬🇧',n:'UK'},{f:'🇺🇸',n:'USA'},
+    {f:'🇮🇹',n:'Italia'},{f:'🇪🇸',n:'España'},{f:'🇱🇧',n:'Liban'},
+    {f:'🇩🇪',n:'Deutschland'},{f:'🇬🇷',n:'Ελλάδα'},{f:'🇩🇰',n:'Danmark'},
+    {f:'🇧🇷',n:'Brasil'},{f:'🇯🇵',n:'日本'},{f:'🇸🇦',n:'العربية'},
+    {f:'🇨🇳',n:'中国'},{f:'🇮🇳',n:'India'},{f:'🇰🇷',n:'한국'},
+  ];
+  const banner=document.getElementById('flagBanner');
+  if(!banner) return;
+  featured.forEach((l,i)=>{
+    const s=document.createElement('span');
+    s.className='fbf';
+    s.textContent=l.f;
+    s.title=l.n;
+    s.style.animationDuration=(2.5+i*0.3)+'s';
+    s.style.animationDelay=(i*0.15)+'s';
+    banner.appendChild(s);
+  });
+})();
+ 
+/* Pillules hero — vraies images drapeaux */
+(function(){
+  const pc=document.getElementById('pills');
+  if(!pc) return;
+  const pillLangs=[
+    {cc:'fr',name:'Français'},{cc:'gb',name:'Anglais'},{cc:'de',name:'Allemand'},
+    {cc:'es',name:'Espagnol'},{cc:'it',name:'Italien'},{cc:'lb',name:'Arabe'},
+    {cc:'ru',name:'Russe'},{cc:'cn',name:'Chinois'},{cc:'pt',name:'Portugais'},
+    {cc:'pl',name:'Polonais'},{cc:'ua',name:'Ukrainien'},{cc:'gr',name:'Grec'},
+    {cc:'tr',name:'Turc'},{cc:'il',name:'Hébreu'},{cc:'in',name:'Hindi'},
+    {cc:'jp',name:'Japonais'},{cc:'kr',name:'Coréen'},{cc:'sa',name:'Arabe SA'},
+    {cc:'nl',name:'Néerlandais'},{cc:'cz',name:'Tchèque'},{cc:'ro',name:'Roumain'},
+    {cc:'se',name:'Suédois'},{cc:'dk',name:'Danois'},{cc:'fi',name:'Finnois'},
+    {cc:'br',name:'Portugais BR'},{cc:'mx',name:'Espagnol MX'},{cc:'th',name:'Thaï'},
+    {cc:'vn',name:'Vietnamien'},{cc:'id',name:'Indonésien'},{cc:'pk',name:'Ourdou'},
+  ];
+  pillLangs.forEach(l=>{
+    const d=document.createElement('div');
+    d.className='pill';
+    d.innerHTML='<img src="https://flagcdn.com/w20/'+l.cc+'.png" width="16" height="11" style="border-radius:2px;flex-shrink:0;vertical-align:middle">'+l.name;
+    pc.appendChild(d);
+  });
+})();
+ 
+/* Ticker — vraies images drapeaux */
+(function(){
+  const t=document.getElementById('ticker');
+  if(!t) return;
+  const tickerLangs=[
+    {cc:'fr',name:'Français / French'},{cc:'gb',name:'Anglais / English'},
+    {cc:'de',name:'Allemand / German'},{cc:'es',name:'Espagnol / Spanish'},
+    {cc:'it',name:'Italien / Italian'},{cc:'lb',name:'Arabe / Arabic'},
+    {cc:'ru',name:'Russe / Russian'},{cc:'cn',name:'Chinois / Chinese'},
+    {cc:'jp',name:'Japonais / Japanese'},{cc:'kr',name:'Coréen / Korean'},
+    {cc:'pt',name:'Portugais / Portuguese'},{cc:'pl',name:'Polonais / Polish'},
+    {cc:'ua',name:'Ukrainien / Ukrainian'},{cc:'gr',name:'Grec / Greek'},
+    {cc:'tr',name:'Turc / Turkish'},{cc:'il',name:'Hébreu / Hebrew'},
+    {cc:'in',name:'Hindi'},{cc:'th',name:'Thaï / Thai'},
+    {cc:'vn',name:'Vietnamien / Vietnamese'},{cc:'nl',name:'Néerlandais / Dutch'},
+    {cc:'se',name:'Suédois / Swedish'},{cc:'dk',name:'Danois / Danish'},
+  ];
+  const doubled=[...tickerLangs,...tickerLangs];
+  doubled.forEach(l=>{
+    const d=document.createElement('div');d.className='ticker-item';
+    d.innerHTML='<img src="https://flagcdn.com/w20/'+l.cc+'.png" width="20" height="14" style="border-radius:2px;vertical-align:middle;box-shadow:0 1px 3px rgba(0,0,0,.2)">'+l.name;
+    t.appendChild(d);
+  });
+})();
+ 
+/* ── Custom dropdowns avec vrais drapeaux ── */
+/* ── Correspondance code langue → code pays pour flagcdn ── */
+const LANG_FLAG={
+  'fr':'fr','en':'gb','de':'de','es':'es','it':'it','pt':'pt',
+  'nl':'nl','pl':'pl','ru':'ru','uk':'ua','cs':'cz','sk':'sk',
+  'hu':'hu','ro':'ro','bg':'bg','hr':'hr','sl':'si','sr':'rs',
+  'el':'gr','tr':'tr','ar':'sa','he':'il','fa':'ir','ur':'pk',
+  'hi':'in','bn':'bd','pa':'in','gu':'in','mr':'in','ta':'in',
+  'te':'in','kn':'in','ml':'in','si':'lk','th':'th','vi':'vn',
+  'id':'id','ms':'my','tl':'ph','km':'kh','lo':'la','my':'mm',
+  'zh':'cn','zh-tw':'tw','ja':'jp','ko':'kr','mn':'mn','ka':'ge',
+  'hy':'am','az':'az','kk':'kz','uz':'uz','sw':'ke','am':'et',
+  'ha':'ng','yo':'ng','ig':'ng','zu':'za','xh':'za','af':'za',
+  'sq':'al','lv':'lv','lt':'lt','et':'ee','fi':'fi','sv':'se',
+  'da':'dk','no':'no','is':'is','ga':'ie','cy':'gb'
+};
+function getFlagUrl(code){
+  const l=MAIN_LANGS.find(x=>x.code===code);
+  if(l) return 'https://flagcdn.com/w40/'+l.country+'.png';
+  const cc=LANG_FLAG[code]||code.slice(0,2);
+  return 'https://flagcdn.com/w40/'+cc+'.png';
+}
+function updateFlag(id, sel){
+  const img=document.getElementById('flag-'+id);
+  if(!img) return;
+  if(sel.value){
+    img.src=getFlagUrl(sel.value);
+    img.style.display='block';
+  } else {
+    img.style.display='none';
+  }
+}
+ 
+/* ── 8 langues disponibles ── */
+const MAIN_LANGS=[
+  {code:'fr', country:'fr', label:'Français',  labelEn:'French'},
+  {code:'en', country:'gb', label:'Anglais',   labelEn:'English'},
+  {code:'de', country:'de', label:'Allemand',  labelEn:'German'},
+  {code:'it', country:'it', label:'Italien',   labelEn:'Italian'},
+  {code:'es', country:'es', label:'Espagnol',  labelEn:'Spanish'},
+  {code:'ar', country:'lb', label:'Arabe',     labelEn:'Arabic'},
+  {code:'ru', country:'ru', label:'Russe',     labelEn:'Russian'},
+  {code:'zh', country:'cn', label:'Chinois',   labelEn:'Chinese'},
+  {code:'he', country:'il', label:'Hébreu',    labelEn:'Hebrew'},
+];
+ 
+function populate(selId, withNone){
+  const sel=document.getElementById(selId);
+  if(!sel) return;
+  const curVal=sel.value;
+  sel.innerHTML='';
+  if(withNone){
+    const o=document.createElement('option');
+    o.value='';
+    o.textContent=currentLang==='fr'?'— Choisir —':'— Choose —';
+    sel.appendChild(o);
+  }
+  MAIN_LANGS.forEach(l=>{
+    const o=document.createElement('option');
+    o.value=l.code;
+    o.textContent=currentLang==='fr'?l.label:l.labelEn;
+    sel.appendChild(o);
+  });
+  if(curVal) sel.value=curVal;
+}
+ 
+(function(){
+  populate('f-lang-src', false);
+  populate('f-lang-p1', false);
+  populate('f-lang-p2', true);
+  populate('f-lang-p3', true);
+  // Valeurs par défaut
+  document.getElementById('f-lang-src').value='fr';
+  document.getElementById('f-lang-p1').value='en';
+  document.getElementById('f-lang-p2').value='';
+  document.getElementById('f-lang-p3').value='';
+  // Mettre à jour les drapeaux par défaut
+  updateFlag('src', document.getElementById('f-lang-src'));
+  updateFlag('p1',  document.getElementById('f-lang-p1'));
+  document.getElementById('flag-p2').style.display='none';
+  document.getElementById('flag-p3').style.display='none';
+})();
+ 
+/* Calculateur */
+// ── NOUVEAU CALCULATEUR ────────────────────────────────────────
+const CALC_BASE_TTC   = 59.99;  // 1h, 2 langues
+const CALC_EXTRA_H    = 49.99;  // par heure supplémentaire
+const CALC_EXTRA_LANG = 49.99;  // par langue supplémentaire par heure
+ 
+let calcHours     = 1;
+let calcExtraLangs = 0;
+ 
+function calcBuildHours() {
+  const g = document.getElementById('calcHoursGrid');
+  if (!g) return;
+  g.innerHTML = '';
+  for (let h = 1; h <= 8; h++) {
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'calc-plan-btn' + (h === calcHours ? ' active' : '');
+    btn.textContent = h + 'h';
+    btn.onclick = (function(hh){ return function(){ calcHours = hh; calcBuildHours(); calcRender(); }; })(h);
+    g.appendChild(btn);
+  }
+}
+ 
+function calcBuildExtraLangs() {
+  const g = document.getElementById('calcExtraLangsGrid');
+  if (!g) return;
+  g.innerHTML = '';
+  for (let n = 0; n <= 3; n++) {
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'calc-plan-btn' + (n === calcExtraLangs ? ' active' : '');
+    const lbl = n === 0
+      ? (currentLang === 'fr' ? '2 incluses' : '2 included')
+      : '+' + n + (currentLang === 'fr' ? ' langue' + (n > 1 ? 's' : '') : ' language' + (n > 1 ? 's' : ''));
+    btn.textContent = lbl;
+    btn.onclick = (function(nn){ return function(){ calcExtraLangs = nn; calcBuildExtraLangs(); calcRender(); }; })(n);
+    g.appendChild(btn);
+  }
+}
+ 
+function calcRender() {
+  var isHue = document.getElementById('calcHue') ? document.getElementById('calcHue').checked : false;
+  var totalTTC = CALC_BASE_TTC
+    + (calcHours - 1) * CALC_EXTRA_H
+    + calcExtraLangs * calcHours * CALC_EXTRA_LANG;
+  var totalHT = totalTTC / 1.2;
+  var isEN = currentLang !== 'fr';
+ 
+  var linesEl = document.getElementById('calcLines');
+  if (linesEl) {
+    var html = '';
+    var fmt = function(v){ return v.toFixed(2).replace('.', ',') + ' €'; };
+    html += '<div class="calc-line"><span>' + (isEN ? '1 hour · 2 languages (base)' : '1 heure · 2 langues (base)') + '</span><span>' + fmt(CALC_BASE_TTC) + ' TTC</span></div>';
+    if (calcHours > 1) {
+      html += '<div class="calc-line"><span>' + (calcHours - 1) + (isEN ? ' extra hour' : ' heure') + (calcHours > 2 ? 's' : '') + ' × ' + fmt(CALC_EXTRA_H) + '</span><span>' + fmt((calcHours - 1) * CALC_EXTRA_H) + ' TTC</span></div>';
+    }
+    if (calcExtraLangs > 0) {
+      html += '<div class="calc-line"><span>' + calcExtraLangs + (isEN ? ' extra lang' : ' langue') + (calcExtraLangs > 1 ? 's' : '') + ' × ' + calcHours + 'h × ' + fmt(CALC_EXTRA_LANG) + '</span><span>' + fmt(calcExtraLangs * calcHours * CALC_EXTRA_LANG) + ' TTC</span></div>';
+    }
+    linesEl.innerHTML = html;
+  }
+ 
+  var hueNote = document.getElementById('calcHueNote');
+  if (hueNote) hueNote.style.display = isHue ? 'block' : 'none';
+  if (document.getElementById('calcTotal')) document.getElementById('calcTotal').textContent = totalTTC.toFixed(2).replace('.', ',') + ' €';
+  if (document.getElementById('calcTTC'))   document.getElementById('calcTTC').textContent   = isHue ? 'Exonéré de TVA (hors UE)' : totalHT.toFixed(2).replace('.', ',') + ' €';
+}
+ 
+function calcInit() {
+  calcBuildHours();
+  calcBuildExtraLangs();
+  calcRender();
+}
+document.addEventListener('DOMContentLoaded', calcInit);
+ 
+ 
+ 
+/* Bilingue */
+function setLang(lang){
+  currentLang = lang;
+  var sel = document.getElementById('lang-select');
+  if(sel) sel.value = lang;
+ 
+  // RTL pour arabe et hébreu
+  var isRTL = (lang === 'ar' || lang === 'he');
+  var heroLeft = document.querySelector('.hero-left');
+  if(heroLeft){
+    heroLeft.dir = isRTL ? 'rtl' : 'ltr';
+    heroLeft.style.alignItems = isRTL ? 'flex-end' : 'flex-start';
+  }
+ 
+  // Langues avec traduction complète (fr + en)
+  // Pour toutes les autres langues : d'abord anglais, puis override avec data-XX du hero
+ 
+  if(lang === 'fr'){
+    // Tout en français
+    document.querySelectorAll('[data-fr]').forEach(function(el){
+      el.innerHTML = el.getAttribute('data-fr');
+    });
+  } else {
+    // D'abord tout en anglais (base commune)
+    document.querySelectorAll('[data-en]').forEach(function(el){
+      el.innerHTML = el.getAttribute('data-en');
+    });
+    // Puis override avec la langue si elle existe (hero, badge, etc.)
+    if(lang !== 'en'){
+      document.querySelectorAll('[data-'+lang+']').forEach(function(el){
+        el.innerHTML = el.getAttribute('data-'+lang);
+      });
+    }
+  }
+ 
+  populate('f-lang-src', false);
+  populate('f-lang-p1', false);
+  populate('f-lang-p2', true);
+  populate('f-lang-p3', true);
+  calcRender();
+  if(typeof updateCtaLang==='function') updateCtaLang(lang);
+}
+ 
+function toggleFaq(btn){
+  btn.closest('.faq-item').classList.toggle('open');
+}
+ 
+function nameToRoom(name){
+  return name.toLowerCase()
+    .normalize('NFD').replace(/[\u0300-\u036f]/g,'')
+    .replace(/[^a-z0-9]/g,'')
+    .slice(0,40);
+}
+function launchOrderFromCalc(){
+  // Détermine le plan selon les heures sélectionnées dans le simulateur
+  const h = typeof calcHours !== 'undefined' ? calcHours : 1;
+  const plan = h >= 10 ? '10H' : h >= 5 ? '5H' : '1H';
+  contactSales(plan);
+}
+
+function openFreeModal(){
+  const ov=document.getElementById('freeTrialOverlay');
+  ov.style.display='flex';
+  document.body.style.overflow='hidden';
+  setLang(currentLang);
+}
+function closeFreeModal(){
+  document.getElementById('freeTrialOverlay').style.display='none';
+  document.body.style.overflow='';
+}
+document.addEventListener('DOMContentLoaded',function(){
+  const ov=document.getElementById('freeTrialOverlay');
+  if(ov) ov.addEventListener('click',function(e){if(e.target===this)closeFreeModal();});
+});
+
+function sanitizeRoom(){
+  const name=document.getElementById('f-name').value.trim();
+  document.getElementById('f-room').value=nameToRoom(name);
+}
+ 
+const usedRooms=new Set(['demo','test','example','free','sogedicom']);
+ 
+const EJS_SERVICE  = 'service_98a5sho';
+const EJS_TEMPLATE = 'template_udijx31';
+const EJS_KEY      = 'nkdEOMlq3ycO1AsIc';
+ 
+window.addEventListener('DOMContentLoaded', function(){
+  emailjs.init({ publicKey: EJS_KEY });
+});
+ 
+function getLangLabel(code){
+  const l=MAIN_LANGS.find(x=>x.code===code);
+  return l?l.label:code;
+}
+ 
+async function handleSubmit(){
+  const name  = document.getElementById('f-name').value.trim();
+  const org   = document.getElementById('f-org').value.trim();
+  const email = document.getElementById('f-email').value.trim();
+  const phone = document.getElementById('f-phone').value.trim();
+  const room  = nameToRoom(name);
+  document.getElementById('f-room').value=room;
+  const src = document.getElementById('f-lang-src').value;
+  const p1  = document.getElementById('f-lang-p1').value;
+  const p2  = document.getElementById('f-lang-p2').value;
+  const p3  = document.getElementById('f-lang-p3').value;
+  const errEl = document.getElementById('room-error');
+ 
+  if(!name||!email){alert(currentLang==='fr'?'Merci de remplir votre nom et email.':'Please fill in your name and email.');return;}
+  if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){alert(currentLang==='fr'?'Adresse email invalide.':'Invalid email address.');return;}
+  if(!p1){alert(currentLang==='fr'?'Choisissez au moins une langue participant.':'Please select at least one participant language.');return;}
+  if(usedRooms.has(room)){errEl.style.display='block';return;}
+  errEl.style.display='none';
+  usedRooms.add(room);
+ 
+  const targets=[p1,p2,p3].filter(Boolean).join(',');
+  const exp=new Date();exp.setDate(exp.getDate()+3);
+  const expTs=Math.floor(exp.getTime()/1000);
+  const baseUrl=window.location.origin;
+  const hostLink=baseUrl+'/host-setup.html?room='+room+'&lang='+src+'&to='+targets+'&dur=15&exp='+expTs;
+  const participantLink=baseUrl+'/join.html?room='+room+'&exp='+expTs;
+  const expDate=exp.toLocaleDateString('fr-FR',{day:'numeric',month:'long',year:'numeric'});
+ 
+  const btn=document.querySelector('.hfc-submit');
+  btn.textContent='⏳ Envoi en cours…';
+  btn.disabled=true;
+ 
+  const qr_url='https://quickchart.io/qr?size=300&text='+encodeURIComponent(participantLink);
+  const params={
+    to_email:email, to_name:name, organisation:org||'—', phone:phone||'—',
+    link:hostLink, host_link:hostLink, participant_link:participantLink,
+    room:room,
+    lang_src:getLangLabel(src),
+    lang_p1:getLangLabel(p1),
+    lang_p2:p2?getLangLabel(p2):'—',
+    lang_p3:p3?getLangLabel(p3):'—',
+    exp_date:expDate, duration:'15 minutes',
+    qr_url:qr_url
+  };
+ 
+  function showModal(emailOk){
+    document.getElementById('modal-email').textContent=email;
+    document.getElementById('modal-host-link').textContent=hostLink;
+    document.getElementById('modal-participant-link').textContent=participantLink;
+    const qEl=document.getElementById('modal-qr');qEl.innerHTML='';
+    new QRCode(qEl,{text:participantLink,width:140,height:140,colorDark:'#0a0a0a',colorLight:'#fff',correctLevel:QRCode.CorrectLevel.M});
+    document.getElementById('modal').classList.add('active');
+    if(!emailOk){
+      setTimeout(()=>{
+        const p=document.querySelector('.modal-card>p');
+        if(p) p.innerHTML='<span style="color:#ffb3b3;font-size:12px">⚠️ Email non envoyé. Copiez vos liens ci-dessous :</span>';
+      },80);
+    }
+  }
+ 
+  try{
+    await emailjs.send(EJS_SERVICE, EJS_TEMPLATE, params);
+    btn.textContent='✅ Email envoyé !';
+    setTimeout(()=>{btn.textContent='✉️ Recevoir mon lien & QR code gratuitement';btn.disabled=false;},3000);
+    showModal(true);
+  }catch(err){
+    console.error('EmailJS error:', err);
+    btn.textContent='✉️ Recevoir mon lien & QR code gratuitement';
+    btn.disabled=false;
+    showModal(false);
+  }
+}
+
+function copyLink(elId,btn){
+  const text=document.getElementById(elId).textContent;
+  navigator.clipboard.writeText(text).then(()=>{
+    const orig=btn.textContent;btn.textContent='✅ Copié !';
+    setTimeout(()=>{btn.textContent=orig;},2000);
+  });
+}
+
+function closeModal(){
+  document.getElementById('modal').classList.remove('active');
+  const name=document.getElementById('f-name').value.trim();
+  const room=nameToRoom(name);
+  const exp=new Date();exp.setDate(exp.getDate()+3);
+  const expTs=Math.floor(exp.getTime()/1000);
+  const baseUrl2=window.location.origin;
+  const participantLink=baseUrl2+'/join.html?room='+room+'&exp='+expTs;
+  document.getElementById('result-link-text').textContent=participantLink;
+  document.getElementById('result-box').style.display='block';
+  const qc=document.getElementById('qrcode');
+  qc.innerHTML='';
+  new QRCode(qc,{text:participantLink,width:130,height:130,colorDark:'#0a0a0a',colorLight:'#fff',correctLevel:QRCode.CorrectLevel.M});
+}
+ 
+/* ── STRIPE CHECKOUT — SELF SERVICE ── */
+const STRIPE_PK   = 'pk_test_51H9DbmLWLP5OU54hWUTKnTThKbC3uky9XxZ32aUnbjF18IYbDzxm1HEnKso7jKja9sYOJrq2sSq99BSP2hVQzh0T00VnCgmuON';
+const PRICE_5H    = 'price_1TIWEcLWLP5OU54hUvXQ5OBb';
+const PRICE_10H   = 'price_1TIWGXLWLP5OU54hc0hhwBrG';
+
+// Tarifs TTC
+const PLAN_DEF = {
+  '1H': {label:'1 heure',  base:5999,  extraLang:4999, hours:1},
+  '5H': {label:'5 heures', base:23800, extraLang:19800, hours:5},
+  '10H':{label:'10 heures',base:45600, extraLang:37600, hours:10},
+};
+let purchasePlan = '1H';
+
+const PU_LANGS = [
+  {code:'fr',country:'fr',label:'Français'},{code:'en',country:'gb',label:'Anglais'},
+  {code:'de',country:'de',label:'Allemand'},{code:'it',country:'it',label:'Italien'},
+  {code:'es',country:'es',label:'Espagnol'},{code:'pt',country:'pt',label:'Portugais'},
+  {code:'ar',country:'lb',label:'Arabe'},{code:'ru',country:'ru',label:'Russe'},
+  {code:'zh',country:'cn',label:'Chinois'},{code:'he',country:'il',label:'Hébreu'},
+  {code:'nl',country:'nl',label:'Néerlandais'},{code:'pl',country:'pl',label:'Polonais'},
+  {code:'uk',country:'ua',label:'Ukrainien'},{code:'tr',country:'tr',label:'Turc'},
+  {code:'ja',country:'jp',label:'Japonais'},{code:'ko',country:'kr',label:'Coréen'},
+  {code:'hi',country:'in',label:'Hindi'},{code:'el',country:'gr',label:'Grec'},
+];
+const PU_FLAGS = Object.fromEntries(PU_LANGS.map(l=>[l.code,l.country]));
+
+function puPopulateSelects(){
+  ['pu-lang-src','pu-lang-p1','pu-lang-p2','pu-lang-p3'].forEach((id,i)=>{
+    const sel=document.getElementById(id);
+    if(!sel) return;
+    sel.innerHTML='';
+    if(i>1){ // p2 et p3 ont une option "aucune"
+      const o=document.createElement('option');
+      o.value=''; o.textContent=currentLang==='fr'?'— Aucune —':'— None —';
+      sel.appendChild(o);
+    }
+    PU_LANGS.forEach(l=>{
+      const o=document.createElement('option');
+      o.value=l.code; o.textContent=l.label;
+      sel.appendChild(o);
+    });
+  });
+  document.getElementById('pu-lang-src').value='fr';
+  document.getElementById('pu-lang-p1').value='en';
+  document.getElementById('pu-lang-p2').value='';
+  document.getElementById('pu-lang-p3').value='';
+  puUpdateFlagSrc(); puUpdateFlagP(1); puUpdateFlagP(2); puUpdateFlagP(3);
+  puUpdateSummary();
+}
+
+function puUpdateFlagSrc(){
+  const v=document.getElementById('pu-lang-src').value;
+  const img=document.getElementById('pu-flag-src');
+  img.src='https://flagcdn.com/w40/'+(PU_FLAGS[v]||'un')+'.png';
+  puUpdateSummary();
+}
+function puUpdateFlagP(n){
+  const v=document.getElementById('pu-lang-p'+n).value;
+  const img=document.getElementById('pu-flag-p'+n);
+  if(v){ img.src='https://flagcdn.com/w40/'+(PU_FLAGS[v]||'un')+'.png'; img.style.display='block'; }
+  else { img.style.display='none'; }
+  puUpdateSummary();
+}
+
+function puUpdateSummary(){
+  const plan=PLAN_DEF[purchasePlan]||PLAN_DEF['1H'];
+  const p1=document.getElementById('pu-lang-p1')?.value||'';
+  const p2=document.getElementById('pu-lang-p2')?.value||'';
+  const p3=document.getElementById('pu-lang-p3')?.value||'';
+  const extraCount=[p2,p3].filter(Boolean).length; // au-delà des 2 incluses (src + p1)
+
+  const baseEur=(plan.base/100).toFixed(2).replace('.',',');
+  const extraTotal=extraCount*(plan.extraLang/100);
+  const total=(plan.base/100 + extraTotal).toFixed(2).replace('.',',');
+
+  const isFr=currentLang==='fr';
+  document.getElementById('puSummaryPlan').textContent=
+    (isFr?'Forfait ':'Plan ')+plan.label+(isFr?' · 2 langues incluses':' · 2 languages included');
+  document.getElementById('puSummaryBase').textContent=baseEur+' €';
+
+  const extraRow=document.getElementById('puExtraRow');
+  if(extraCount>0){
+    extraRow.style.display='flex';
+    document.getElementById('puSummaryExtra').textContent=
+      extraCount+(isFr?' langue supp.':' extra lang.');
+    document.getElementById('puSummaryExtraPrice').textContent=
+      '+'+extraTotal.toFixed(2).replace('.',',')+' €';
+  } else {
+    extraRow.style.display='none';
+  }
+  document.getElementById('puSummaryTotal').textContent=total+' € TTC';
+}
+
+function contactSales(plan){
+  purchasePlan=plan;
+  const planDef=PLAN_DEF[plan]||PLAN_DEF['1H'];
+  const badge=document.getElementById('purchaseBadge');
+  badge.textContent=(currentLang==='fr'?'Forfait ':'Plan ')+planDef.label+' — '+(planDef.base/100).toFixed(2).replace('.',',')+' € TTC';
+  badge.style.background=plan==='10H'?'var(--ink)':'var(--teal)';
+  // Pré-remplir depuis le formulaire gratuit si rempli
+  const n=document.getElementById('f-name'); const e=document.getElementById('f-email');
+  if(n?.value) document.getElementById('pu-name').value=n.value;
+  if(e?.value) document.getElementById('pu-email').value=e.value;
+  puPopulateSelects();
+  document.getElementById('purchaseError').style.display='none';
+  document.getElementById('purchaseOverlay').classList.add('active');
+  document.body.style.overflow='hidden';
+  setLang(currentLang);
+}
+
+function closePurchaseModal(){
+  document.getElementById('purchaseOverlay').classList.remove('active');
+  document.body.style.overflow='';
+}
+
+document.addEventListener('DOMContentLoaded',function(){
+  const ov=document.getElementById('purchaseOverlay');
+  if(ov) ov.addEventListener('click',function(e){if(e.target===this)closePurchaseModal();});
+});
+
+async function purchaseSubmit(){
+  const name =document.getElementById('pu-name').value.trim();
+  const org  =document.getElementById('pu-org').value.trim();
+  const email=document.getElementById('pu-email').value.trim();
+  const src  =document.getElementById('pu-lang-src').value;
+  const p1   =document.getElementById('pu-lang-p1').value;
+  const p2   =document.getElementById('pu-lang-p2').value;
+  const p3   =document.getElementById('pu-lang-p3').value;
+  const errEl=document.getElementById('purchaseError');
+
+  if(!name){errEl.textContent=currentLang==='fr'?'Merci d\'indiquer votre nom.':'Please enter your name.';errEl.style.display='block';return;}
+  if(!email||!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){errEl.textContent=currentLang==='fr'?'Email invalide.':'Invalid email.';errEl.style.display='block';return;}
+  if(!p1){errEl.textContent=currentLang==='fr'?'Choisissez au moins une langue participant.':'Select at least one participant language.';errEl.style.display='block';return;}
+  errEl.style.display='none';
+
+  const room=name.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9]/g,'').slice(0,40)+'_'+Date.now().toString(36);
+  const targets=[p1,p2,p3].filter(Boolean).join(',');
+  const allLangs=[src,...[p1,p2,p3].filter(Boolean)].join(',');
+
+  const plan=PLAN_DEF[purchasePlan]||PLAN_DEF['1H'];
+  const extraLangs=[p2,p3].filter(Boolean).length;
+  const totalCents=plan.base + extraLangs*plan.extraLang;
+
+  const btn=document.getElementById('purchaseSubmitBtn');
+  btn.innerHTML='⏳ '+(currentLang==='fr'?'Redirection vers le paiement…':'Redirecting to payment…');
+  btn.disabled=true;
+
+  try{
+    const res=await fetch('/.netlify/functions/create-checkout',{
+      method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({
+        plan:purchasePlan, room, customerEmail:email,
+        customerName:name, organisation:org,
+        langSrc:src, targets, languages:allLangs,
+        totalCents, hours:plan.hours
+      })
+    });
+    const data=await res.json();
+    if(data.url){ window.location.href=data.url; }
+    else{
+      errEl.textContent='Erreur : '+(data.error||'Paiement impossible.');
+      errEl.style.display='block';
+      btn.innerHTML='💳 '+(currentLang==='fr'?'Procéder au paiement':'Proceed to payment');
+      btn.disabled=false;
+    }
+  }catch(err){
+    errEl.textContent=currentLang==='fr'?'Erreur de connexion. Réessayez.':'Connection error. Try again.';
+    errEl.style.display='block';
+    btn.innerHTML='💳 '+(currentLang==='fr'?'Procéder au paiement':'Proceed to payment');
+    btn.disabled=false;
+  }
+}
+ 
+// Détection automatique de la langue du visiteur
+(function(){
+  const browserLang = (navigator.language || navigator.userLanguage || 'en').slice(0,2);
+  const supported = ['fr','en','de','es','it','pt','nl','ar','he','zh','ru','ja'];
+  if(supported.includes(browserLang)) setLang(browserLang);
+  else if(supported.includes(browserLang.split('-')[0])) setLang(browserLang.split('-')[0]);
+  else setLang('en');
+})();
+</script>
+ 
+  <script>
+    // Service Worker pour installation écran d'accueil
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('/sw.js').catch(function(){});
+    }
+ 
+    // Bannière "Ajouter à l'écran d'accueil" sur Android
+    var deferredPrompt;
+    var installBanner = null;
+ 
+    window.addEventListener('beforeinstallprompt', function(e) {
+      e.preventDefault();
+      deferredPrompt = e;
+ 
+      // Créer la bannière
+      installBanner = document.createElement('div');
+      installBanner.id = 'installBanner';
+      installBanner.style.cssText = 'position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:#0d1f1a;color:#fff;padding:14px 20px;border-radius:14px;box-shadow:0 4px 20px rgba(0,0,0,.3);display:flex;align-items:center;gap:12px;z-index:9999;max-width:340px;width:90%;border:1px solid #2dd4bf';
+      installBanner.innerHTML =
+        '<img src="/favicon-192.png" width="40" height="40" style="border-radius:8px">'+
+        '<div style="flex:1"><div style="font-weight:700;font-size:14px">TranslateTheWorld</div><div style="font-size:11px;color:#2dd4bf">Ajouter à l'écran d'accueil</div></div>'+
+        '<button onclick="doInstall()" style="background:#2dd4bf;color:#0d1f1a;border:none;border-radius:8px;padding:8px 14px;font-weight:700;cursor:pointer;font-size:13px">Installer</button>'+
+        '<button onclick="dismissBanner()" style="background:none;border:none;color:#999;cursor:pointer;font-size:18px;padding:0 4px">✕</button>';
+      document.body.appendChild(installBanner);
+    });
+ 
+    function doInstall() {
+      if (!deferredPrompt) return;
+      deferredPrompt.prompt();
+      deferredPrompt.userChoice.then(function(){ dismissBanner(); });
+    }
+ 
+    function dismissBanner() {
+      if (installBanner) { installBanner.remove(); installBanner = null; }
+    }
+  </script>
+ 
+<!-- ══ MODAL BOOKING ══ -->
+<div id="bookingOverlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:2000;align-items:center;justify-content:center;padding:16px">
+  <div style="background:#fff;border-radius:20px;max-width:520px;width:100%;max-height:90vh;overflow-y:auto;box-shadow:0 24px 60px rgba(0,0,0,.3)">
+    <div style="background:#0d1f1a;border-radius:20px 20px 0 0;padding:24px 28px;display:flex;justify-content:space-between;align-items:center">
+      <div>
+        <div style="font-size:11px;font-weight:700;letter-spacing:.15em;text-transform:uppercase;color:#2dd4bf;margin-bottom:4px" id="book-label">Book a Demo</div>
+        <div style="font-size:18px;font-weight:800;color:#fff" id="book-title">Choose a slot</div>
+      </div>
+      <button onclick="closeBookingModal()" style="background:rgba(255,255,255,.1);border:none;color:#fff;width:36px;height:36px;border-radius:50%;font-size:18px;cursor:pointer">x</button>
+    </div>
+    <div style="padding:24px 28px">
+      <div id="bookStep1">
+        <div id="bookSlotsGrid" style="display:flex;flex-direction:column;gap:16px"></div>
+        <div id="bookNoSlots" style="display:none;text-align:center;padding:40px 20px;color:#999;font-size:14px">
+          No availability for the next 7 days.<br>Contact us: <a href="mailto:dnb@sogedicom.com" style="color:#2dd4bf;font-weight:600">dnb@sogedicom.com</a>
+        </div>
+      </div>
+      <div id="bookStep2" style="display:none">
+        <button onclick="bookingBackToStep1()" style="background:none;border:none;color:#2dd4bf;font-weight:600;cursor:pointer;font-size:13px;margin-bottom:16px;padding:0">Back</button>
+        <div id="bookSelectedSlot" style="background:#f0faf8;border:1.5px solid #2dd4bf;border-radius:10px;padding:12px 16px;font-weight:700;font-size:14px;color:#0d1f1a;margin-bottom:20px"></div>
+        <div style="display:grid;gap:12px">
+          <div>
+            <label style="font-size:11px;font-weight:700;color:#999;letter-spacing:.08em;text-transform:uppercase;display:block;margin-bottom:6px">Full name *</label>
+            <input id="bookName" type="text" placeholder="Marie Dupont" style="width:100%;padding:11px 14px;border-radius:10px;border:1.5px solid #b8b8b8;font-size:14px;font-family:Arial,sans-serif;box-sizing:border-box;outline:none">
+          </div>
+          <div>
+            <label style="font-size:11px;font-weight:700;color:#999;letter-spacing:.08em;text-transform:uppercase;display:block;margin-bottom:6px">Email *</label>
+            <input id="bookEmail" type="email" placeholder="marie@company.com" style="width:100%;padding:11px 14px;border-radius:10px;border:1.5px solid #b8b8b8;font-size:14px;font-family:Arial,sans-serif;box-sizing:border-box;outline:none">
+          </div>
+          <div>
+            <label style="font-size:11px;font-weight:700;color:#999;letter-spacing:.08em;text-transform:uppercase;display:block;margin-bottom:6px">Company</label>
+            <input id="bookOrg" type="text" placeholder="ACME Corp" style="width:100%;padding:11px 14px;border-radius:10px;border:1.5px solid #b8b8b8;font-size:14px;font-family:Arial,sans-serif;box-sizing:border-box;outline:none">
+          </div>
+        </div>
+        <div id="bookError" style="display:none;color:#e53e3e;font-size:13px;margin-top:10px"></div>
+        <button onclick="confirmBooking()" id="bookConfirmBtn" style="width:100%;margin-top:20px;background:#2dd4bf;color:#0d1f1a;border:none;border-radius:10px;padding:14px;font-size:15px;font-weight:800;cursor:pointer;font-family:Arial,sans-serif">Confirm booking</button>
+      </div>
+      <div id="bookStep3" style="display:none;text-align:center;padding:20px 0">
+        <div style="font-size:48px;margin-bottom:16px">done</div>
+        <div style="font-size:20px;font-weight:800;color:#0d1f1a;margin-bottom:10px">Booking confirmed!</div>
+        <div id="bookConfirmText" style="font-size:14px;color:#555;line-height:1.7;margin-bottom:24px"></div>
+        <button onclick="closeBookingModal()" style="background:#0d1f1a;color:#fff;border:none;border-radius:10px;padding:12px 32px;font-size:14px;font-weight:700;cursor:pointer;font-family:Arial,sans-serif">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+ 
+<script>
+var selectedBookingSlot = null;
+function initBookingFb(){
+  try{
+    var cfg={apiKey:"AIzaSyCQZ_htYiPyUv50oIObwN3eGSJ9SneO7sI",databaseURL:"https://sogevoxreunion-default-rtdb.europe-west1.firebasedatabase.app",projectId:"sogevoxreunion"};
+    if(typeof firebase!=='undefined'&&!firebase.apps.length) firebase.initializeApp(cfg);
+    return firebase.database();
+  }catch(e){return null;}
+}
+function openBookingModal(){
+  var o=document.getElementById('bookingOverlay'); o.style.display='flex';
+  document.body.style.overflow='hidden';
+  var isFr=(typeof currentLang!=='undefined'&&currentLang==='fr');
+  document.getElementById('book-label').textContent=isFr?'Reserver une demo':'Book a Demo';
+  document.getElementById('book-title').textContent=isFr?'Choisissez un creneau':'Choose a slot';
+  document.getElementById('bookStep1').style.display='block';
+  document.getElementById('bookStep2').style.display='none';
+  document.getElementById('bookStep3').style.display='none';
+  loadBookingSlots();
+}
+function closeBookingModal(){document.getElementById('bookingOverlay').style.display='none';document.body.style.overflow='';}
+document.getElementById('bookingOverlay').addEventListener('click',function(e){if(e.target===this)closeBookingModal();});
+function loadBookingSlots(){
+  var grid=document.getElementById('bookSlotsGrid');
+  var noSlots=document.getElementById('bookNoSlots');
+  grid.innerHTML='<div style="text-align:center;padding:30px;color:#999;font-size:13px">Loading...</div>';
+  noSlots.style.display='none';
+  var db=initBookingFb();
+  if(!db){grid.innerHTML='';noSlots.style.display='block';return;}
+  var today=new Date();today.setHours(0,0,0,0);
+  var days=[];
+  for(var i=0;i<7;i++){var d=new Date(today);d.setDate(today.getDate()+i);days.push(d.toISOString().slice(0,10));}
+  db.ref('demo_availability').once('value',function(snap){
+    var avail=snap.val()||{};
+    db.ref('demo_bookings').once('value',function(bSnap){
+      var booked=bSnap.val()||{};
+      var bookedKeys=new Set(Object.keys(booked));
+      var hasSlots=false;
+      grid.innerHTML='';
+      days.forEach(function(date){
+        if(!avail[date]||!avail[date].slots) return;
+        var slots=avail[date].slots.filter(function(s){return !bookedKeys.has(date+'_'+s);});
+        if(!slots.length) return;
+        hasSlots=true;
+        var d=new Date(date+'T12:00:00');
+        var dayLabel=d.toLocaleDateString('en-GB',{weekday:'long',day:'numeric',month:'long'});
+        var dayDiv=document.createElement('div');
+        dayDiv.innerHTML='<div style="font-size:13px;font-weight:700;color:#0d1f1a;margin-bottom:10px;padding-bottom:8px;border-bottom:1px solid #f0f0f0">'+dayLabel+'</div>';
+        var row=document.createElement('div');
+        row.style.cssText='display:flex;flex-wrap:wrap;gap:8px';
+        slots.forEach(function(slot){
+          var btn=document.createElement('button');
+          btn.textContent=slot;
+          btn.style.cssText='background:#f0faf8;border:1.5px solid #2dd4bf;border-radius:8px;padding:8px 16px;font-size:13px;font-weight:700;color:#0d1f1a;cursor:pointer;transition:all .15s';
+          btn.onmouseover=function(){this.style.background='#2dd4bf';};
+          btn.onmouseout=function(){this.style.background='#f0faf8';};
+          (function(d2,s2,dl2){btn.onclick=function(){selectedBookingSlot={date:d2,time:s2,label:dl2+' at '+s2};showBookingStep2(dl2,s2);};})(date,slot,dayLabel);
+          row.appendChild(btn);
+        });
+        dayDiv.appendChild(row);
+        grid.appendChild(dayDiv);
+      });
+      if(!hasSlots){grid.innerHTML='';noSlots.style.display='block';}
+    });
+  });
+}
+function showBookingStep2(dl,t){
+  document.getElementById('bookStep1').style.display='none';
+  document.getElementById('bookStep2').style.display='block';
+  document.getElementById('bookSelectedSlot').textContent=dl+' - '+t;
+}
+function bookingBackToStep1(){
+  document.getElementById('bookStep2').style.display='none';
+  document.getElementById('bookStep1').style.display='block';
+}
+async function confirmBooking(){
+  var name=document.getElementById('bookName').value.trim();
+  var email=document.getElementById('bookEmail').value.trim();
+  var org=document.getElementById('bookOrg').value.trim();
+  var errEl=document.getElementById('bookError');
+  if(!name){errEl.textContent='Please enter your name.';errEl.style.display='block';return;}
+  if(!email||!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){errEl.textContent='Invalid email.';errEl.style.display='block';return;}
+  errEl.style.display='none';
+  var btn=document.getElementById('bookConfirmBtn');
+  btn.textContent='Confirming...';btn.disabled=true;
+  var slotKey=selectedBookingSlot.date+'_'+selectedBookingSlot.time;
+  try{
+    var db=initBookingFb();
+    await db.ref('demo_bookings/'+slotKey).set({slot:slotKey,date:selectedBookingSlot.date,time:selectedBookingSlot.time,name:name,email:email,org:org||'-',bookedAt:Date.now()});
+    try{
+      await emailjs.send('service_98a5sho','template_ofhz8y6',{to_email:'dnb@sogedicom.com',from_name:name,from_org:org||'-',from_email:email,message:'DEMO BOOKING - '+selectedBookingSlot.label+' | Name: '+name+' | Email: '+email+' | Org: '+(org||'-'),reply_to:email});
+    }catch(e2){console.warn('email',e2);}
+    document.getElementById('bookStep2').style.display='none';
+    document.getElementById('bookStep3').style.display='block';
+    document.getElementById('bookConfirmText').innerHTML='Your demo is booked for <strong>'+selectedBookingSlot.label+'</strong>.<br>We will contact you at <strong>'+email+'</strong>.';
+  }catch(err){
+    errEl.textContent='Error: '+err.message;errEl.style.display='block';
+    btn.textContent='Confirm booking';btn.disabled=false;
+  }
+}
+</script>
+ 
+</body>
+</html>
+ 
+
