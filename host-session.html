@@ -1,0 +1,2200 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>TranslateTheWorld — Host Session</title>
+<link rel="icon" type="image/svg+xml" href="/favicon.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;700;800&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<!-- Firebase -->
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+<!-- Azure Speech SDK -->
+<script src="https://aka.ms/csspeech/jsbrowserpackageraw"></script>
+<style>
+:root{
+  /* ── Variables communes (police, etc.) ── */
+  --font:'DM Sans',sans-serif;--mono:'DM Mono',monospace;
+  --r:14px;
+}
+/* ── Thème clair ── */
+body.theme-light{
+  --bg:#f7f8f6;--surface:#ffffff;--card:#f0f2ef;--card2:#e8ebe7;
+  --border:rgba(21,122,110,.18);--border2:rgba(0,0,0,.09);
+  --teal:#157a6e;--teal-dim:rgba(21,122,110,.08);--teal-glow:rgba(21,122,110,.2);
+  --gold:#a07000;--red:#dc2626;--red-dim:rgba(220,38,38,.08);
+  --white:#ffffff;--ink:#0d1f1a;--mid:#5a7268;--dim:#888;
+  --part-bg:#f7f8f6;
+  --btn-bg:#ffffff;
+  --shadow-lg:rgba(0,0,0,.12);
+}
+/* ── Thème sombre ── */
+body.theme-dark{
+  --bg:#0b1512;--surface:#121e19;--card:#1a2b24;--card2:#243632;
+  --border:rgba(45,212,191,.22);--border2:rgba(255,255,255,.08);
+  --teal:#2dd4bf;--teal-dim:rgba(45,212,191,.1);--teal-glow:rgba(45,212,191,.25);
+  --gold:#e5c569;--red:#f87171;--red-dim:rgba(248,113,113,.12);
+  --white:#0b1512;--ink:#e8edeb;--mid:#8a9e97;--dim:#6a7a72;
+  --part-bg:#1a2b24;
+  --btn-bg:#1a2b24;
+  --shadow-lg:rgba(0,0,0,.45);
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;overflow:hidden}
+body{font-family:var(--font);background:var(--bg);color:var(--ink);display:flex;flex-direction:column}
+
+/* ── TOP BAR ── */
+.topbar{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:0 20px;height:56px;flex-shrink:0;
+  background:var(--surface);border-bottom:1px solid var(--border2);
+  gap:12px;
+}
+.tb-left{display:flex;align-items:center;gap:14px;min-width:0}
+.tb-logo{font-size:14px;font-weight:800;color:var(--ink);letter-spacing:-.02em;text-decoration:none;white-space:nowrap}
+.tb-logo span{background:linear-gradient(110deg,#e8690a,#f5c842,#2dd4bf);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.tb-session{font-size:12px;color:var(--mid);font-family:var(--mono);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tb-center{display:flex;align-items:center;gap:10px}
+.tb-right{display:flex;align-items:center;gap:8px;flex-shrink:0}
+
+/* Timer */
+.timer{
+  font-family:var(--mono);font-size:15px;font-weight:500;
+  color:var(--teal);background:var(--teal-dim);border:1px solid var(--border);
+  padding:5px 14px;border-radius:999px;letter-spacing:.05em;
+}
+.timer.warning{color:#a07000;background:rgba(240,212,138,.2);border-color:rgba(212,168,67,.4)}
+.timer.danger{color:var(--red);background:var(--red-dim);border-color:rgba(220,38,38,.25)}
+
+/* Status dot */
+.status-dot{width:8px;height:8px;border-radius:50%;background:#ccc;display:inline-block;margin-right:4px}
+.status-dot.live{background:var(--teal);box-shadow:0 0 8px rgba(21,122,110,.4);animation:pulse 1.5s ease infinite}
+.status-dot.speaking{background:#dc2626;box-shadow:0 0 8px rgba(220,38,38,.4);animation:pulse .8s ease infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+@keyframes raiseHandPulse{0%,100%{box-shadow:inset 0 0 0 0 rgba(212,168,67,0)}50%{box-shadow:inset 0 0 24px 0 rgba(212,168,67,.4)}}
+
+/* ── Clignotement du bouton "Inviter" ──
+   Actif tant que l'utilisateur n'a pas cliqué dessus une première fois.
+   Une fois cliqué, on retire la classe .invite-btn-pulse et l'animation s'arrête,
+   pour ne pas distraire pendant la session. */
+@keyframes invitePulse{
+  0%,100%{
+    box-shadow:0 0 0 0 rgba(45,212,191,.6),0 0 14px 0 rgba(45,212,191,.5);
+    transform:scale(1);
+  }
+  50%{
+    box-shadow:0 0 0 10px rgba(45,212,191,0),0 0 22px 4px rgba(45,212,191,.85);
+    transform:scale(1.06);
+  }
+}
+.invite-btn-pulse{
+  animation:invitePulse 1.4s ease infinite;
+}
+
+/* Buttons */
+.btn{
+  display:inline-flex;align-items:center;gap:6px;
+  padding:7px 14px;border-radius:8px;border:none;
+  font-size:12px;font-weight:700;font-family:var(--font);
+  cursor:pointer;transition:all .15s;white-space:nowrap;
+}
+.btn-ghost{background:transparent;border:1px solid var(--border2);color:var(--mid)}
+.btn-ghost:hover{border-color:var(--teal);color:var(--teal)}
+.btn-teal{background:var(--teal);color:#fff}
+.btn-teal:hover{opacity:.85}
+.btn-red{background:var(--red-dim);border:1px solid rgba(220,38,38,.25);color:var(--red)}
+.btn-red:hover{background:rgba(220,38,38,.15)}
+.btn-gold{background:rgba(212,168,67,.12);border:1px solid rgba(212,168,67,.35);color:var(--gold)}
+.btn-gold:hover{background:rgba(212,168,67,.2)}
+.btn-speaker{background:rgba(220,38,38,.08);border:1.5px solid rgba(220,38,38,.3);color:#dc2626;font-size:13px;padding:9px 20px;border-radius:10px}
+.btn-speaker.active{background:#dc2626;border-color:#dc2626;color:#fff;box-shadow:0 0 20px rgba(220,38,38,.3);animation:speakPulse 2s ease infinite}
+@keyframes speakPulse{0%,100%{box-shadow:0 0 20px rgba(220,38,38,.3)}50%{box-shadow:0 0 32px rgba(220,38,38,.55)}}
+.btn-participant{background:var(--teal-dim);border:1.5px solid var(--border);color:var(--teal);font-size:13px;padding:9px 20px;border-radius:10px}
+.btn-participant.active{background:rgba(21,122,110,.15);border-color:var(--teal);color:var(--teal)}
+.btn-stop{background:var(--red-dim);border:1.5px solid rgba(220,38,38,.25);color:var(--red);font-size:12px;padding:7px 14px;border-radius:8px}
+.btn-stop:hover{background:rgba(220,38,38,.15)}
+
+/* ─── NEW : bouton MUTE (gris/orange selon état) ─── */
+.btn-mute{
+  background:rgba(160,160,160,.12);border:1.5px solid rgba(160,160,160,.35);
+  color:var(--mid);font-size:13px;padding:9px 18px;border-radius:10px;
+  font-weight:800;cursor:pointer;font-family:inherit;
+  display:flex;align-items:center;gap:6px;
+  transition:all .15s;
+}
+.btn-mute:hover{background:rgba(160,160,160,.2)}
+.btn-mute.muted{
+  background:#f59e0b;border-color:#f59e0b;color:#fff;
+  box-shadow:0 0 14px rgba(245,158,11,.4);
+}
+
+/* ─── NEW : bouton STOP principal (rouge, gros, visible) ─── */
+.btn-stop-main{
+  background:#dc2626;border:1.5px solid #dc2626;color:#fff;
+  font-size:13px;padding:9px 18px;border-radius:10px;
+  font-weight:800;cursor:pointer;font-family:inherit;
+  display:flex;align-items:center;gap:6px;
+  transition:all .15s;
+  box-shadow:0 2px 8px rgba(220,38,38,.25);
+}
+.btn-stop-main:hover{background:#b91c1c;border-color:#b91c1c;box-shadow:0 4px 12px rgba(220,38,38,.4)}
+
+/* Language switcher in topbar */
+.lang-switcher{
+  display:flex;gap:2px;
+  background:var(--card2);
+  border:1px solid var(--border2);
+  border-radius:999px;padding:3px;
+}
+.lang-btn{
+  border:none;background:transparent;
+  color:var(--mid);
+  font-family:var(--font);font-size:11px;font-weight:700;
+  padding:4px 10px;border-radius:999px;cursor:pointer;
+  display:flex;align-items:center;gap:5px;
+  transition:all .15s;
+}
+.lang-btn:hover{color:var(--ink)}
+.lang-btn.active{
+  background:var(--teal-dim);
+  color:var(--teal);
+}
+.lang-btn .flag{
+  width:14px;height:10px;border-radius:2px;overflow:hidden;display:inline-block;
+}
+.lang-btn .flag img{width:100%;height:100%;object-fit:cover;display:block}
+
+/* ── MAIN LAYOUT ── */
+.main{display:flex;flex:1;overflow:hidden;gap:0}
+
+/* Sidebar */
+.sidebar{
+  width:260px;flex-shrink:0;
+  border-right:1px solid var(--border2);
+  background:var(--surface);
+  display:flex;flex-direction:column;
+  overflow:hidden;
+  transition:width .25s;
+}
+.sidebar.collapsed{width:0;border-right:none}
+@media(max-width:700px){.sidebar{display:none}}
+
+/* ── Mobile topbar: organisation propre en 2 lignes ── */
+@media(max-width:700px){
+  /* Ligne 1 : Logo+code session à gauche, Timer à droite
+     Ligne 2 : Tous les boutons d'action centrés, taille homogène */
+  .topbar{
+    padding:8px 10px;
+    gap:6px;
+    height:auto;
+    flex-wrap:wrap;
+    row-gap:8px;
+    align-items:center;
+  }
+  .tb-left{
+    gap:8px;
+    flex:1 1 auto;
+    min-width:0;
+  }
+  .tb-session{font-size:10px;max-width:120px}
+  /* Timer reste sur la ligne 1, à droite */
+  .tb-center{
+    flex:0 0 auto;
+    margin-left:auto;
+  }
+
+  /* ── Barre de boutons : HARMONIE + SYMÉTRIE ──
+     Tous les contrôles partagent la même hauteur (34px), le même rythme
+     vertical et le même style. La couleur verte du bouton Partager
+     suffit à hiérarchiser sans casser l'alignement visuel. */
+  .tb-right{
+    flex:0 0 100%;
+    width:100%;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    gap:8px;
+    flex-wrap:nowrap;
+  }
+  /* Hauteur unifiée pour tous les contrôles de la barre */
+  .tb-right .btn,
+  .tb-right .lang-switcher{
+    height:34px !important;
+    min-height:34px !important;
+    box-sizing:border-box;
+    display:inline-flex;
+    align-items:center;
+  }
+  /* Boutons texte/icône : padding & font-size uniformes */
+  .tb-right .btn{
+    padding:0 12px !important;
+    font-size:11px !important;
+    gap:5px;
+    flex:0 0 auto;
+    border-radius:10px;
+  }
+  /* Partager : même hauteur, mis en valeur uniquement par la couleur */
+  .tb-right #shareBtn{
+    padding:0 14px !important;
+    font-size:11px !important;
+    font-weight:800;
+  }
+  /* Bouton thème (icône seule) : carré régulier */
+  .tb-right #themeToggleBtn{
+    width:40px;
+    min-width:40px;
+    padding:0 !important;
+    justify-content:center;
+  }
+  /* Bouton participants (icône + nombre) : largeur fixe régulière */
+  .tb-right #partToggleTop{
+    min-width:52px;
+    padding:0 10px !important;
+    justify-content:center;
+  }
+  /* Switcher de langue : aligné en hauteur sur les autres boutons */
+  .tb-right .lang-switcher{
+    gap:2px;
+    padding:3px;
+  }
+  .tb-right .lang-btn{
+    padding:4px 10px;
+    font-size:10px;
+    height:auto;
+    min-height:0;
+  }
+  #themeToggleLabel{display:none}
+  .timer{font-size:13px;padding:4px 12px}
+
+  /* ── Mobile mode-bar: label sur sa ligne, boutons centrés ── */
+  .mode-bar{
+    padding:10px 12px;
+    gap:8px;
+    justify-content:center;
+    row-gap:8px;
+  }
+  .mode-label{
+    flex:0 0 100%;
+    text-align:center;
+    margin:0 0 2px;
+  }
+}
+
+.sidebar-tab{
+  display:flex;gap:0;border-bottom:1px solid var(--border2);flex-shrink:0;
+}
+.s-tab{
+  flex:1;padding:10px;text-align:center;font-size:11px;font-weight:700;
+  color:var(--mid);letter-spacing:.06em;text-transform:uppercase;
+  cursor:pointer;border-bottom:2px solid transparent;transition:all .15s;
+}
+.s-tab.active{color:var(--teal);border-bottom-color:var(--teal)}
+
+.sidebar-body{flex:1;overflow-y:auto;padding:14px}
+.sidebar-body::-webkit-scrollbar{width:4px}
+.sidebar-body::-webkit-scrollbar-thumb{background:rgba(0,0,0,.1);border-radius:2px}
+
+/* Participants list */
+.part-count{font-size:11px;color:var(--mid);margin-bottom:12px;font-family:var(--mono)}
+.part-item{
+  display:flex;align-items:center;gap:10px;
+  padding:9px 10px;border-radius:8px;
+  background:var(--part-bg);border:1px solid var(--border2);
+  margin-bottom:7px;
+}
+.part-flag{width:22px;height:16px;border-radius:2px;object-fit:cover;flex-shrink:0}
+.part-name{font-size:13px;font-weight:600;color:var(--ink);flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.part-lang{font-size:10px;color:var(--mid);font-family:var(--mono)}
+.part-dot{width:6px;height:6px;border-radius:50%;background:var(--teal);flex-shrink:0}
+
+/* Download panel */
+.dl-btn{
+  display:flex;align-items:center;gap:8px;
+  width:100%;padding:11px 14px;border-radius:8px;
+  border:1px solid var(--border2);background:var(--btn-bg);
+  color:var(--ink);font-size:13px;font-weight:600;font-family:var(--font);
+  cursor:pointer;margin-bottom:8px;transition:all .15s;text-align:left;
+}
+.dl-btn:hover{background:var(--teal-dim);border-color:var(--border)}
+.dl-btn .icon{font-size:16px}
+
+/* ── CONTENT AREA ── */
+.content{flex:1;display:flex;flex-direction:column;overflow:hidden;position:relative}
+
+/* Mode bar */
+.mode-bar{
+  display:flex;align-items:center;gap:10px;
+  padding:12px 20px;
+  background:var(--surface);
+  border-bottom:1px solid var(--border2);
+  flex-shrink:0;
+  flex-wrap:wrap;
+}
+.mode-label{font-size:11px;color:var(--mid);font-weight:700;letter-spacing:.08em;text-transform:uppercase;margin-right:4px}
+
+/* Subtitles area */
+.subtitles{
+  flex:1;overflow-y:auto;
+  padding:24px 28px;
+  display:flex;flex-direction:column;
+  gap:14px;
+  background:var(--bg);
+}
+.subtitles::-webkit-scrollbar{width:4px}
+.subtitles::-webkit-scrollbar-thumb{background:rgba(0,0,0,.1);border-radius:2px}
+
+.sub-entry{animation:slideIn .3s ease}
+@keyframes slideIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+
+.sub-speaker{
+  font-size:10px;font-weight:700;color:var(--mid);letter-spacing:.06em;
+  text-transform:uppercase;margin-bottom:4px;display:flex;align-items:center;gap:6px;
+}
+.sub-speaker .from-flag{width:16px;height:12px;border-radius:2px;object-fit:cover}
+.sub-text{font-size:18px;font-weight:500;line-height:1.5;color:var(--ink)}
+.sub-text.interim{color:rgba(0,0,0,.85);font-style:normal}
+
+/* B — Traductions sous le texte hôte */
+.sub-translations{margin-top:8px;display:flex;flex-direction:column;gap:5px;padding-left:4px;border-left:3px solid var(--border)}
+.sub-trans-line{display:flex;align-items:baseline;gap:7px;font-size:14px;line-height:1.4}
+.sub-trans-lang{font-size:10px;font-weight:700;color:var(--mid);text-transform:uppercase;letter-spacing:.06em;flex-shrink:0;min-width:52px}
+.sub-trans-text{color:var(--mid);font-weight:400}
+
+/* Mic indicator */
+.mic-bar{
+  padding:14px 20px;border-top:1px solid var(--border2);
+  background:var(--surface);flex-shrink:0;
+  display:flex;align-items:center;gap:16px;flex-wrap:wrap;
+}
+.mic-viz{display:flex;align-items:flex-end;gap:3px;height:28px}
+.mic-bar-el{width:4px;border-radius:2px;background:var(--teal);min-height:4px;transition:height .08s}
+.mic-status-text{font-size:12px;color:var(--mid)}
+.mic-status-text.speaking{color:var(--red)}
+
+/* Overlay: session ended */
+.end-overlay{
+  display:none;position:absolute;inset:0;
+  background:rgba(247,248,246,.95);z-index:50;
+  align-items:center;justify-content:center;flex-direction:column;gap:16px;
+  text-align:center;padding:32px;
+}
+.end-overlay.show{display:flex}
+.end-title{font-size:24px;font-weight:800;color:var(--ink)}
+.end-sub{font-size:14px;color:var(--mid);line-height:1.6;margin-bottom:8px}
+
+/* Participants sidebar toggle button (mobile/small) */
+.part-toggle-btn{
+  display:none;position:fixed;top:64px;right:12px;z-index:40;
+  background:var(--btn-bg);border:1px solid var(--border);
+  color:var(--teal);border-radius:999px;padding:6px 12px;
+  font-size:11px;font-weight:700;font-family:var(--font);cursor:pointer;
+  box-shadow:0 2px 10px var(--shadow-lg);
+  opacity:.9;
+}
+@media(max-width:700px){.part-toggle-btn{display:flex;align-items:center;gap:5px}}
+
+/* No content message */
+.empty-msg{
+  flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;
+  color:var(--mid);text-align:center;gap:10px;padding:40px;
+}
+.empty-msg .icon{font-size:40px;opacity:.4}
+.empty-msg p{font-size:14px;line-height:1.6}
+</style>
+</head>
+<body class="theme-dark">
+
+<!-- THEME : applique IMMÉDIATEMENT le thème pour éviter le flash en clair -->
+<script>
+(function(){
+  try{
+    var saved = localStorage.getItem('ttw-theme');
+    if(saved === 'light'){
+      document.body.classList.remove('theme-dark');
+      document.body.classList.add('theme-light');
+    }
+    // Sinon on garde theme-dark (défaut)
+  }catch(e){/* navigation privée : on reste en dark */}
+})();
+</script>
+
+<!-- ════════════════════════════════════════════════════════════
+     SIGNAL "À VOUS DE PARLER" — apparaît 4 secondes lors de la passation
+     ════════════════════════════════════════════════════════════ -->
+<div id="floorRecoveredAlert" style="
+  display:none;
+  position:fixed;top:0;left:0;right:0;z-index:99999;
+  background:linear-gradient(135deg,#10b981 0%,#157a6e 100%);
+  color:#ffffff;
+  padding:18px 24px;
+  text-align:center;
+  font-family:Arial,Helvetica,sans-serif;font-weight:800;font-size:18px;letter-spacing:.01em;
+  box-shadow:0 8px 28px rgba(16,185,129,.45);
+  transform:translateY(-100%);
+  transition:transform .35s cubic-bezier(.2,.8,.2,1);
+  pointer-events:none;
+">
+  <span id="floorRecoveredText">🎤 À vous de parler !</span>
+</div>
+
+<!-- ════════════════════════════════════════════════════════════
+     VOYANT PERMANENT "MICRO ACTIF" — visible tant que Pierre est orateur
+     ════════════════════════════════════════════════════════════ -->
+<div id="micOnIndicator" style="
+  display:none;
+  position:fixed;top:80px;right:20px;z-index:9998;
+  background:#dc2626;color:#ffffff;
+  padding:8px 14px 8px 30px;
+  border-radius:999px;
+  font-family:Arial,Helvetica,sans-serif;font-weight:800;font-size:12px;letter-spacing:.06em;
+  box-shadow:0 4px 14px rgba(220,38,38,.45);
+  pointer-events:none;
+  white-space:nowrap;
+  max-width:calc(100vw - 40px);
+  overflow:hidden;
+  text-overflow:ellipsis;
+  box-sizing:border-box;
+">
+  <!-- Point rouge clignotant -->
+  <span style="
+    position:absolute;left:12px;top:50%;transform:translateY(-50%);
+    width:10px;height:10px;border-radius:50%;background:#fff;
+    animation:micDotPulse 1.2s ease-in-out infinite;
+  "></span>
+  <span id="micOnIndicatorText">MICRO ACTIF</span>
+</div>
+
+<style>
+@keyframes micDotPulse{
+  0%,100%{opacity:1;transform:translateY(-50%) scale(1)}
+  50%{opacity:.4;transform:translateY(-50%) scale(.7)}
+}
+.floor-alert-show{transform:translateY(0)!important}
+/* Mobile portrait : badge minuscule en haut à droite, ne chevauche pas les boutons */
+@media(max-width:700px) and (orientation:portrait){
+  #micOnIndicator{
+    /* Coin haut-droite extrême, hors zone des boutons */
+    top:6px !important;
+    right:8px !important;
+    bottom:auto !important;
+    left:auto !important;
+    transform:none !important;
+    font-size:9px !important;
+    padding:3px 9px 3px 18px !important;
+    letter-spacing:.04em !important;
+    max-width:100px !important;
+    z-index:10001 !important;
+    border-radius:999px !important;
+  }
+  #micOnIndicator > span:first-child{
+    width:6px !important;height:6px !important;left:7px !important;
+  }
+}
+/* Mobile paysage : on garde la position d'origine en haut à droite */
+@media(max-width:900px) and (orientation:landscape){
+  #micOnIndicator{top:auto;bottom:18px;right:18px;font-size:11px;padding:7px 12px 7px 26px}
+  #floorRecoveredAlert{font-size:16px;padding:14px 18px}
+}
+</style>
+
+<!-- ── TOP BAR ── -->
+<div class="topbar">
+  <div class="tb-left">
+    <a href="/" class="tb-logo">TT<span>W</span></a>
+    <span class="tb-session" id="sessionLabel">Loading…</span>
+  </div>
+  <div class="tb-center">
+    <span class="status-dot live" id="statusDot"></span>
+    <span class="timer" id="timer">00:00</span>
+  </div>
+  <div class="tb-right">
+    <div class="lang-switcher">
+      <button class="lang-btn" id="btnLangFr" onclick="setUiLang('fr')">
+        <span class="flag"><img src="https://flagcdn.com/w40/fr.png" alt=""></span>FR
+      </button>
+      <button class="lang-btn active" id="btnLangEn" onclick="setUiLang('en')">
+        <span class="flag"><img src="https://flagcdn.com/w40/gb.png" alt=""></span>EN
+      </button>
+    </div>
+    <button type="button" class="btn btn-ghost" id="themeToggleBtn" onclick="toggleTheme()" title="Toggle theme" style="padding:8px 14px;font-size:13px;font-weight:700;position:relative;z-index:10000;cursor:pointer;pointer-events:auto;user-select:none;gap:6px">🌙 <span id="themeToggleLabel">Dark</span></button>
+    <button type="button" class="btn btn-ghost invite-btn-pulse" id="shareBtn" onclick="onInviteClick()" title="Invite participants — SMS, WhatsApp, email" style="padding:9px 16px;font-size:13px;font-weight:800;background:#2dd4bf;border:2px solid #2dd4bf;color:#0b1512">📨 <span id="shareBtnLabel">Invite</span></button>
+    <button class="btn btn-ghost" onclick="toggleSidebar()" id="partToggleTop">👥 <span id="partCount">0</span></button>
+    <button class="btn btn-stop" id="btnStop" onclick="confirmStop()" style="display:none">⏹ Stop</button>
+  </div>
+</div>
+
+<!-- ── MAIN ── -->
+<div class="main">
+
+  <!-- Sidebar -->
+  <div class="sidebar" id="sidebar">
+    <div class="sidebar-tab">
+      <div class="s-tab active" id="tabPart" onclick="switchTab('participants')">Participants</div>
+      <div class="s-tab" id="tabDl" onclick="switchTab('downloads')">Download</div>
+    </div>
+    <div class="sidebar-body" id="sidebarBody">
+      <!-- Participants panel (default) -->
+      <div id="panelParticipants">
+        <div class="part-count" id="partCountLabel">0 connected</div>
+        <div id="partList"><div class="waiting-msg" style="color:rgba(255,255,255,.2);font-size:12px">Waiting for connections…</div></div>
+      </div>
+      <!-- Downloads panel -->
+      <div id="panelDownloads" style="display:none">
+        <div id="dlIntro" style="font-size:11px;color:var(--mid);margin-bottom:14px;line-height:1.5">Download your session data after it has ended.</div>
+        <button class="dl-btn" onclick="downloadParticipants()">
+          <span class="icon">👥</span>
+          <span><strong id="dlPartsTitle">Participants list</strong><br><span class="dl-sub" id="dlPartsSub" style="font-size:11px;color:var(--mid)">CSV format</span></span>
+        </button>
+        <button class="dl-btn" onclick="downloadTranscript()">
+          <span class="icon">📝</span>
+          <span><strong id="dlTrTitle">Transcript</strong><br><span class="dl-sub" id="dlTrSub" style="font-size:11px;color:var(--mid)">Full text with translations</span></span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Content -->
+  <div class="content">
+
+    <!-- Mode bar -->
+    <div class="mode-bar">
+      <span class="mode-label" id="modeLabel">Mode:</span>
+      <div style="display:flex;flex-direction:column;align-items:center;gap:2px">
+        <button class="btn btn-speaker" id="btnSpeaker" onclick="setMode('speaker')">
+          🎤 Speaker
+        </button>
+        <span id="speakerHint" style="font-size:10px;color:#dc2626;font-weight:700;letter-spacing:.04em;line-height:1;text-align:center">👆 Cliquez pour démarrer</span>
+      </div>
+
+      <!-- ─── NEW : bouton MUTE (visible quand on est Speaker) ─── -->
+      <button class="btn btn-mute" id="btnMute" onclick="toggleMute()" title="Mute / Unmute" style="display:none">
+        <span id="btnMuteIcon">🔇</span> <span id="btnMuteLabel">Mute</span>
+      </button>
+
+      <!-- ─── NEW : bouton STOP principal (rouge, toujours visible) ─── -->
+      <button class="btn btn-stop-main" id="btnStopMain" onclick="confirmStop()" title="End the session">
+        <span>⏹</span> <span id="btnStopMainLabel">End session</span>
+      </button>
+
+      <span style="flex:1"></span>
+      <span id="autoDetectBadge" style="display:none;font-size:11px;color:var(--teal);background:var(--teal-dim);border:1px solid var(--border);padding:4px 10px;border-radius:999px">🤖 Auto mode</span>
+    </div>
+
+    <!-- ═══ DEMANDE DE PAROLE — Bandeau très visible ═══ -->
+    <div id="floorRequestPanel" style="display:none;background:linear-gradient(180deg,#fef3c7 0%,#fde68a 100%);border-bottom:3px solid #d4a843;padding:14px 18px;animation:raiseHandPulse 1.5s ease infinite;flex-shrink:0">
+      <div style="display:flex;align-items:center;gap:14px;flex-wrap:wrap">
+        <div style="font-size:22px;line-height:1">🙋</div>
+        <div id="floorRequestContent" style="flex:1;min-width:200px;font-size:14px;color:#78350f;font-weight:600"></div>
+        <div style="display:flex;gap:8px;flex-shrink:0">
+          <button id="btnGrantFloor" onclick="grantFloor()" style="background:#157a6e;color:#fff;border:none;padding:10px 18px;border-radius:8px;font-weight:800;cursor:pointer;font-family:inherit;font-size:13px;white-space:nowrap">✓ Grant</button>
+          <button id="btnDenyFloor" onclick="denyFloor()" style="background:#fff;color:#78350f;border:1.5px solid #d4a843;padding:10px 16px;border-radius:8px;font-weight:700;cursor:pointer;font-family:inherit;font-size:13px;white-space:nowrap">Deny</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Bandeau quand un participant a la parole -->
+    <div id="activeSpeakerBanner" style="display:none;background:rgba(220,38,38,.06);border-bottom:1.5px solid rgba(220,38,38,.2);padding:12px 16px;text-align:center;font-size:13px;color:#dc2626;font-weight:600"></div>
+
+    <!-- Subtitles -->
+    <div class="subtitles" id="subtitles">
+      <div class="empty-msg" id="emptyMsg">
+        <div class="icon">🎤</div>
+        <p id="emptyMsgText">Click on <strong>Speaker</strong> to activate your microphone and start speaking.<br>Translated subtitles will appear here.</p>
+      </div>
+    </div>
+
+    <!-- Mic bar -->
+    <div class="mic-bar" id="micBar" style="display:none">
+      <div class="mic-viz" id="micViz">
+        <div class="mic-bar-el" style="height:6px"></div>
+        <div class="mic-bar-el" style="height:10px"></div>
+        <div class="mic-bar-el" style="height:16px"></div>
+        <div class="mic-bar-el" style="height:10px"></div>
+        <div class="mic-bar-el" style="height:6px"></div>
+      </div>
+      <span class="mic-status-text speaking" id="micStatusText">🔴 Microphone active — speak now</span>
+    </div>
+
+    <!-- End overlay -->
+    <div class="end-overlay" id="endOverlay">
+      <div style="font-size:48px">✅</div>
+      <div class="end-title" id="endTitle">Session ended</div>
+      <div class="end-sub"><span id="endDurLabel">Duration:</span> <strong id="endDuration"></strong><br><span id="endPartLabel">Participants:</span> <strong id="endPartCount"></strong></div>
+      <div style="display:flex;gap:10px;flex-wrap:wrap;justify-content:center">
+        <button class="btn btn-teal" id="btnEndDlParts" onclick="downloadParticipants()">👥 Download participants</button>
+        <button class="btn btn-gold" id="btnEndDlTr" onclick="downloadTranscript()">📝 Download transcript</button>
+      </div>
+      <a href="/" id="endBackLink" style="font-size:13px;color:var(--mid);margin-top:8px">← Back to home</a>
+    </div>
+
+  </div>
+</div>
+
+<!-- Mobile participants toggle -->
+<button class="part-toggle-btn" onclick="toggleSidebar()">
+  👥 <span id="partCountMobile">0</span> <span id="partMobileLabel">participants</span>
+</button>
+
+<script>
+// ── CONFIG ──
+const AZURE_KEY    = 'BfBydAOdsonrVXY68xadxIWn9EwQWoJPUzZc2OOcC4gA0IATC2O9JQQJ99BDAC5T7U2XJ3w3AAAYACOGqosg';
+const AZURE_REGION = 'francecentral';           // ← à adapter si besoin
+
+const FB_CFG = {
+  apiKey:"AIzaSyCQZ_htYiPyUv50oIObwN3eGSJ9SneO7sI",
+  databaseURL:"https://sogevoxreunion-default-rtdb.europe-west1.firebasedatabase.app",
+  projectId:"sogevoxreunion"
+};
+
+// Codes Azure par langue
+const AZ_LANG = {
+  fr:'fr-FR',en:'en-US',de:'de-DE',it:'it-IT',es:'es-ES',pt:'pt-PT',
+  ar:'ar-SA',ru:'ru-RU',zh:'zh-CN',he:'he-IL',nl:'nl-NL',
+  pl:'pl-PL',uk:'uk-UA',tr:'tr-TR',ja:'ja-JP',ko:'ko-KR',
+  sv:'sv-SE',cs:'cs-CZ',el:'el-GR'
+};
+const FLAGS = {
+  fr:'fr',en:'gb',de:'de',it:'it',es:'es',pt:'pt',
+  ar:'lb',ru:'ru',zh:'cn',he:'il',nl:'nl',
+  pl:'pl',uk:'ua',tr:'tr',ja:'jp',ko:'kr',
+  sv:'se',cs:'cz',
+  el:'gr',da:'dk',hi:'in'
+};
+const LANG_NAMES = {
+  fr:'Français',en:'English',de:'Deutsch',it:'Italiano',es:'Español',
+  pt:'Português',ar:'العربية',ru:'Русский',zh:'中文',he:'עברית',
+  nl:'Nederlands',pl:'Polski',uk:'Українська',tr:'Türkçe',ja:'日本語',ko:'한국어',
+  sv:'Svenska',cs:'Čeština',
+  el:'Ελληνικά / Greek',da:'Dansk',hi:'हिन्दी'
+};
+
+// ══════════════════════════════════════════════════════════════
+// I18N — Interface translations (FR / EN)
+// ══════════════════════════════════════════════════════════════
+const I18N = {
+  fr: {
+    title_page:          'TranslateTheWorld — Session Hôte',
+    loading:             'Chargement…',
+    theme_go_dark:       'Passer en mode sombre',
+    theme_go_light:      'Passer en mode clair',
+    stop_btn:            '⏹ Stop',
+    credit_exhausted_t:  'Crédit épuisé',
+    credit_exhausted_m:  'Le crédit de temps de cette session est entièrement consommé. Pour poursuivre, veuillez acheter du temps supplémentaire sur translatetheworld.com.',
+    credit_loading:      'Chargement du crédit…',
+    credit_remaining:    'Crédit restant',
+    credit_offline:      '⚠️ Impossible de vérifier le crédit (hors-ligne). Session démarrée en mode dégradé.',
+    invite_btn:          '📨 Invite',
+    invite_btn_title:    'Inviter des participants — SMS, WhatsApp, e-mail',
+    tab_participants:    'Participants',
+    tab_downloads:       'Télécharger',
+    connected_singular:  'connecté',
+    connected_plural:    'connectés',
+    waiting_conn:        'En attente de connexions…',
+    dl_intro:            'Téléchargez les données de votre session après l\'avoir terminée.',
+    dl_parts_title:      'Liste des participants',
+    dl_parts_sub:        'Format CSV',
+    dl_tr_title:         'Retranscription',
+    dl_tr_sub:           'Texte complet avec traductions',
+    mode_label:          'Micro :',
+    mode_speaker:        '🎤 Speaker',
+    speaker_hint:        '👆 Cliquez pour démarrer',
+    auto_badge:          '🤖 Mode auto',
+    grant_btn:           '✓ Grant',
+    deny_btn:            'Deny',
+    empty_msg:           'Cliquez sur <strong>Speaker</strong> pour activer votre micro et commencer à parler.<br>Les sous-titres traduits apparaîtront ici.',
+    mic_active:          '🔴 Microphone actif — parlez maintenant',
+    end_title:           'Session terminée',
+    end_duration_lbl:    'Durée :',
+    end_parts_lbl:       'Participants :',
+    end_dl_parts:        '👥 Télécharger participants',
+    end_dl_tr:           '📝 Télécharger retranscription',
+    end_back:            '← Retour à l\'accueil',
+    mobile_parts_label:  'participants',
+    fr_requests:         'demande la parole',
+    fr_resume:           '🎤 Reprendre la parole',
+    fr_speaks:           'parle',
+    fr_recovered:        '🎤 À vous de parler !',
+    fr_mic_on:           'MICRO ACTIF',
+    // Alerts / errors
+    err_invalid_link:    'Lien invalide — paramètre room manquant.',
+    err_sdk_unavailable: 'SDK Azure non disponible — vérifiez votre connexion.',
+    err_azure_prefix:    'Erreur Azure : ',
+    err_mic_prefix:      'Erreur micro : ',
+    err_azure_check:     ' — Vérifiez votre clé API.',
+    err_mic_start:       'Erreur démarrage micro : ',
+    err_sdk:             'Erreur SDK : ',
+    mic_help_title:      'Le micro ne semble pas activé',
+    mic_help_text:       'Pour que TranslateTheWorld fonctionne, vérifiez que vous avez autorisé l\'accès au microphone dans les réglages de votre navigateur. Si le problème persiste, ouvrez ce lien dans Safari ou Chrome.',
+    mic_help_close:      'Fermer',
+    alert_request_gone:  'La demande n\'est plus disponible.',
+    alert_no_parts:      'Aucun participant enregistré.',
+    alert_no_transcript: 'Aucune retranscription disponible.',
+    confirm_stop:        'Arrêter la session ? Les participants seront déconnectés.',
+    dur_min:             'min',
+    dur_sec:             's',
+    part_suffix:         'participant(s)',
+    anonymous:           'Anonyme',
+    default_host:        'Hôte',
+    csv_header:          'Nom,Langue,Organisation,Rôle,Heure de connexion',
+    csv_filename:        'participants_',
+    tr_header_title:     'RETRANSCRIPTION — Session : ',
+    tr_header_date:      'Date : ',
+    tr_header_host:      'Hôte : ',
+    tr_header_langs:     'Langues : ',
+    tr_original_lbl:     'Original : ',
+    tr_filename:         'retranscription_',
+    locale_code:         'fr-FR',
+  },
+  en: {
+    title_page:          'TranslateTheWorld — Host Session',
+    loading:             'Loading…',
+    theme_go_dark:       'Switch to dark mode',
+    theme_go_light:      'Switch to light mode',
+    stop_btn:            '⏹ Stop',
+    credit_exhausted_t:  'Credit exhausted',
+    credit_exhausted_m:  'The time credit for this session has been fully consumed. To continue, please purchase additional time at translatetheworld.com.',
+    credit_loading:      'Loading credit…',
+    credit_remaining:    'Credit remaining',
+    credit_offline:      '⚠️ Could not verify credit (offline). Session started in degraded mode.',
+    invite_btn:          '📨 Invite',
+    invite_btn_title:    'Invite participants — SMS, WhatsApp, email',
+    tab_participants:    'Participants',
+    tab_downloads:       'Download',
+    connected_singular:  'connected',
+    connected_plural:    'connected',
+    waiting_conn:        'Waiting for connections…',
+    dl_intro:            'Download your session data after it has ended.',
+    dl_parts_title:      'Participants list',
+    dl_parts_sub:        'CSV format',
+    dl_tr_title:         'Transcript',
+    dl_tr_sub:           'Full text with translations',
+    mode_label:          'Mic:',
+    mode_speaker:        '🎤 Speaker',
+    speaker_hint:        '👆 Tap to start',
+    auto_badge:          '🤖 Auto mode',
+    grant_btn:           '✓ Grant',
+    deny_btn:            'Deny',
+    empty_msg:           'Click on <strong>Speaker</strong> to activate your microphone and start speaking.<br>Translated subtitles will appear here.',
+    mic_active:          '🔴 Microphone active — speak now',
+    end_title:           'Session ended',
+    end_duration_lbl:    'Duration:',
+    end_parts_lbl:       'Participants:',
+    end_dl_parts:        '👥 Download participants',
+    end_dl_tr:           '📝 Download transcript',
+    end_back:            '← Back to home',
+    mobile_parts_label:  'participants',
+    fr_requests:         'is requesting the floor',
+    fr_resume:           '🎤 Take the floor back',
+    fr_speaks:           'is speaking',
+    fr_recovered:        '🎤 You have the floor!',
+    fr_mic_on:           'MIC ON',
+    // Alerts / errors
+    err_invalid_link:    'Invalid link — room parameter missing.',
+    err_sdk_unavailable: 'Azure SDK not available — check your connection.',
+    err_azure_prefix:    'Azure error: ',
+    err_mic_prefix:      'Microphone error: ',
+    err_azure_check:     ' — Check your API key.',
+    err_mic_start:       'Microphone start error: ',
+    err_sdk:             'SDK error: ',
+    mic_help_title:      'Microphone does not seem to be active',
+    mic_help_text:       'For TranslateTheWorld to work, please make sure you have granted microphone access in your browser settings. If the problem persists, open this link in Safari or Chrome.',
+    mic_help_close:      'Close',
+    alert_request_gone:  'The request is no longer available.',
+    alert_no_parts:      'No participants recorded.',
+    alert_no_transcript: 'No transcript available.',
+    confirm_stop:        'Stop the session? Participants will be disconnected.',
+    dur_min:             'min',
+    dur_sec:             's',
+    part_suffix:         'participant(s)',
+    anonymous:           'Anonymous',
+    default_host:        'Host',
+    csv_header:          'Name,Language,Organization,Role,Connection time',
+    csv_filename:        'participants_',
+    tr_header_title:     'TRANSCRIPT — Session: ',
+    tr_header_date:      'Date: ',
+    tr_header_host:      'Host: ',
+    tr_header_langs:     'Languages: ',
+    tr_original_lbl:     'Original: ',
+    tr_filename:         'transcript_',
+    locale_code:         'en-GB',
+  }
+};
+
+let uiLang = 'en';  // Default: English — user can switch to FR via toggle
+
+function t(key){ return (I18N[uiLang]||I18N.en)[key] || key; }
+
+function setUiLang(l){
+  if(l !== 'fr' && l !== 'en') l = 'en';
+  uiLang = l;
+  document.documentElement.lang = l;
+  try { localStorage.setItem('ttw-ui-lang', l); } catch(e){}
+  const fb = document.getElementById('btnLangFr');
+  const eb = document.getElementById('btnLangEn');
+  if(fb) fb.classList.toggle('active', l==='fr');
+  if(eb) eb.classList.toggle('active', l==='en');
+  applyTranslations();
+}
+
+function applyTranslations(){
+  document.title = t('title_page');
+
+  const setTxt = (id, txt)=>{ const el = document.getElementById(id); if(el) el.textContent = txt; };
+  const setHtml = (id, html)=>{ const el = document.getElementById(id); if(el) el.innerHTML = html; };
+
+  // Topbar
+  setTxt('btnStop', t('stop_btn'));
+  // Label du bouton "End session" dans la mode-bar
+  const isFr2 = (uiLang==='fr');
+  setTxt('btnStopMainLabel', isFr2 ? 'Fin de session' : 'End session');
+  // Met à jour le label Mute (dépend de l'état muted ou non)
+  if(typeof updateMuteButton === 'function') updateMuteButton();
+  // Bouton "Inviter" : libellé + tooltip
+  const inviteBtn = document.getElementById('shareBtn');
+  const inviteLabel = document.getElementById('shareBtnLabel');
+  if(inviteBtn) inviteBtn.title = t('invite_btn_title');
+  if(inviteLabel){
+    // On retire le préfixe émoji éventuel pour ne garder que le mot
+    const lbl = t('invite_btn').replace(/^📨\s*/,'');
+    inviteLabel.textContent = lbl;
+  }
+  const themeBtn = document.getElementById('themeToggleBtn');
+  if(themeBtn){
+    const isDark = document.body.classList.contains('theme-dark');
+    themeBtn.title = isDark ? t('theme_go_light') : t('theme_go_dark');
+  }
+
+  // Sidebar
+  setTxt('tabPart', t('tab_participants'));
+  setTxt('tabDl',   t('tab_downloads'));
+  setTxt('dlIntro', t('dl_intro'));
+  setTxt('dlPartsTitle', t('dl_parts_title'));
+  setTxt('dlPartsSub',   t('dl_parts_sub'));
+  setTxt('dlTrTitle',    t('dl_tr_title'));
+  setTxt('dlTrSub',      t('dl_tr_sub'));
+
+  // Mode bar
+  setTxt('modeLabel',       t('mode_label'));
+  setTxt('autoDetectBadge', t('auto_badge'));
+  setTxt('speakerHint',     t('speaker_hint'));
+
+  // Floor request buttons
+  setTxt('btnGrantFloor', t('grant_btn'));
+  setTxt('btnDenyFloor',  t('deny_btn'));
+
+  // Empty msg & mic
+  setHtml('emptyMsgText',  t('empty_msg'));
+  setTxt('micStatusText',  t('mic_active'));
+
+  // End overlay
+  setTxt('endTitle',       t('end_title'));
+  setTxt('endDurLabel',    t('end_duration_lbl'));
+  setTxt('endPartLabel',   t('end_parts_lbl'));
+  setTxt('btnEndDlParts',  t('end_dl_parts'));
+  setTxt('btnEndDlTr',     t('end_dl_tr'));
+  setTxt('endBackLink',    t('end_back'));
+
+  // Mobile
+  setTxt('partMobileLabel', t('mobile_parts_label'));
+
+  // Re-render dynamic parts (participants list, banners, etc.)
+  if(Array.isArray(participantsList)) renderParticipants(participantsList);
+  // Re-render floor banners if visible
+  refreshFloorBanners();
+}
+
+function refreshFloorBanners(){
+  // Re-render the "active speaker" banner if currently visible
+  if(db){
+    db.ref('sessions/'+room+'/activeSpeaker').once('value', snap=>{
+      const data = snap.val();
+      const banner = document.getElementById('activeSpeakerBanner');
+      if(data && data.deviceId !== deviceId && banner && banner.style.display !== 'none'){
+        const flag = FLAGS[data.lang]||'un';
+        banner.innerHTML = '🎙️ <img src="https://flagcdn.com/w40/'+flag+'.png" style="width:18px;height:13px;border-radius:2px;vertical-align:middle;margin:0 6px"> <strong>'+data.name+'</strong> '+t('fr_speaks')+' · <button onclick="resumeFloor()" style="background:#dc2626;color:#fff;border:none;padding:6px 14px;border-radius:6px;font-weight:700;cursor:pointer;font-family:inherit;font-size:12px;margin-left:8px">'+t('fr_resume')+'</button>';
+      }
+    });
+    // Re-render floor request banner
+    db.ref('sessions/'+room+'/floorRequest').once('value', snap=>{
+      const data = snap.val();
+      const content = document.getElementById('floorRequestContent');
+      if(data && content){
+        const flag = FLAGS[data.lang]||'un';
+        const langName = LANG_NAMES[data.lang]||data.lang;
+        content.innerHTML =
+          '<img src="https://flagcdn.com/w40/'+flag+'.png" style="width:22px;height:16px;border-radius:2px;vertical-align:middle;margin-right:8px">'+
+          '<strong style="color:#78350f;font-size:15px">'+data.name+'</strong>'+
+          ' <span style="color:#92400e;font-weight:500">('+langName+')</span>'+
+          ' <span style="color:#92400e;font-weight:500">'+t('fr_requests')+'</span>';
+      }
+    });
+  }
+}
+
+// Initialize UI language from URL param `ui`, then localStorage, then default EN
+(function initUiLang(){
+  let initial = 'en';
+  const fromUrl = new URLSearchParams(window.location.search).get('ui');
+  if(fromUrl === 'fr' || fromUrl === 'en') initial = fromUrl;
+  else {
+    try {
+      const stored = localStorage.getItem('ttw-ui-lang');
+      if(stored === 'fr' || stored === 'en') initial = stored;
+    } catch(e){}
+  }
+  uiLang = initial;
+  document.documentElement.lang = initial;
+})();
+
+function getP(n){return new URLSearchParams(window.location.search).get(n)||'';}
+
+// ── SESSION PARAMS ──
+const room       = getP('room');
+const myLang     = getP('lang')||'fr';
+const toLangs    = getP('to').split(',').filter(Boolean);
+const dur        = parseInt(getP('dur'))||15;
+const expTs      = parseInt(getP('exp'))||0;
+const hostName   = getP('host')||'Host';
+const hostOrg    = getP('org')||'';
+// Mode auto-detect retiré de l'interface. On force false pour neutraliser
+// tout reste de logique conditionnelle sur ce mode.
+const autoDetect = false;
+const deviceId   = 'host_'+Date.now();
+
+// All langs in session (host + participants)
+const allLangs   = [...new Set([myLang,...toLangs])];
+const targetLangs= allLangs.filter(l=>l!==myLang);
+
+// ── STATE ──
+let mode         = 'speaker'; // 'speaker' | 'participant'
+let sessionStart = null;
+let timerInterval= null;
+let durSeconds   = dur * 60;
+// ── SUIVI DE CRÉDIT CUMULÉ ──
+// dur = total acheté (ex : 180 min pour 3h). On lit subscriptions/{room}/minutesUsed
+// dans Firebase et on calcule le restant.
+let minutesUsedAtStart = 0;       // valeur lue dans Firebase au chargement
+let remainingMinutes   = dur;     // par défaut = dur tant que Firebase n'a pas répondu
+let timerStarted       = false;   // empêche le double-démarrage du timer
+let creditExhausted    = false;   // flag : pas de crédit dispo, on bloque Speaker
+let recognition  = null;
+let db           = null;
+let participantsList = [];
+let transcriptData   = [];
+let sessionEnded     = false;
+
+// ── VERROU DE PAROLE (synchrone) ──
+// Drapeau lu instantanément par les handlers Azure (recognizing/recognized).
+// Mis à false dès qu'on cède la parole — AVANT que Azure ait fini de fermer son
+// flux audio (asynchrone). Cela permet d'IGNORER toute transcription parasite
+// captée pendant les ~300 ms de fermeture du micro.
+// Règle absolue : 1 micro ouvert = 1 seul orateur autorisé.
+let iAmActiveSpeaker = true;
+
+// ── THÈME CLAIR / SOMBRE ──
+// Le thème est sauvegardé dans localStorage sous la clé 'ttw-theme'.
+// Valeurs possibles : 'light' (défaut) ou 'dark'.
+function loadThemePreference(){
+  let pref = 'dark';
+  try { pref = localStorage.getItem('ttw-theme') || 'dark'; } catch(e){}
+  applyTheme(pref);
+}
+
+function applyTheme(theme){
+  const btn  = document.getElementById('themeToggleBtn');
+  // Système simple et robuste : on enlève l'autre, on ajoute celui-ci
+  if(theme === 'dark'){
+    document.body.classList.remove('theme-light');
+    document.body.classList.add('theme-dark');
+    if(btn){
+      btn.innerHTML = '🌙 <span id="themeToggleLabel">Dark</span>';
+      btn.title = t('theme_go_light');
+    }
+  } else {
+    document.body.classList.remove('theme-dark');
+    document.body.classList.add('theme-light');
+    if(btn){
+      btn.innerHTML = '☀️ <span id="themeToggleLabel">Light</span>';
+      btn.title = t('theme_go_dark');
+    }
+  }
+  console.log('[theme] applied:', theme, '— body class:', document.body.className);
+}
+
+function toggleTheme(){
+  console.log('[theme] toggleTheme() called');
+  const isDark = document.body.classList.contains('theme-dark');
+  const newTheme = isDark ? 'light' : 'dark';
+  applyTheme(newTheme);
+  try { localStorage.setItem('ttw-theme', newTheme); } catch(e){}
+  console.log('[theme] toggled to:', newTheme);
+}
+
+// Rend la fonction accessible globalement (au cas où la portée serait limitée)
+window.toggleTheme = toggleTheme;
+window.applyTheme  = applyTheme;
+
+// NOTE : on N'ATTACHE PAS de second handler addEventListener('click', toggleTheme)
+// ici, parce que le bouton a déjà un onclick="toggleTheme()" dans son HTML.
+// Si on ajoutait les deux, ils se déclencheraient tous les deux à chaque clic
+// et le thème basculerait deux fois (= rien ne change visuellement).
+
+// ── INIT ──
+window.addEventListener('DOMContentLoaded', async ()=>{
+  if(!room){alert(t('err_invalid_link'));return;}
+
+  // Apply initial UI language (set by initUiLang IIFE earlier)
+  applyTranslations();
+
+  // Restaurer le thème préféré (dark/light)
+  loadThemePreference();
+
+  document.getElementById('sessionLabel').textContent = '🔑 '+room+(hostOrg?' · '+hostOrg:'');
+  if(autoDetect) document.getElementById('autoDetectBadge').style.display='inline';
+
+  initFirebase();
+  // ── SUIVI DE CRÉDIT : on lit avant tout pour savoir combien il reste ──
+  await loadRemainingCredit();
+  if(creditExhausted){
+    showCreditExhaustedScreen();
+    return; // on n'enregistre pas l'hôte, on n'écoute rien
+  }
+  // ⚠️ NOUVEAU : on NE démarre PAS le timer ni le mode speaker automatiquement.
+  // L'hôte cliquera sur 🎤 Speaker quand il sera prêt — c'est à ce moment que
+  // le décompte de crédit commence (juste pour le client).
+  // setMode('speaker'); ← retiré
+  // startTimer();       ← retiré (déclenché par le 1er clic Speaker)
+  registerHost();
+  listenSubtitles();
+  listenParticipants();
+  listenActiveSpeaker();    // ← suivi du micro actif
+  listenFloorRequest();     // ← affichage des demandes de parole
+
+  // Affiche le temps restant dans le timer SANS démarrer le décompte
+  showInitialRemainingTime();
+
+  // Toggle the active state on lang buttons correctly after first paint
+  const fb = document.getElementById('btnLangFr');
+  const eb = document.getElementById('btnLangEn');
+  if(fb) fb.classList.toggle('active', uiLang==='fr');
+  if(eb) eb.classList.toggle('active', uiLang==='en');
+});
+
+// ── FIREBASE ──
+function initFirebase(){
+  if(!firebase.apps.length) firebase.initializeApp(FB_CFG);
+  db = firebase.database();
+}
+
+function registerHost(){
+  if(!db) return;
+  const ref = db.ref('sessions/'+room+'/participants/'+deviceId);
+  ref.set({name:hostName, org:hostOrg, lang:myLang, role:'host', joinedAt:Date.now(), active:true});
+  ref.onDisconnect().update({active:false, leftAt:Date.now()});
+  // Store session config
+  db.ref('sessions/'+room+'/config').set({
+    languages: allLangs, hostName, hostOrg,
+    started: Date.now(), expires: expTs*1000,
+    duration: dur, autoDetect
+  });
+}
+
+// ─────────────────────────────────────────────────────
+// SUIVI DE CRÉDIT CUMULÉ (essentiel pour la facturation)
+// ─────────────────────────────────────────────────────
+async function loadRemainingCredit(){
+  // Si Firebase n'est pas dispo : mode dégradé (on accorde tout le crédit)
+  if(!db){
+    minutesUsedAtStart = 0;
+    remainingMinutes   = dur;
+    durSeconds         = remainingMinutes * 60;
+    return;
+  }
+  try {
+    const snap = await db.ref('subscriptions/'+room+'/minutesUsed').once('value');
+    minutesUsedAtStart = parseInt(snap.val()) || 0;
+    remainingMinutes   = Math.max(0, dur - minutesUsedAtStart);
+    durSeconds         = remainingMinutes * 60;
+    if(remainingMinutes <= 0){ creditExhausted = true; }
+  } catch(err){
+    console.warn('[credit] load failed, fallback full duration:', err);
+    minutesUsedAtStart = 0;
+    remainingMinutes   = dur;
+    durSeconds         = remainingMinutes * 60;
+  }
+}
+function showCreditExhaustedScreen(){
+  // Désactive Speaker + Mute (impossibles)
+  const btnSpk = document.getElementById('btnSpeaker');
+  if(btnSpk){ btnSpk.disabled = true; btnSpk.style.opacity = '0.4'; btnSpk.style.cursor = 'not-allowed'; }
+  // Affiche un overlay clair par-dessus la page
+  const overlay = document.createElement('div');
+  overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:99999;display:flex;align-items:center;justify-content:center;padding:20px';
+  overlay.innerHTML =
+    '<div style="background:#fff;color:#0d1f1a;border-radius:16px;padding:32px 28px;max-width:440px;text-align:center;box-shadow:0 20px 60px rgba(0,0,0,.5)">'+
+    '  <div style="font-size:48px;margin-bottom:12px">⏰</div>'+
+    '  <div style="font-size:20px;font-weight:800;margin-bottom:10px">'+t('credit_exhausted_t')+'</div>'+
+    '  <div style="font-size:14px;line-height:1.6;color:#555;margin-bottom:20px">'+t('credit_exhausted_m')+'</div>'+
+    '  <a href="https://translatetheworld.com" style="display:inline-block;background:#157a6e;color:#fff;text-decoration:none;padding:12px 24px;border-radius:10px;font-weight:800">translatetheworld.com →</a>'+
+    '</div>';
+  document.body.appendChild(overlay);
+}
+function showInitialRemainingTime(){
+  // Affiche le compteur figé sur "MM:00" (minutes restantes) avant 1er clic Speaker
+  const timerEl = document.getElementById('timer');
+  if(!timerEl) return;
+  const m = Math.floor(remainingMinutes).toString().padStart(2,'0');
+  timerEl.textContent = m + ':00';
+  if(remainingMinutes <= 1) timerEl.className = 'timer danger';
+  else if(remainingMinutes <= 5) timerEl.className = 'timer warning';
+  else timerEl.className = 'timer';
+}
+
+function listenParticipants(){
+  if(!db) return;
+  db.ref('sessions/'+room+'/participants').on('value', snap=>{
+    const data = snap.val()||{};
+    participantsList = Object.values(data).filter(p=>p.active);
+    renderParticipants(participantsList);
+  });
+}
+
+function listenSubtitles(){
+  if(!db) return;
+  console.log('🔵 [HÔTE] J\'écoute Firebase subtitles/'+myLang+' (myLang=', myLang, ')');
+  // Phrases finales : ajoutées une à une dans l'historique
+  db.ref('sessions/'+room+'/subtitles/'+myLang).limitToLast(50).on('child_added', snap=>{
+    const d = snap.val();
+    if(d){
+      // ── ANTI-DOUBLON #1 : ignorer mes propres phrases
+      // Quand l'hôte parle, sa phrase est déjà affichée localement par
+      // addSubtitleWithTranslations() (avec les traductions dessous).
+      // Firebase nous renvoie ensuite la même phrase via child_added,
+      // ce qui causait un doublon. On filtre ici.
+      if(d.speaker === hostName){
+        return;
+      }
+      // ── ANTI-DOUBLON #2 : protection texte+temps
+      // Si la même phrase exacte apparaît deux fois à moins de 3 secondes
+      // d'intervalle (peu importe la source), on ignore la seconde.
+      if(isDuplicateSubtitle(d.text, d.speaker, d.ts)){
+        console.log('🟡 [HÔTE] Doublon ignoré:', d.text?.substring(0,40));
+        return;
+      }
+      console.log('🔵 [HÔTE] Reçu sous-titre dans subtitles/'+myLang+':', d.text?.substring(0,60), '| from=', d.fromLang, '| speaker=', d.speaker);
+      addSubtitle(d.text, d.fromLang, d.speaker, d.interim||false);
+    } else {
+      console.warn('🟠 [HÔTE] snap.val() est vide pour child_added');
+    }
+  });
+
+  // Sous-titres en cours (live) : se mettent à jour en remplaçant l'aperçu en temps réel.
+  // Quand l'orateur finalise sa phrase, ce noeud est effacé et la phrase finale prend le relais.
+  db.ref('sessions/'+room+'/subtitles_live/'+myLang).on('value', snap=>{
+    const d = snap.val();
+    if(d && d.speaker !== hostName){
+      // Aperçu en cours d'un autre orateur (participant qui parle)
+      updateLiveFromOther(d.text, d.fromLang, d.speaker);
+    } else {
+      clearLiveFromOther();
+    }
+  });
+}
+
+// Affiche/met à jour l'aperçu temps réel d'un orateur autre que moi.
+// Utilise l'élément interimEl existant pour éviter d'inventer un nouveau composant.
+function updateLiveFromOther(text, fromLang, speaker){
+  const container = document.getElementById('subtitles');
+  document.getElementById('emptyMsg').style.display='none';
+  if(!interimEl){
+    interimEl = document.createElement('div');
+    interimEl.className='sub-entry';
+    container.appendChild(interimEl);
+  }
+  const flagCode = FLAGS[fromLang]||'un';
+  // Affichage en romain (non italique) avec opacité 0.85 pour indiquer "en cours"
+  interimEl.innerHTML =
+    '<div class="sub-speaker"><img class="from-flag" src="https://flagcdn.com/w40/'+flagCode+'.png"> '+speaker+'</div>'+
+    '<div class="sub-text" style="opacity:.85;font-style:normal">'+text+'</div>';
+  container.scrollTop = container.scrollHeight;
+}
+
+function clearLiveFromOther(){
+  if(interimEl){
+    const container = document.getElementById('subtitles');
+    try{ container.removeChild(interimEl); }catch(_){}
+    interimEl = null;
+  }
+}
+
+// ── TIMER ──
+let _lastWrittenMinute = 0; // dernier nombre de minutes écrites dans Firebase
+function startTimer(){
+  if(timerStarted) return;        // protection anti double-démarrage
+  timerStarted = true;
+  sessionStart = Date.now();
+  _lastWrittenMinute = 0;
+  timerInterval = setInterval(()=>{
+    if(sessionEnded) return;
+    const elapsed = Math.floor((Date.now()-sessionStart)/1000);
+    const left    = durSeconds - elapsed;
+    const timerEl = document.getElementById('timer');
+
+    if(left<=0){ endSession(); return; }
+
+    // Affichage en compte à rebours (temps RESTANT)
+    const m = Math.floor(left/60).toString().padStart(2,'0');
+    const s = (left%60).toString().padStart(2,'0');
+    timerEl.textContent = m+':'+s;
+
+    if(left<=60) timerEl.className='timer danger';
+    else if(left<=300) timerEl.className='timer warning';
+    else timerEl.className='timer';
+
+    // ── ÉCRITURE FIREBASE (toutes les 60s) ──
+    // On écrit minutesUsedAtStart + minutes écoulées. Idempotent : si Firebase
+    // est lent ou en erreur, on retentera la prochaine minute.
+    const elapsedMin = Math.floor(elapsed / 60);
+    if(elapsedMin > _lastWrittenMinute){
+      _lastWrittenMinute = elapsedMin;
+      const totalUsed = minutesUsedAtStart + elapsedMin;
+      if(db){
+        db.ref('subscriptions/'+room+'/minutesUsed').set(totalUsed)
+          .catch(err => console.warn('[credit] write failed:', err));
+      }
+    }
+
+    animateMicViz();
+  },1000);
+}
+
+// ── MIC VISUALIZATION ──
+function animateMicViz(){
+  if(mode!=='speaker') return;
+  const bars = document.querySelectorAll('.mic-bar-el');
+  bars.forEach(b=>{
+    b.style.height = (4+Math.random()*22)+'px';
+  });
+}
+
+// ── MODE SWITCHING ──
+// Le président peut reprendre la parole à tout moment en cliquant sur son bouton Speaker.
+// Cela écrase `activeSpeaker` — ce qui coupe automatiquement le participant qui parlait.
+// ── INDICATEUR MICRO ACTIF (voyant permanent dans le coin) ──
+function showMicOnIndicator(){
+  const ind = document.getElementById('micOnIndicator');
+  const txt = document.getElementById('micOnIndicatorText');
+  if(!ind) return;
+  if(txt) txt.textContent = t('fr_mic_on');
+  ind.style.display = 'block';
+}
+function hideMicOnIndicator(){
+  const ind = document.getElementById('micOnIndicator');
+  if(ind) ind.style.display = 'none';
+}
+
+// ── ALERTE "À VOUS DE PARLER" (bandeau vert temporaire 4s) ──
+// Apparaît au moment précis où l'hôte récupère le micro automatiquement.
+let _floorAlertTimer = null;
+function flashFloorRecovered(){
+  const alert = document.getElementById('floorRecoveredAlert');
+  const txt = document.getElementById('floorRecoveredText');
+  if(!alert) return;
+  if(txt) txt.textContent = t('fr_recovered');
+  // Glissé d'entrée (slide-down)
+  alert.style.display = 'block';
+  // Force reflow puis ajoute la classe d'animation
+  void alert.offsetWidth;
+  alert.classList.add('floor-alert-show');
+  // Auto-masquage après 4s
+  if(_floorAlertTimer) clearTimeout(_floorAlertTimer);
+  _floorAlertTimer = setTimeout(()=>{
+    alert.classList.remove('floor-alert-show');
+    setTimeout(()=>{ alert.style.display='none'; }, 350); // attend la fin de la transition
+  }, 4000);
+}
+
+function setMode(m){
+  // Bloque tout passage en mode speaker si le crédit est épuisé
+  if(m === 'speaker' && creditExhausted) return;
+  mode = m;
+  // 🔒 VERROU SYNCHRONE : avant tout async, on déclare qui est l'orateur.
+  // En mode 'speaker' → on accepte les transcriptions Azure ; sinon on les ignore.
+  iAmActiveSpeaker = (m === 'speaker');
+  // ⏱️ DÉMARRAGE DU TIMER au 1er clic Speaker (et seulement la 1ère fois)
+  if(m === 'speaker' && !timerStarted){ startTimer(); }
+  const bS = document.getElementById('btnSpeaker');
+  const micBar = document.getElementById('micBar');
+  const statusDot = document.getElementById('statusDot');
+
+  const btnMute = document.getElementById('btnMute');
+  if(m==='speaker'){
+    bS.classList.add('active');
+    // Cacher le hint "Cliquez pour démarrer" une fois activé
+    var hint = document.getElementById('speakerHint');
+    if(hint) hint.style.display = 'none';
+    micBar.style.display='flex';
+    statusDot.classList.add('speaking');
+    statusDot.classList.remove('live');
+    claimSpeakerLockAsHost();
+    startRecognition();
+    showMicOnIndicator();
+    // Affiche le bouton Mute (utile uniquement quand on parle)
+    if(btnMute){ btnMute.style.display='flex'; isMuted=false; updateMuteButton(); }
+  } else {
+    bS.classList.remove('active');
+    micBar.style.display='none';
+    statusDot.classList.remove('speaking');
+    statusDot.classList.add('live');
+    releaseSpeakerLockIfMine();
+    stopRecognition();
+    hideMicOnIndicator();
+    // Cache le bouton Mute hors mode speaker
+    if(btnMute){ btnMute.style.display='none'; isMuted=false; updateMuteButton(); }
+  }
+
+  if(db) db.ref('sessions/'+room+'/participants/'+deviceId).update({mode:m});
+}
+
+// ── BOUTON MUTE (pause / reprise de la transcription) ──
+// L'hôte garde la parole (verrou speaker), mais Azure ne transcrit plus.
+// Le timer continue de tourner (comme un mute classique de visio).
+let isMuted = false;
+function toggleMute(){
+  if(mode !== 'speaker') return;        // sécurité : seul l'orateur peut se muter
+  isMuted = !isMuted;
+  if(isMuted){
+    stopRecognition();
+    hideMicOnIndicator();
+  } else {
+    startRecognition();
+    showMicOnIndicator();
+  }
+  updateMuteButton();
+}
+function updateMuteButton(){
+  const btn = document.getElementById('btnMute');
+  const icon = document.getElementById('btnMuteIcon');
+  const lbl = document.getElementById('btnMuteLabel');
+  if(!btn) return;
+  const isFr = (typeof uiLang!=='undefined' && uiLang==='fr');
+  if(isMuted){
+    btn.classList.add('muted');
+    if(icon) icon.textContent = '🔊';
+    if(lbl)  lbl.textContent = isFr ? 'Reprendre' : 'Unmute';
+  } else {
+    btn.classList.remove('muted');
+    if(icon) icon.textContent = '🔇';
+    if(lbl)  lbl.textContent = isFr ? 'Couper' : 'Mute';
+  }
+}
+
+// ── GESTION DU MICRO PRÉSIDENT ──
+// Un seul micro ouvert dans toute la session.
+// Quand l'hôte reprend la parole, tous les micros participants se ferment automatiquement.
+let iHoldSpeakerLock = false;
+let speakerLockDisconnect = null;
+
+function claimSpeakerLockAsHost(){
+  if(!db) return;
+  db.ref('sessions/'+room+'/activeSpeaker').set({
+    deviceId: deviceId,
+    name: hostName,
+    lang: myLang,
+    role: 'host',
+    ts: Date.now()
+  });
+  iHoldSpeakerLock = true;
+  speakerLockDisconnect = db.ref('sessions/'+room+'/activeSpeaker').onDisconnect();
+  speakerLockDisconnect.remove();
+}
+
+function releaseSpeakerLockIfMine(){
+  if(!db || !iHoldSpeakerLock) return;
+  iHoldSpeakerLock = false;
+  db.ref('sessions/'+room+'/activeSpeaker').transaction(current=>{
+    if(current && current.deviceId === deviceId) return null;
+    return;
+  });
+  if(speakerLockDisconnect){
+    speakerLockDisconnect.cancel();
+    speakerLockDisconnect = null;
+  }
+}
+
+// ── DONNER LA PAROLE À UN PARTICIPANT ──
+// Appelée quand le président clique "Autoriser" sur la demande affichée.
+function grantFloor(){
+  if(!db) return;
+  db.ref('sessions/'+room+'/floorRequest').once('value', snap=>{
+    const req = snap.val();
+    if(!req){
+      alert(t('alert_request_gone'));
+      return;
+    }
+
+    // ── COUPER IMMÉDIATEMENT le micro hôte ──
+    // 1) Drapeau synchrone : à partir de cet instant, les handlers Azure
+    //    qui se déclencheraient encore vont ignorer leurs données.
+    //    C'est la 1re ligne de défense, instantanée.
+    iAmActiveSpeaker = false;
+    // 2) Arrêt physique du micro (asynchrone, prend ~300 ms).
+    stopRecognition();
+    iHoldSpeakerLock = false;
+    if(speakerLockDisconnect){
+      speakerLockDisconnect.cancel();
+      speakerLockDisconnect = null;
+    }
+    mode = 'participant';
+    document.getElementById('btnSpeaker').classList.remove('active');
+    document.getElementById('micBar').style.display='none';
+    document.getElementById('statusDot').classList.remove('speaking');
+    document.getElementById('statusDot').classList.add('live');
+
+    // Maintenant on propage dans Firebase
+    db.ref('sessions/'+room+'/activeSpeaker').set({
+      deviceId: req.deviceId,
+      name: req.name,
+      lang: req.lang,
+      role: 'participant',
+      ts: Date.now()
+    });
+    db.ref('sessions/'+room+'/floorRequest').set(null);
+    if(db) db.ref('sessions/'+room+'/participants/'+deviceId).update({mode:'participant'});
+  });
+}
+
+// ── REFUSER UNE DEMANDE DE PAROLE ──
+function denyFloor(){
+  if(!db) return;
+  db.ref('sessions/'+room+'/floorRequest').set(null);
+}
+
+// ── REPRENDRE LA PAROLE (écrase l'orateur participant en cours) ──
+function resumeFloor(){
+  setMode('speaker');
+}
+
+// ── ÉCOUTE DE L'ORATEUR ACTIF ──
+// Quand un participant reçoit l'autorisation, ce listener me fait passer en mode participant.
+// Quand un participant rend le micro (activeSpeaker devient null), je reprends automatiquement.
+function listenActiveSpeaker(){
+  if(!db) return;
+  db.ref('sessions/'+room+'/activeSpeaker').on('value', snap=>{
+    const data = snap.val();
+    const banner = document.getElementById('activeSpeakerBanner');
+    const resumeBtn = document.getElementById('btnResumeFloor');
+
+    if(data && data.deviceId !== deviceId){
+      // Un participant a la parole (parce que je l'ai autorisé)
+      if(mode === 'speaker'){
+        // 🔒 Garde-fou : si pour une raison quelconque grantFloor() n'a pas été
+        // exécuté localement (ex: synchro Firebase en avance), on coupe quand même.
+        iAmActiveSpeaker = false;
+        // Force passage en participant sans toucher activeSpeaker (qui appartient à l'autre)
+        iHoldSpeakerLock = false;
+        if(speakerLockDisconnect){ speakerLockDisconnect.cancel(); speakerLockDisconnect=null; }
+        stopRecognition();
+        mode = 'participant';
+        document.getElementById('btnSpeaker').classList.remove('active');
+        document.getElementById('micBar').style.display='none';
+        document.getElementById('statusDot').classList.remove('speaking');
+        document.getElementById('statusDot').classList.add('live');
+        if(db) db.ref('sessions/'+room+'/participants/'+deviceId).update({mode:'participant'});
+      }
+      if(banner){
+        const flag = FLAGS[data.lang]||'un';
+        banner.innerHTML = '🎙️ <img src="https://flagcdn.com/w40/'+flag+'.png" style="width:18px;height:13px;border-radius:2px;vertical-align:middle;margin:0 6px"> <strong>'+data.name+'</strong> '+t('fr_speaks')+' · <button onclick="resumeFloor()" style="background:#dc2626;color:#fff;border:none;padding:6px 14px;border-radius:6px;font-weight:700;cursor:pointer;font-family:inherit;font-size:12px;margin-left:8px">'+t('fr_resume')+'</button>';
+        banner.style.display = 'block';
+      }
+      if(resumeBtn) resumeBtn.style.display='inline-flex';
+    } else if(data && data.deviceId === deviceId){
+      // C'est moi qui ai le micro (normal)
+      if(banner) banner.style.display = 'none';
+      if(resumeBtn) resumeBtn.style.display='none';
+    } else {
+      // Personne ne parle → je reprends automatiquement la parole
+      if(mode !== 'speaker'){
+        setMode('speaker');
+        // 🎤 Signal visuel à Pierre : "le micro est à vous"
+        flashFloorRecovered();
+      }
+      if(banner) banner.style.display = 'none';
+      if(resumeBtn) resumeBtn.style.display='none';
+    }
+  });
+}
+
+// ── ÉCOUTE DES DEMANDES DE PAROLE ──
+// Affiche le bandeau horizontal très visible en haut de l'écran quand un participant lève la main.
+function listenFloorRequest(){
+  if(!db) return;
+  db.ref('sessions/'+room+'/floorRequest').on('value', snap=>{
+    const data = snap.val();
+    const panel = document.getElementById('floorRequestPanel');
+    const content = document.getElementById('floorRequestContent');
+    if(!panel || !content) return;
+
+    if(data){
+      const flag = FLAGS[data.lang]||'un';
+      const langName = LANG_NAMES[data.lang]||data.lang;
+      content.innerHTML =
+        '<img src="https://flagcdn.com/w40/'+flag+'.png" style="width:22px;height:16px;border-radius:2px;vertical-align:middle;margin-right:8px">'+
+        '<strong style="color:#78350f;font-size:15px">'+data.name+'</strong>'+
+        ' <span style="color:#92400e;font-weight:500">('+langName+')</span>'+
+        ' <span style="color:#92400e;font-weight:500">'+t('fr_requests')+'</span>';
+      panel.style.display='block';
+      try{ playNotifSound(); }catch(e){}
+    } else {
+      panel.style.display='none';
+    }
+  });
+}
+
+// ── Son de notification court (beep subtil) ──
+let notifAudioCtx = null;
+function playNotifSound(){
+  try{
+    if(!notifAudioCtx) notifAudioCtx = new (window.AudioContext||window.webkitAudioContext)();
+    const ctx = notifAudioCtx;
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.connect(gain); gain.connect(ctx.destination);
+    osc.frequency.value = 880;
+    gain.gain.value = 0.04;
+    osc.start();
+    gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.25);
+    osc.stop(ctx.currentTime + 0.3);
+  }catch(e){}
+}
+
+// ── AZURE SPEECH RECOGNITION ──
+function startRecognition(){
+  if(!window.SpeechSDK){
+    console.warn('Azure Speech SDK not loaded');
+    showSubtitleError(t('err_sdk_unavailable'));
+    return;
+  }
+  stopRecognition();
+
+  try{
+    // Si pas de langues cibles (ex: hôte et participants ont la même langue)
+    // → on utilise SpeechRecognizer simple (transcription sans traduction)
+    if(targetLangs.length === 0){
+      const speechConfig = SpeechSDK.SpeechConfig.fromSubscription(AZURE_KEY, AZURE_REGION);
+      speechConfig.speechRecognitionLanguage = AZ_LANG[myLang]||'fr-FR';
+      const audioConfig = SpeechSDK.AudioConfig.fromDefaultMicrophoneInput();
+      recognition = new SpeechSDK.SpeechRecognizer(speechConfig, audioConfig);
+
+      recognition.recognizing = (s,e)=>{ if(e.result.text) updateInterim(e.result.text, myLang, hostName); };
+      recognition.recognized = (s,e)=>{
+        if(e.result.reason===SpeechSDK.ResultReason.RecognizedSpeech){
+          const original=e.result.text;
+          if(!original||!original.trim()) return;
+          const ts=Date.now();
+          pushSubtitle(myLang, myLang, original, hostName, false, ts);
+          storeTranscript(original, myLang, new Map(), ts);
+          clearInterim();
+        }
+      };
+      recognition.canceled = (s,e)=>{ if(e.reason===SpeechSDK.CancellationReason.Error) showSubtitleError(t('err_azure_prefix')+e.errorDetails); };
+      recognition.startContinuousRecognitionAsync(()=>{}, err=>showSubtitleError(t('err_mic_prefix')+err));
+      return;
+    }
+
+    const speechConfig = SpeechSDK.SpeechTranslationConfig.fromSubscription(AZURE_KEY, AZURE_REGION);
+    speechConfig.speechRecognitionLanguage = AZ_LANG[myLang]||'fr-FR';
+    targetLangs.forEach(l=>{ if(AZ_LANG[l]) speechConfig.addTargetLanguage(AZ_LANG[l].split('-')[0]); });
+
+    // ── Timeout de silence adapté à la langue ──
+    // Par défaut : 300 ms (réactivité maximale, comme dans nos références
+    // anglais ↔ hébreu qui fonctionnent très bien sans réglage).
+    // Exception : russe → 600 ms (élocution plus longue, évite que les
+    // phrases soient coupées en morceaux).
+    const SLOW_LANGS = new Set(['ru']);
+    const silenceMs = SLOW_LANGS.has(myLang) ? '600' : '300';
+    speechConfig.setProperty('SpeechServiceConnection_InitialSilenceTimeoutMs','10000');
+    speechConfig.setProperty('Speech_SegmentationSilenceTimeoutMs', silenceMs);
+
+    const audioConfig = SpeechSDK.AudioConfig.fromDefaultMicrophoneInput();
+    recognition = new SpeechSDK.TranslationRecognizer(speechConfig, audioConfig);
+
+    // ── Anti-spam : 1 écriture toutes les 400 ms max ──
+    let lastLiveSent = 0;
+    const LIVE_THROTTLE_MS = 400;
+
+    recognition.recognizing = (s,e)=>{
+      // 🔒 GARDE-FOU : si je ne suis plus l'orateur actif, j'ignore toute
+      // transcription parasite captée pendant que Azure ferme son flux.
+      if(!iAmActiveSpeaker) return;
+      const interim = e.result.text;
+      if(!interim) return;
+      // Affichage local instantané sur mon propre écran
+      updateInterim(interim, myLang, hostName);
+
+      // Diffusion temps réel aux participants via canal subtitles_live
+      const now = Date.now();
+      if(now - lastLiveSent < LIVE_THROTTLE_MS) return;
+      lastLiveSent = now;
+
+      if(!db) return;
+      const translations = e.result.translations;
+
+      // Original dans ma langue
+      db.ref('sessions/'+room+'/subtitles_live/'+myLang).set({
+        text: interim, fromLang: myLang, speaker: hostName, ts: now
+      });
+
+      // Traductions en cours
+      if(translations){
+        targetLangs.forEach(tl=>{
+          const azCode = AZ_LANG[tl] ? AZ_LANG[tl].split('-')[0] : tl;
+          const translated = translations.get(azCode) || translations.get(tl) || '';
+          if(translated){
+            db.ref('sessions/'+room+'/subtitles_live/'+tl).set({
+              text: translated, fromLang: myLang, speaker: hostName, ts: now
+            });
+          }
+        });
+      }
+    };
+
+    recognition.recognized = (s,e)=>{
+      // 🔒 GARDE-FOU : même règle. Si j'ai cédé la parole, je n'envoie
+      // RIEN dans Firebase, même si Azure a réussi à transcrire un dernier
+      // bout de phrase pendant la fermeture asynchrone du micro.
+      if(!iAmActiveSpeaker) return;
+      if(e.result.reason===SpeechSDK.ResultReason.TranslatedSpeech){
+        const original = e.result.text;
+        if(!original||original.trim()==='') return;
+
+        const translations = e.result.translations;
+        const ts = Date.now();
+
+        // Historique final (avec timestamp)
+        pushSubtitle(myLang, myLang, original, hostName, false, ts);
+        // Nettoie le sous-titre live pour ma langue (la phrase finale prend le relais)
+        if(db) db.ref('sessions/'+room+'/subtitles_live/'+myLang).remove();
+
+        // B — Construire l'entrée avec traductions pour l'hôte
+        const transMap = {};
+        targetLangs.forEach(tl=>{
+          const azCode = AZ_LANG[tl]?AZ_LANG[tl].split('-')[0]:tl;
+          const translated = translations.get(azCode)||translations.get(tl)||'';
+          transMap[tl] = translated;
+          if(translated) pushSubtitle(tl, myLang, translated, hostName, false, ts);
+          // Nettoie le sous-titre live correspondant
+          if(db) db.ref('sessions/'+room+'/subtitles_live/'+tl).remove();
+        });
+
+        // B — Afficher sur l'interface hôte avec les traductions dessous
+        addSubtitleWithTranslations(original, myLang, hostName, transMap);
+        storeTranscript(original, myLang, translations, ts);
+        clearInterim();
+      }
+    };
+
+    recognition.canceled = (s,e)=>{
+      console.warn('Recognition canceled:', e.reason, e.errorDetails);
+      if(e.reason===SpeechSDK.CancellationReason.Error){
+        if(isMicError(e.errorDetails)) showMicHelp();
+        else showSubtitleError(t('err_azure_prefix')+e.errorDetails+t('err_azure_check'));
+      }
+    };
+
+    recognition.startContinuousRecognitionAsync(
+      ()=>{ console.log('Recognition started'); },
+      err=>{
+        console.error('Start error:', err);
+        if(isMicError(err)) showMicHelp();
+        else showSubtitleError(t('err_mic_start')+err);
+      }
+    );
+  } catch(err){
+    console.error('SDK error:', err);
+    if(isMicError(err && err.message)) showMicHelp();
+    else showSubtitleError(t('err_sdk')+err.message);
+  }
+}
+
+function stopRecognition(){
+  if(recognition){
+    // On garde une référence locale et on déréférence immédiatement.
+    // Cela empêche un appel concurrent de stopRecognition() de tomber sur le
+    // même objet, et coupe le lien dès maintenant.
+    const r = recognition;
+    recognition = null;
+    try {
+      r.stopContinuousRecognitionAsync(
+        ()=>{ try{ r.close(); }catch(_){} },
+        ()=>{ try{ r.close(); }catch(_){} }
+      );
+    } catch(_){ try{ r.close(); }catch(_){} }
+  }
+}
+
+// ── FIREBASE SUBTITLE PUSH ──
+function pushSubtitle(lang, fromLang, text, speaker, interim, ts){
+  if(!db) return;
+  db.ref('sessions/'+room+'/subtitles/'+lang+'/'+ts).set({
+    text, fromLang, speaker, interim, ts
+  });
+}
+
+function storeTranscript(original, fromLang, translations, ts){
+  if(!db) return;
+  const entry = {original, fromLang, speaker:hostName, ts};
+  targetLangs.forEach(tl=>{
+    const azCode = AZ_LANG[tl]?AZ_LANG[tl].split('-')[0]:tl;
+    entry['t_'+tl] = translations.get(azCode)||translations.get(tl)||'';
+  });
+  transcriptData.push(entry);
+  db.ref('sessions/'+room+'/transcript/'+ts).set(entry);
+}
+
+// ── SUBTITLE RENDERING ──
+let interimEl = null;
+
+// ── ANTI-DOUBLON : mémoire glissante des phrases récentes ──
+// On garde les 20 dernières phrases reçues. Si une nouvelle phrase
+// est identique à une déjà vue il y a moins de 3 secondes, on l'ignore.
+const _recentSubtitles = []; // [{key, ts}, …]
+const DUPLICATE_WINDOW_MS = 3000;
+
+function isDuplicateSubtitle(text, speaker, ts){
+  if(!text) return false;
+  const now = Date.now();
+  const key = (speaker||'') + '|' + text.trim();
+  // Nettoyer les entrées trop anciennes
+  while(_recentSubtitles.length && (now - _recentSubtitles[0].ts) > DUPLICATE_WINDOW_MS){
+    _recentSubtitles.shift();
+  }
+  // Vérifier si la phrase a déjà été vue récemment
+  for(let i=0; i<_recentSubtitles.length; i++){
+    if(_recentSubtitles[i].key === key){
+      return true; // doublon
+    }
+  }
+  // Pas un doublon — on l'enregistre
+  _recentSubtitles.push({key, ts: now});
+  if(_recentSubtitles.length > 20) _recentSubtitles.shift();
+  return false;
+}
+
+function addSubtitle(text, fromLang, speaker, interim){
+  const container = document.getElementById('subtitles');
+  document.getElementById('emptyMsg').style.display='none';
+
+  if(interim){
+    if(!interimEl){
+      interimEl = document.createElement('div');
+      interimEl.className='sub-entry';
+      container.appendChild(interimEl);
+    }
+    const flagCode = FLAGS[fromLang]||'un';
+    interimEl.innerHTML=
+      '<div class="sub-speaker"><img class="from-flag" src="https://flagcdn.com/w40/'+flagCode+'.png"> '+speaker+'</div>'+
+      '<div class="sub-text interim">'+text+'</div>';
+    container.scrollTop=container.scrollHeight;
+    return;
+  }
+
+  // Final sans traductions (utilisé pour les sous-titres reçus des autres)
+  if(interimEl){container.removeChild(interimEl);interimEl=null;}
+  const entry = document.createElement('div');
+  entry.className='sub-entry';
+  const flagCode = FLAGS[fromLang]||'un';
+  entry.innerHTML=
+    '<div class="sub-speaker"><img class="from-flag" src="https://flagcdn.com/w40/'+flagCode+'.png"> '+speaker+'</div>'+
+    '<div class="sub-text">'+text+'</div>';
+  container.appendChild(entry);
+  container.scrollTop=container.scrollHeight;
+}
+
+// B — Affiche le texte original + traductions en dessous
+function addSubtitleWithTranslations(original, fromLang, speaker, transMap){
+  const container = document.getElementById('subtitles');
+  document.getElementById('emptyMsg').style.display='none';
+  if(interimEl){container.removeChild(interimEl);interimEl=null;}
+
+  const entry = document.createElement('div');
+  entry.className='sub-entry';
+  const flagCode = FLAGS[fromLang]||'un';
+  const langName = LANG_NAMES[fromLang]||fromLang;
+
+  let html =
+    '<div class="sub-speaker"><img class="from-flag" src="https://flagcdn.com/w40/'+flagCode+'.png"> '+speaker+'</div>'+
+    '<div class="sub-text">'+original+'</div>';
+
+  // Traductions dessous
+  const transKeys = Object.keys(transMap).filter(tl=>transMap[tl]);
+  if(transKeys.length){
+    html += '<div class="sub-translations">';
+    transKeys.forEach(tl=>{
+      const tf = FLAGS[tl]||'un';
+      const tn = LANG_NAMES[tl]||tl;
+      html += '<div class="sub-trans-line">'+
+        '<img class="from-flag" src="https://flagcdn.com/w40/'+tf+'.png">'+
+        '<span class="sub-trans-lang">'+tn+'</span>'+
+        '<span class="sub-trans-text">'+transMap[tl]+'</span>'+
+      '</div>';
+    });
+    html += '</div>';
+  }
+
+  entry.innerHTML = html;
+  container.appendChild(entry);
+  container.scrollTop=container.scrollHeight;
+}
+
+function updateInterim(text, fromLang, speaker){
+  addSubtitle(text, fromLang, speaker, true);
+}
+function clearInterim(){
+  if(interimEl){document.getElementById('subtitles').removeChild(interimEl);interimEl=null;}
+}
+
+function showSubtitleError(msg){
+  const container = document.getElementById('subtitles');
+  document.getElementById('emptyMsg').style.display='none';
+  const el=document.createElement('div');
+  el.style.cssText='padding:14px;background:rgba(248,113,113,.1);border:1px solid rgba(248,113,113,.25);border-radius:10px;font-size:13px;color:#f87171;line-height:1.5';
+  el.textContent='⚠️ '+msg;
+  container.appendChild(el);
+}
+
+// ── DETECTION ERREUR MICRO ──
+// Reconnaît les erreurs liées au refus / absence d'autorisation micro
+function isMicError(errMsg){
+  if(!errMsg) return false;
+  const s = String(errMsg).toLowerCase();
+  return s.includes('permission')
+      || s.includes('microphone')
+      || s.includes('not allowed')
+      || s.includes('notallowed')
+      || s.includes('denied')
+      || s.includes('mediastream')
+      || s.includes('getusermedia')
+      || s.includes('audio device')
+      || s.includes('1006')   // Azure: no input audio
+      || s.includes('1007');  // Azure: audio device error
+}
+
+// ── MESSAGE D'AIDE MICRO ──
+// Affiche un bandeau jaune fermable en haut d'écran
+function showMicHelp(){
+  if(document.getElementById('micHelpOverlay')) return; // déjà affiché
+  const div = document.createElement('div');
+  div.id = 'micHelpOverlay';
+  div.style.cssText = 'position:fixed;top:0;left:0;right:0;background:#fff8e6;border-bottom:2px solid #f0d68c;padding:14px 20px;z-index:99999;font-family:Arial,sans-serif;font-size:14px;line-height:1.5;color:#5a4a1a;box-shadow:0 4px 14px rgba(0,0,0,.15)';
+  div.innerHTML =
+    '<div style="max-width:720px;margin:0 auto;display:flex;align-items:flex-start;gap:12px">'+
+      '<div style="font-size:26px;flex-shrink:0;line-height:1">🎤</div>'+
+      '<div style="flex:1">'+
+        '<div style="font-weight:700;color:#0d1f1a;margin-bottom:6px;font-size:15px">'+t('mic_help_title')+'</div>'+
+        '<div>'+t('mic_help_text')+'</div>'+
+      '</div>'+
+      '<button onclick="this.parentElement.parentElement.remove()" aria-label="'+t('mic_help_close')+'" style="background:none;border:none;font-size:26px;cursor:pointer;color:#5a4a1a;padding:0 6px;line-height:1;flex-shrink:0">×</button>'+
+    '</div>';
+  document.body.appendChild(div);
+}
+
+// ── PARTICIPANTS RENDER ──
+function renderParticipants(list){
+  const count = list.length;
+  document.getElementById('partCount').textContent = count;
+  document.getElementById('partCountMobile').textContent = count;
+  const connLabel = count>1 ? t('connected_plural') : t('connected_singular');
+  document.getElementById('partCountLabel').textContent = count+' '+connLabel;
+
+  const ul = document.getElementById('partList');
+  if(!count){ ul.innerHTML='<div class="waiting-msg" style="color:rgba(255,255,255,.2);font-size:12px">'+t('waiting_conn')+'</div>'; return; }
+
+  ul.innerHTML = list.map(p=>{
+    const flag = FLAGS[p.lang]||'un';
+    const langName = LANG_NAMES[p.lang]||p.lang;
+    return '<div class="part-item">'+
+      '<img class="part-flag" src="https://flagcdn.com/w40/'+flag+'.png">'+
+      '<span class="part-name">'+escHtml(p.name||t('anonymous'))+'</span>'+
+      '<span class="part-lang">'+langName+'</span>'+
+      '<span class="part-dot"></span>'+
+    '</div>';
+  }).join('');
+}
+
+// ── SIDEBAR ──
+let sidebarOpen = true;
+function toggleSidebar(){
+  sidebarOpen=!sidebarOpen;
+  document.getElementById('sidebar').classList.toggle('collapsed',!sidebarOpen);
+}
+function switchTab(tab){
+  document.getElementById('tabPart').classList.toggle('active',tab==='participants');
+  document.getElementById('tabDl').classList.toggle('active',tab==='downloads');
+  document.getElementById('panelParticipants').style.display=tab==='participants'?'block':'none';
+  document.getElementById('panelDownloads').style.display=tab==='downloads'?'block':'none';
+}
+
+// ── STOP SESSION ──
+function confirmStop(){
+  if(confirm(t('confirm_stop'))) endSession();
+}
+function endSession(){
+  if(sessionEnded) return;
+  sessionEnded=true;
+  clearInterval(timerInterval);
+  stopRecognition();
+  const elapsed=Math.floor((Date.now()-sessionStart)/1000);
+  const m=Math.floor(elapsed/60),s=elapsed%60;
+  document.getElementById('endDuration').textContent=m+t('dur_min')+' '+s+t('dur_sec');
+  document.getElementById('endPartCount').textContent=participantsList.length+' '+t('part_suffix');
+  document.getElementById('endOverlay').classList.add('show');
+  if(db){
+    db.ref('sessions/'+room+'/config').update({ended:true, endedAt:Date.now()});
+    db.ref('sessions/'+room+'/participants/'+deviceId).update({active:false});
+  }
+}
+
+// ── DOWNLOADS ──
+function downloadParticipants(){
+  if(!participantsList.length){alert(t('alert_no_parts'));return;}
+  const headers=t('csv_header');
+  const rows=participantsList.map(p=>[
+    '"'+(p.name||'')+'","'+(LANG_NAMES[p.lang]||p.lang)+'","'+(p.org||'')+'","'+(p.role||'participant')+'","'+new Date(p.joinedAt||0).toLocaleTimeString(t('locale_code'))+'"'
+  ].join('')).join('\n');
+  downloadFile(headers+'\n'+rows,t('csv_filename')+room+'.csv','text/csv');
+}
+
+function downloadTranscript(){
+  if(!transcriptData.length){alert(t('alert_no_transcript'));return;}
+  let txt=t('tr_header_title')+room+'\n';
+  txt+=t('tr_header_date')+new Date().toLocaleString(t('locale_code'))+'\n';
+  txt+=t('tr_header_host')+hostName+(hostOrg?' ('+hostOrg+')':'')+'\n';
+  txt+=t('tr_header_langs')+allLangs.map(l=>LANG_NAMES[l]||l).join(', ')+'\n\n';
+  txt+='─'.repeat(60)+'\n\n';
+  transcriptData.forEach((e,i)=>{
+    txt+='['+(i+1)+'] '+new Date(e.ts).toLocaleTimeString(t('locale_code'))+' — '+(LANG_NAMES[e.fromLang]||e.fromLang)+' ('+e.speaker+')\n';
+    txt+=t('tr_original_lbl')+e.original+'\n';
+    targetLangs.forEach(tl=>{ if(e['t_'+tl]) txt+=(LANG_NAMES[tl]||tl)+' : '+e['t_'+tl]+'\n'; });
+    txt+='\n';
+  });
+  downloadFile(txt,t('tr_filename')+room+'.txt','text/plain');
+}
+
+function downloadFile(content, filename, type){
+  const blob=new Blob(['\uFEFF'+content],{type:type+';charset=utf-8'});
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(blob);
+  a.download=filename;
+  a.click();
+}
+
+function escHtml(s){return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')}
+
+// ════════════════════════════════════════════════════════════
+// OVERLAY DE PARTAGE — Permet à l'hôte d'envoyer le lien participants
+// pendant la session, sans devoir retourner dans son email.
+// Lit les liens mémorisés en localStorage (sauvegardés au moment de la
+// création de la session sur la page d'accueil, valables 30 minutes).
+// ════════════════════════════════════════════════════════════
+
+// Charge la lib QRCode à la demande (la 1ère fois qu'on ouvre le partage)
+function loadQRCodeLib(callback){
+  if(typeof QRCode !== 'undefined'){ callback(); return; }
+  const s = document.createElement('script');
+  s.src = 'https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js';
+  s.onload = callback;
+  s.onerror = function(){
+    console.error('[share] QRCode lib failed to load');
+    callback(); // on continue quand même, juste sans QR
+  };
+  document.head.appendChild(s);
+}
+
+// ── BOUTON "INVITER" : 1er clic = arrêt du clignotement ──
+// Tant que l'utilisateur n'a pas cliqué une première fois, le bouton
+// clignote (CSS .invite-btn-pulse) pour attirer l'œil. Au premier clic,
+// on retire la classe pour que l'animation s'arrête définitivement,
+// afin de ne plus perturber l'orateur pendant la session.
+function onInviteClick(){
+  const btn = document.getElementById('shareBtn');
+  if(btn) btn.classList.remove('invite-btn-pulse');
+  openShareOverlay();
+}
+
+function openShareOverlay(){
+  let overlay = document.getElementById('shareOverlay');
+  if(!overlay){
+    overlay = document.createElement('div');
+    overlay.id = 'shareOverlay';
+    overlay.style.cssText = 'display:none;position:fixed;inset:0;z-index:99999;background:rgba(0,0,0,.7);align-items:center;justify-content:center;padding:20px;font-family:DM Sans,Arial,sans-serif';
+    overlay.innerHTML = `
+      <div style="background:#fff;border-radius:14px;max-width:420px;width:100%;padding:24px;box-shadow:0 12px 40px rgba(0,0,0,.4);max-height:90vh;overflow-y:auto">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">
+          <div style="font-size:18px;font-weight:800;color:#0d1f1a">📤 <span id="shareTitle">Partager avec mes participants</span></div>
+          <button onclick="closeShareOverlay()" style="background:none;border:none;font-size:24px;cursor:pointer;color:#999;line-height:1;padding:0 4px">×</button>
+        </div>
+
+        <!-- Lien participants -->
+        <div style="background:#f0faf8;border:1.5px solid #2dd4bf;border-radius:10px;padding:14px;margin-bottom:14px">
+          <div style="font-size:11px;font-weight:700;color:#157a6e;letter-spacing:.08em;text-transform:uppercase;margin-bottom:6px">👥 <span id="shareLinkLabel">Lien Participants</span></div>
+          <div id="sharePartLink" style="background:#fff;border:1px solid #ddd;border-radius:6px;padding:8px 10px;font-family:monospace;font-size:11px;color:#0d1f1a;word-break:break-all;margin-bottom:8px"></div>
+          <button onclick="copyShareLink()" id="shareCopyBtn" style="background:#157a6e;color:#fff;border:none;padding:8px 14px;border-radius:6px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">📋 <span id="shareCopyLabel">Copier le lien</span></button>
+        </div>
+
+        <!-- QR code -->
+        <div style="text-align:center;margin-bottom:18px">
+          <div id="shareQR" style="display:inline-block;background:#fff;padding:8px;border:1px solid #eee;border-radius:8px"></div>
+          <div style="font-size:11px;color:#666;margin-top:6px"><span id="shareQRLabel">Vos invités peuvent scanner ce QR code</span></div>
+        </div>
+
+        <!-- Boutons de partage -->
+        <div style="font-size:12px;font-weight:700;color:#666;margin-bottom:8px;text-align:center"><span id="shareViaLabel">Envoyer par :</span></div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap">
+          <a id="shareGmailBtn"    href="#" target="_blank" rel="noopener" style="flex:1;min-width:84px;background:#ea4335;color:#fff;text-align:center;padding:11px 6px;border-radius:8px;text-decoration:none;font-weight:700;font-size:13px">✉️ Gmail</a>
+          <a id="shareOutlookBtn"  href="#" target="_blank" rel="noopener" style="flex:1;min-width:84px;background:#0078d4;color:#fff;text-align:center;padding:11px 6px;border-radius:8px;text-decoration:none;font-weight:700;font-size:13px">📨 Outlook</a>
+          <a id="shareMailAppBtn"  href="#" style="flex:1;min-width:84px;background:#475569;color:#fff;text-align:center;padding:11px 6px;border-radius:8px;text-decoration:none;font-weight:700;font-size:13px">📧 Mail app</a>
+        </div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:8px">
+          <a id="shareWhatsappBtn" href="#" target="_blank" rel="noopener" style="flex:1;min-width:84px;background:#25d366;color:#fff;text-align:center;padding:11px 6px;border-radius:8px;text-decoration:none;font-weight:700;font-size:13px">💬 WhatsApp</a>
+          <a id="shareSmsBtn"      href="#" style="flex:1;min-width:84px;background:#64748b;color:#fff;text-align:center;padding:11px 6px;border-radius:8px;text-decoration:none;font-weight:700;font-size:13px">📱 SMS</a>
+        </div>
+
+        <div id="shareNoLinks" style="display:none;background:#fff8e6;border:1px solid #f0d68c;color:#5a4a1a;padding:12px;border-radius:8px;font-size:13px;line-height:1.5;text-align:center;margin-top:14px"></div>
+      </div>
+    `;
+    document.body.appendChild(overlay);
+    // Fermeture au clic sur le fond
+    overlay.addEventListener('click', function(e){
+      if(e.target === overlay) closeShareOverlay();
+    });
+  }
+
+  // ═══ RECONSTRUCTION DU LIEN PARTICIPANT DEPUIS L'URL ACTUELLE ═══
+  // Avant : on lisait localStorage 'ttw_recent_links' (mémoire temporaire du
+  // navigateur, valide 30 min). Problème : sur iPhone, Safari peut vider cette
+  // mémoire quand on change d'app (Gmail → Safari), ou si l'utilisateur ouvre
+  // le lien host depuis un email sur un appareil différent de celui où la salle
+  // a été créée, la mémoire n'existe pas du tout.
+  //
+  // Solution : on est sur host-session.html, donc on a TOUS les paramètres de
+  // la salle dans l'URL courante (room, exp). Le lien participant a un format
+  // fixe (origine + /join.html?room=...&exp=...). On le reconstruit à la volée.
+  // Résultat : ça marche sur iPhone, iPad, PC, après 30 min, après 5 heures,
+  // sur n'importe quel appareil, tant que la session host est ouverte.
+  let data = null;
+  if(room && expTs){
+    const baseUrl = window.location.origin;
+    const participantLink = baseUrl + '/join.html?room=' + room + '&exp=' + expTs;
+    const shareLabel = (hostOrg && hostOrg !== '—') ? hostOrg : 'TranslateTheWorld';
+    const shareText  = 'Join our multilingual session – ' + shareLabel + ': ' + participantLink;
+    const shareEmailSubject = 'Join our multilingual session';
+    data = {
+      participant:    participantLink,
+      share_whatsapp: 'https://api.whatsapp.com/send?text=' + encodeURIComponent(shareText),
+      share_sms:      'sms:?&body=' + encodeURIComponent(shareText),
+      share_email:    'mailto:?subject=' + encodeURIComponent(shareEmailSubject) + '&body=' + encodeURIComponent(shareText)
+    };
+  }
+
+  const isFr = (typeof uiLang !== 'undefined' && uiLang === 'fr');
+  // Localisation des textes
+  document.getElementById('shareTitle').textContent       = isFr ? 'Partager avec mes participants' : 'Share with my participants';
+  document.getElementById('shareLinkLabel').textContent   = isFr ? 'Lien Participants' : 'Participants link';
+  document.getElementById('shareCopyLabel').textContent   = isFr ? 'Copier le lien'    : 'Copy link';
+  document.getElementById('shareQRLabel').textContent     = isFr ? 'Vos invités peuvent scanner ce QR code' : 'Your guests can scan this QR code';
+  document.getElementById('shareViaLabel').textContent    = isFr ? 'Envoyer par :'     : 'Send via:';
+
+  if(data){
+    // Affiche le lien
+    document.getElementById('sharePartLink').textContent = data.participant;
+    // Boutons de partage : WhatsApp et SMS marchent directement (URLs web/system)
+    document.getElementById('shareWhatsappBtn').href = data.share_whatsapp || '#';
+    document.getElementById('shareSmsBtn').href      = data.share_sms      || '#';
+    // 3 boutons email distincts pour ouvrir directement le service de l'utilisateur,
+    // sans popup d'étape intermédiaire. Chacun construit l'URL native de son service.
+    let emailSubject = '', emailBody = '';
+    try{
+      const u = new URL(data.share_email || '');
+      const p = new URLSearchParams(u.search);
+      emailSubject = p.get('subject') || '';
+      emailBody    = p.get('body')    || '';
+    }catch(e){/* mailto: vide ou malformé : on continue avec champs vides */}
+    const enc = encodeURIComponent;
+    document.getElementById('shareGmailBtn').href   = 'https://mail.google.com/mail/?view=cm&fs=1&su='+enc(emailSubject)+'&body='+enc(emailBody);
+    document.getElementById('shareOutlookBtn').href = 'https://outlook.live.com/mail/deeplink/compose?subject='+enc(emailSubject)+'&body='+enc(emailBody);
+    document.getElementById('shareMailAppBtn').href = data.share_email || '#';
+    document.getElementById('shareNoLinks').style.display = 'none';
+
+    // Génère le QR code (charge la lib si besoin)
+    const qrEl = document.getElementById('shareQR');
+    qrEl.innerHTML = '';
+    loadQRCodeLib(function(){
+      if(typeof QRCode !== 'undefined'){
+        try {
+          new QRCode(qrEl, {
+            text: data.participant,
+            width: 160, height: 160,
+            colorDark: '#0d1f1a', colorLight: '#fff',
+            correctLevel: QRCode.CorrectLevel.M
+          });
+        } catch(e){
+          qrEl.innerHTML = '<div style="padding:20px;color:#999;font-size:12px">QR code unavailable</div>';
+        }
+      }
+    });
+  } else {
+    // Pas de liens en mémoire → message clair
+    document.getElementById('sharePartLink').textContent = '—';
+    document.getElementById('shareCopyBtn').disabled = true;
+    ['shareGmailBtn','shareOutlookBtn','shareMailAppBtn','shareWhatsappBtn','shareSmsBtn'].forEach(function(id){
+      const el = document.getElementById(id);
+      el.style.opacity = '.4';
+      el.onclick = function(e){ e.preventDefault(); };
+    });
+    document.getElementById('shareQR').innerHTML = '';
+    const noLinksMsg = document.getElementById('shareNoLinks');
+    noLinksMsg.innerHTML = isFr
+      ? '⚠️ Lien participant indisponible. Veuillez recharger la page ou consulter votre email d\'origine pour récupérer le lien participants.'
+      : '⚠️ Participant link unavailable. Please reload the page or check your original email to find the participants link.';
+    noLinksMsg.style.display = 'block';
+  }
+
+  overlay.style.display = 'flex';
+}
+
+function closeShareOverlay(){
+  const overlay = document.getElementById('shareOverlay');
+  if(overlay) overlay.style.display = 'none';
+}
+
+function copyShareLink(){
+  const link = document.getElementById('sharePartLink').textContent;
+  if(!link || link === '—') return;
+  const btn = document.getElementById('shareCopyBtn');
+  navigator.clipboard.writeText(link).then(function(){
+    const orig = btn.innerHTML;
+    btn.innerHTML = '✅ ' + ((typeof uiLang !== 'undefined' && uiLang === 'fr') ? 'Copié !' : 'Copied!');
+    btn.style.background = '#2dd4bf';
+    setTimeout(function(){ btn.innerHTML = orig; btn.style.background = '#157a6e'; }, 2000);
+  }).catch(function(){
+    // Fallback si l'API clipboard n'est pas disponible
+    alert((typeof uiLang !== 'undefined' && uiLang === 'fr') ? 'Copiez ce lien : '+link : 'Copy this link: '+link);
+  });
+}
+
+// Met à jour le label du bouton selon la langue UI
+function refreshShareBtnLabel(){
+  const lbl = document.getElementById('shareBtnLabel');
+  if(lbl) lbl.textContent = (typeof uiLang !== 'undefined' && uiLang === 'fr') ? 'Partager' : 'Share';
+}
+document.addEventListener('DOMContentLoaded', refreshShareBtnLabel);
+// Et après chaque changement de langue UI
+const _origSetUiLang = (typeof setUiLang === 'function') ? setUiLang : null;
+if(_origSetUiLang){
+  window.setUiLang = function(l){ _origSetUiLang(l); refreshShareBtnLabel(); };
+}
+</script>
+</body>
+</html>

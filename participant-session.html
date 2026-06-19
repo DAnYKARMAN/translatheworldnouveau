@@ -1,0 +1,1337 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<title>TranslateTheWorld — Session</title>
+<link rel="icon" type="image/svg+xml" href="/favicon.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;700;800&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+<script src="https://aka.ms/csspeech/jsbrowserpackageraw"></script>
+<style>
+:root{
+  --bg:#050908;--surface:#0a110e;--card:#101a16;
+  --border:rgba(45,212,191,.14);--border2:rgba(255,255,255,.06);
+  --teal:#2dd4bf;--teal-dim:rgba(45,212,191,.1);
+  --red:#f87171;--red-dim:rgba(248,113,113,.12);
+  --white:#e8edeb;--mid:#5a7870;--dim:rgba(255,255,255,.3);
+  --font:'DM Sans',sans-serif;--mono:'DM Mono',monospace;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;overflow:hidden;overscroll-behavior:none}
+body{font-family:var(--font);background:var(--bg);color:var(--white);display:flex;flex-direction:column;-webkit-font-smoothing:antialiased}
+
+/* ── HEADER ── */
+.header{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:12px 16px;flex-shrink:0;
+  border-bottom:1px solid var(--border2);
+  background:var(--surface);
+}
+.h-left{display:flex;align-items:center;gap:10px;min-width:0}
+.h-name{font-size:13px;font-weight:700;color:var(--white);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:120px}
+.h-lang{display:flex;align-items:center;gap:5px;background:var(--teal-dim);border:1px solid var(--border);border-radius:999px;padding:3px 10px;font-size:11px;font-weight:700;color:var(--teal)}
+.h-lang img{width:14px;height:11px;border-radius:2px;object-fit:cover}
+.h-lang-btn{cursor:pointer;font-family:inherit;transition:all .15s;padding:3px 8px 3px 10px}
+.h-lang-btn:hover{background:rgba(45,212,191,.2);transform:translateY(-1px)}
+.h-lang-btn:active{transform:translateY(0)}
+.h-lang-chevron{font-size:9px;opacity:.7;margin-left:2px}
+
+/* ── Language picker modal ── */
+.lang-picker-overlay{
+  position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:9999;
+  display:none;align-items:center;justify-content:center;padding:20px;
+  backdrop-filter:blur(3px);-webkit-backdrop-filter:blur(3px);
+}
+.lang-picker-overlay.show{display:flex}
+.lang-picker-modal{
+  background:var(--bg);border:1px solid var(--border);border-radius:18px;
+  padding:20px;max-width:380px;width:100%;max-height:80vh;overflow-y:auto;
+  box-shadow:0 20px 60px rgba(0,0,0,.4);
+}
+.lang-picker-title{font-size:15px;font-weight:800;color:var(--ink);margin:0 0 6px 0}
+.lang-picker-desc{font-size:12px;color:var(--mid);margin:0 0 14px 0;line-height:1.4}
+.lang-picker-list{display:flex;flex-direction:column;gap:6px}
+.lang-picker-item{
+  display:flex;align-items:center;gap:10px;padding:10px 12px;
+  background:var(--surface);border:1px solid var(--border);border-radius:12px;
+  cursor:pointer;transition:all .15s;font-family:inherit;font-size:14px;
+  font-weight:600;color:var(--ink);text-align:left;width:100%;
+}
+.lang-picker-item:hover{background:var(--teal-dim);border-color:var(--teal);transform:translateX(2px)}
+.lang-picker-item.current{background:var(--teal-dim);border-color:var(--teal);color:var(--teal)}
+.lang-picker-item img{width:24px;height:18px;border-radius:3px;object-fit:cover;flex-shrink:0}
+.lang-picker-item-check{margin-left:auto;color:var(--teal);font-weight:800;font-size:13px}
+.lang-picker-close{
+  margin-top:14px;width:100%;padding:10px;border-radius:10px;
+  background:transparent;border:1px solid var(--border);color:var(--mid);
+  font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;
+}
+.lang-picker-close:hover{background:var(--surface)}
+.h-right{display:flex;align-items:center;gap:8px;flex-shrink:0}
+.live-dot{width:7px;height:7px;border-radius:50%;background:var(--teal);box-shadow:0 0 6px var(--teal);animation:pulse 2s ease infinite;display:inline-block}
+.live-dot.speaking{background:var(--red);box-shadow:0 0 10px var(--red);animation:pulse .7s ease infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
+
+/* ── SUBTITLES MAIN AREA ── */
+.subtitles{
+  flex:1;overflow-y:auto;overflow-x:hidden;
+  padding:20px 18px 16px;
+  display:flex;flex-direction:column;gap:16px;
+  -webkit-overflow-scrolling:touch;
+  scroll-behavior:smooth;
+}
+.subtitles::-webkit-scrollbar{width:3px}
+.subtitles::-webkit-scrollbar-thumb{background:rgba(255,255,255,.06);border-radius:2px}
+
+.sub-entry{
+  animation:fadeUp .25s ease;
+  max-width:100%;
+}
+@keyframes fadeUp{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+
+.sub-speaker{
+  display:flex;align-items:center;gap:6px;
+  font-size:10px;font-weight:700;color:var(--mid);
+  letter-spacing:.06em;text-transform:uppercase;
+  margin-bottom:5px;
+}
+.sub-speaker img{width:14px;height:11px;border-radius:2px;object-fit:cover}
+
+.sub-text{
+  font-size:clamp(17px,4.5vw,22px);
+  font-weight:500;line-height:1.5;
+  color:var(--white);
+  word-break:break-word;
+}
+.sub-text.interim{
+  color:rgba(255,255,255,.85);
+  font-style:normal;
+}
+.sub-text.mine{color:rgba(45,212,191,.7);font-size:clamp(15px,3.5vw,18px)}
+
+/* ── BOTTOM BAR ── */
+.bottom{
+  flex-shrink:0;
+  background:var(--surface);
+  border-top:1px solid var(--border2);
+  padding:14px 16px calc(14px + env(safe-area-inset-bottom));
+}
+
+/* Mode buttons */
+.mode-btns{display:flex;gap:10px;margin-bottom:0}
+.btn-mode{
+  flex:1;display:flex;align-items:center;justify-content:center;gap:7px;
+  padding:13px;border-radius:12px;border:none;
+  font-size:14px;font-weight:700;font-family:var(--font);
+  cursor:pointer;transition:all .2s;
+  -webkit-tap-highlight-color:transparent;
+}
+/* État 1 : repos (prêt à lever la main) */
+.btn-mode.idle{
+  background:var(--teal-dim);
+  border:1.5px solid var(--border);
+  color:var(--teal);
+}
+.btn-mode.idle:hover{background:rgba(45,212,191,.15)}
+/* État 2 : main levée, en attente de l'hôte */
+.btn-mode.pending{
+  background:rgba(240,212,138,.12);
+  border:1.5px solid rgba(240,212,138,.4);
+  color:#e5c569;
+  animation:pendingPulse 2s ease infinite;
+}
+@keyframes pendingPulse{0%,100%{opacity:.85}50%{opacity:1}}
+/* État 3 : vous avez la parole, micro ouvert */
+.btn-mode.speaking{
+  background:rgba(239,68,68,.9);
+  border:1.5px solid #ef4444;
+  color:#fff;
+  box-shadow:0 0 24px rgba(239,68,68,.4);
+  animation:speakGlow 1.8s ease infinite;
+}
+@keyframes speakGlow{0%,100%{box-shadow:0 0 24px rgba(239,68,68,.4)}50%{box-shadow:0 0 40px rgba(239,68,68,.7)}}
+/* Désactivé (autre participant a la parole ou demande en cours) */
+/* ─── NEW : bouton PAUSE défilement ─── */
+.btn-pause-scroll{
+  background:rgba(160,160,160,.12);border:1.5px solid rgba(160,160,160,.35);
+  color:var(--mid);font-size:13px;padding:10px 14px;border-radius:10px;
+  font-weight:800;cursor:pointer;font-family:inherit;
+  display:flex;align-items:center;justify-content:center;gap:6px;
+  transition:all .15s;flex-shrink:0;
+}
+.btn-pause-scroll:hover{background:rgba(160,160,160,.2)}
+.btn-pause-scroll.paused{
+  background:#f59e0b;border-color:#f59e0b;color:#fff;
+  box-shadow:0 0 14px rgba(245,158,11,.4);
+}
+
+/* ─── NEW : bouton LEAVE (quitter la session) ─── */
+.btn-leave-session{
+  background:rgba(220,38,38,.12);border:1.5px solid rgba(220,38,38,.35);
+  color:#dc2626;font-size:13px;padding:10px 14px;border-radius:10px;
+  font-weight:800;cursor:pointer;font-family:inherit;
+  display:flex;align-items:center;justify-content:center;gap:6px;
+  transition:all .15s;flex-shrink:0;
+}
+.btn-leave-session:hover{background:#dc2626;color:#fff;border-color:#dc2626}
+
+/* ─── NEW : indicateur "nouveaux sous-titres" pendant pause ─── */
+.new-subs-pill{
+  position:fixed;bottom:140px;left:50%;transform:translateX(-50%);
+  background:#2dd4bf;color:#0b1512;
+  padding:8px 16px;border-radius:999px;
+  font-size:12px;font-weight:800;
+  cursor:pointer;z-index:99;
+  box-shadow:0 6px 16px rgba(0,0,0,.4);
+  display:none;
+}
+.new-subs-pill:active{transform:translateX(-50%) scale(.95)}
+
+.btn-mode.disabled{
+  background:rgba(255,255,255,.03);
+  border:1.5px solid rgba(255,255,255,.08);
+  color:rgba(255,255,255,.25);
+  cursor:not-allowed;
+}
+
+/* Mic viz under speaker btn */
+.mic-viz{
+  display:none;
+  align-items:flex-end;justify-content:center;
+  gap:3px;height:18px;margin-top:8px;
+}
+.mic-viz.show{display:flex}
+.bar{width:3px;border-radius:2px;background:#ef4444;min-height:3px;transition:height .07s}
+
+/* Session ended banner */
+.ended-banner{
+  display:none;
+  background:rgba(248,113,113,.1);border-top:1px solid rgba(248,113,113,.2);
+  padding:12px 16px;text-align:center;font-size:13px;color:var(--red);
+  font-weight:600;
+}
+.ended-banner.show{display:block}
+
+/* Empty state */
+.empty{
+  flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;
+  text-align:center;padding:32px;gap:12px;color:var(--mid);
+}
+.empty .icon{font-size:40px;opacity:.3}
+.empty p{font-size:14px;line-height:1.6}
+
+/* RTL support */
+[dir="rtl"] .sub-text{direction:rtl;text-align:right}
+
+/* UI language switcher (compact, in header) */
+.ui-lang-switch{
+  display:flex;gap:2px;
+  background:rgba(255,255,255,.04);
+  border:1px solid rgba(255,255,255,.06);
+  border-radius:999px;
+  padding:2px;
+  flex-shrink:0;
+}
+.ui-lang-btn{
+  border:none;background:transparent;
+  color:var(--mid);
+  font-family:var(--font);font-size:10px;font-weight:700;
+  padding:3px 8px;border-radius:999px;cursor:pointer;
+  letter-spacing:.03em;
+  -webkit-tap-highlight-color:transparent;
+  transition:color .15s, background .15s;
+}
+.ui-lang-btn:active{opacity:.6}
+.ui-lang-btn.active{
+  background:var(--teal-dim);
+  color:var(--teal);
+}
+</style>
+</head>
+<body>
+
+<!-- ════════════════════════════════════════════════════════════
+     ÉCRAN D'ACCUEIL iOS — Pré-autorise le micro AVANT tout
+     ════════════════════════════════════════════════════════════
+     Sur iOS, la fenêtre système "Autoriser le micro ?" est asynchrone
+     et casse le contexte de geste utilisateur. Conséquence : quand
+     l'hôte accorde la parole plus tard, le tap "Speak now" obtient
+     bien la permission, mais iOS bloque Azure ensuite (l'utilisateur
+     doit retaper).
+
+     Solution : demander la permission MAINTENANT, pendant un tap
+     d'arrivée volontaire. La fenêtre système iOS s'affiche une seule
+     fois ici. Plus tard, "Speak now" ne déclenche plus de fenêtre
+     → le tap reste "actif" → Azure démarre instantanément.
+-->
+<div id="iosWelcomeOverlay" style="
+  display:none;position:fixed;inset:0;z-index:99996;
+  background:linear-gradient(180deg,#0b1512 0%,#121e19 100%);
+  align-items:center;justify-content:center;flex-direction:column;
+  padding:24px;text-align:center;font-family:'DM Sans',sans-serif;
+">
+  <div style="font-size:64px;margin-bottom:18px">👋</div>
+  <div style="font-size:22px;font-weight:800;color:#2dd4bf;margin-bottom:10px">Welcome!</div>
+  <div style="font-size:15px;color:#e8edeb;margin-bottom:8px;max-width:340px;line-height:1.5">
+    Tap to join the session.
+  </div>
+  <div style="font-size:13px;color:#8a9e97;margin-bottom:30px;max-width:340px;line-height:1.5">
+    Your phone will ask for microphone access.<br>Tap <strong>Allow</strong> so you can speak when invited.
+  </div>
+  <button id="iosWelcomeBtn" type="button" style="
+    background:#2dd4bf;color:#0b1512;
+    border:none;padding:18px 36px;border-radius:14px;
+    font-size:18px;font-weight:800;font-family:inherit;
+    cursor:pointer;box-shadow:0 8px 24px rgba(45,212,191,.4);
+    min-width:240px;
+  ">▶️ Join session</button>
+</div>
+
+<script>
+// Détection iOS (iPhone, iPad, iPod). Aussi le Mac avec écran tactile,
+// mais ces appareils utilisent généralement Safari et ont la même contrainte.
+(function(){
+  const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent)
+             || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+  if(isIOS){
+    // On affiche immédiatement l'écran de pré-autorisation
+    document.addEventListener('DOMContentLoaded', function(){
+      const overlay = document.getElementById('iosWelcomeOverlay');
+      if(overlay) overlay.style.display = 'flex';
+    });
+  }
+})();
+
+// Le tap utilisateur sur "Join session" — pré-autorise le micro
+function iosWelcomeJoin(){
+  const btn = document.getElementById('iosWelcomeBtn');
+  if(btn){ btn.disabled = true; btn.textContent = '⏳ Requesting…'; }
+
+  navigator.mediaDevices.getUserMedia({audio:true})
+    .then(stream=>{
+      // Permission accordée — on libère immédiatement le stream
+      stream.getTracks().forEach(t=>t.stop());
+      // Mémorise pour les prochaines opérations micro
+      window.micPermissionGranted = true;
+      try { if(typeof micPermissionGranted !== 'undefined') micPermissionGranted = true; } catch(e){}
+      // Cache l'écran de bienvenue → la session est utilisable
+      const overlay = document.getElementById('iosWelcomeOverlay');
+      if(overlay) overlay.style.display = 'none';
+      console.log('[ios-welcome] mic permission granted');
+    })
+    .catch(err=>{
+      console.error('[ios-welcome] mic permission denied:', err);
+      // L'utilisateur a refusé — on cache l'écran quand même pour qu'il
+      // puisse au moins voir les sous-titres. Il pourra tenter à nouveau
+      // via le bouton "Speak now" plus tard, ou en réautorisant dans Réglages.
+      const overlay = document.getElementById('iosWelcomeOverlay');
+      if(overlay) overlay.style.display = 'none';
+      if(btn){ btn.disabled = false; btn.textContent = '▶️ Join session'; }
+    });
+}
+
+document.addEventListener('DOMContentLoaded', function(){
+  const btn = document.getElementById('iosWelcomeBtn');
+  if(btn && !btn.dataset.bound){
+    btn.addEventListener('click', iosWelcomeJoin);
+    btn.dataset.bound = '1';
+  }
+});
+</script>
+
+<!-- Header -->
+<div class="header">
+  <div class="h-left">
+    <span class="h-name" id="hName"></span>
+    <button class="h-lang h-lang-btn" id="changeLangBtn" onclick="openLangPicker()" type="button" title="Change language">
+      <img id="hFlagImg" src="https://flagcdn.com/w40/gb.png" alt="">
+      <span id="hLangLabel">English</span>
+      <span class="h-lang-chevron">▾</span>
+    </button>
+  </div>
+  <div class="h-right">
+    <div class="ui-lang-switch">
+      <button class="ui-lang-btn" id="btnLangFr" onclick="setUiLang('fr')">FR</button>
+      <button class="ui-lang-btn active" id="btnLangEn" onclick="setUiLang('en')">EN</button>
+    </div>
+    <span class="live-dot" id="liveDot"></span>
+    <span style="font-size:11px;color:var(--mid);font-family:var(--mono)" id="hRoom"></span>
+  </div>
+</div>
+
+<!-- Bandeau orateur actif (qui parle en ce moment) -->
+<div id="activeSpeakerBanner" style="display:none;background:rgba(248,113,113,.1);border-bottom:1px solid rgba(248,113,113,.25);padding:8px 14px;text-align:center;font-size:12px;color:#f87171;font-weight:600"></div>
+
+<!-- Language picker modal -->
+<div class="lang-picker-overlay" id="langPickerOverlay" onclick="if(event.target===this)closeLangPicker()">
+  <div class="lang-picker-modal">
+    <h3 class="lang-picker-title" id="langPickerTitle">Change language</h3>
+    <p class="lang-picker-desc" id="langPickerDesc">Choose the language you want to read subtitles in.</p>
+    <div class="lang-picker-list" id="langPickerList"></div>
+    <button type="button" class="lang-picker-close" id="langPickerCloseBtn" onclick="closeLangPicker()">Cancel</button>
+  </div>
+</div>
+
+<!-- Bandeau "vous avez la parole" -->
+<div id="youSpeakBanner" style="display:none;background:rgba(45,212,191,.12);border-bottom:1px solid rgba(45,212,191,.3);padding:10px 14px;text-align:center;font-size:13px;color:#2dd4bf;font-weight:700">
+  <span id="youSpeakBannerText">🎤 Mic is open — speak now</span>
+</div>
+
+<!-- ════════════════════════════════════════════════════════════
+     OVERLAY "PRENDRE LA PAROLE" — apparaît quand l'hôte donne la parole
+     iOS Safari exige un tap UTILISATEUR pour déverrouiller le micro.
+     Ce bouton est ce tap : sans lui, getUserMedia() est bloqué.
+     ════════════════════════════════════════════════════════════ -->
+<div id="takeFloorOverlay" style="
+  display:none;position:fixed;inset:0;z-index:99997;
+  background:rgba(11,21,18,.92);
+  align-items:center;justify-content:center;flex-direction:column;
+  padding:24px;text-align:center;
+  font-family:'DM Sans',sans-serif;
+">
+  <div style="font-size:64px;margin-bottom:18px;animation:pulse 1.6s ease infinite">🎙️</div>
+  <div id="takeFloorTitle" style="font-size:24px;font-weight:800;color:#2dd4bf;margin-bottom:10px">Your turn to speak!</div>
+  <div id="takeFloorDesc" style="font-size:15px;color:#e8edeb;margin-bottom:30px;max-width:340px;line-height:1.5">Tap the button to start</div>
+  <button id="takeFloorBtn" type="button" style="
+    background:#2dd4bf;color:#0b1512;
+    border:none;padding:18px 36px;border-radius:14px;
+    font-size:18px;font-weight:800;font-family:inherit;
+    cursor:pointer;box-shadow:0 8px 24px rgba(45,212,191,.4);
+    min-width:260px;
+  ">🎤 Speak now</button>
+</div>
+
+<!-- Subtitles -->
+<div class="subtitles" id="subtitles">
+  <div class="empty" id="emptyMsg">
+    <div class="icon">👂</div>
+    <p id="emptyMsgText">Waiting for subtitles…<br>The speaker hasn't started yet.</p>
+  </div>
+</div>
+
+<!-- Ended banner -->
+<div class="ended-banner" id="endedBanner">
+  <span id="endedBannerText">⏹ The session has ended.</span>
+</div>
+
+<!-- Bottom bar -->
+<div class="bottom">
+  <div class="mode-btns" style="flex-wrap:wrap">
+    <button class="btn-mode participant active" id="btnRaiseHand" onclick="toggleRaiseHand()" style="flex:1;min-width:140px">
+      ✋ Raise hand
+    </button>
+    <!-- ─── NEW : bouton Pause défilement ─── -->
+    <button class="btn-pause-scroll" id="btnPauseScroll" onclick="togglePauseScroll()" title="Pause/resume scroll">
+      <span id="pauseIcon">⏸</span> <span id="pauseLabel">Pause</span>
+    </button>
+    <!-- ─── NEW : bouton Quitter la session ─── -->
+    <button class="btn-leave-session" id="btnLeaveSession" onclick="confirmLeave()" title="Leave the session">
+      <span>⏹</span> <span id="leaveLabel">Leave</span>
+    </button>
+  </div>
+  <!-- Pastille "nouveaux sous-titres" qui apparaît pendant la pause -->
+  <div class="new-subs-pill" id="newSubsPill" onclick="resumeAndScroll()">↓ <span id="newSubsLabel">New subtitles</span></div>
+  <div id="handStatusLine" style="text-align:center;font-size:12px;color:var(--mid);margin-top:8px;min-height:16px"></div>
+  <div class="mic-viz" id="micViz">
+    <div class="bar" style="height:5px"></div>
+    <div class="bar" style="height:9px"></div>
+    <div class="bar" style="height:14px"></div>
+    <div class="bar" style="height:9px"></div>
+    <div class="bar" style="height:5px"></div>
+  </div>
+</div>
+
+<script>
+const AZURE_KEY    = 'BfBydAOdsonrVXY68xadxIWn9EwQWoJPUzZc2OOcC4gA0IATC2O9JQQJ99BDAC5T7U2XJ3w3AAAYACOGqosg';
+const AZURE_REGION = 'francecentral';
+
+const FB_CFG = {
+  apiKey:"AIzaSyCQZ_htYiPyUv50oIObwN3eGSJ9SneO7sI",
+  databaseURL:"https://sogevoxreunion-default-rtdb.europe-west1.firebasedatabase.app",
+  projectId:"sogevoxreunion"
+};
+
+const AZ_LANG = {
+  fr:'fr-FR',en:'en-US',de:'de-DE',it:'it-IT',es:'es-ES',pt:'pt-PT',
+  ar:'ar-SA',ru:'ru-RU',zh:'zh-CN',he:'he-IL',nl:'nl-NL',
+  pl:'pl-PL',uk:'uk-UA',tr:'tr-TR',ja:'ja-JP',ko:'ko-KR',
+  sv:'sv-SE',cs:'cs-CZ',el:'el-GR'
+};
+const FLAGS = {fr:'fr',en:'gb',de:'de',it:'it',es:'es',pt:'pt',ar:'lb',ru:'ru',zh:'cn',he:'il',nl:'nl',pl:'pl',uk:'ua',tr:'tr',ja:'jp',ko:'kr',sv:'se',cs:'cz',el:'gr',da:'dk',hi:'in'};
+const LANG_NAMES = {fr:'Français',en:'English',de:'Deutsch',it:'Italiano',es:'Español',pt:'Português',ar:'العربية',ru:'Русский',zh:'中文',he:'עברית',nl:'Nederlands',pl:'Polski',uk:'Українська',tr:'Türkçe',ja:'日本語',ko:'한국어',sv:'Svenska',cs:'Čeština',el:'Ελληνικά / Greek',da:'Dansk',hi:'हिन्दी'};
+const RTL_LANGS = new Set(['ar','he']);
+
+// ══════════════════════════════════════════════════════════════
+// I18N — Interface translations (EN default, FR toggle)
+// ══════════════════════════════════════════════════════════════
+const I18N = {
+  en: {
+    title_page:       'TranslateTheWorld — Session',
+    mic_open:         '🎤 Mic is open — speak now',
+    empty_msg:        'Waiting for subtitles…<br>The speaker hasn\'t started yet.',
+    session_ended:    '⏹ The session has ended.',
+    // Hand button states
+    hand_idle:        '✋ Raise hand',
+    hand_pending:     '⏳ Hand raised — tap to cancel',
+    hand_speaking:    '🎤 Release mic',
+    // Status lines
+    status_pending:   'Waiting for the chair to give you the floor…',
+    status_speaking:  'Your mic is open — speak now!',
+    status_requesting:'🎤 Requesting microphone access…',
+    status_mic_denied:'🎤 Microphone access is needed. Please allow it in your browser settings, or open this link in Safari or Chrome.',
+    status_net_error: 'Network error, please try again',
+    status_other_req: 'Another request is in progress, try again shortly',
+    status_cancelled: 'Request cancelled',
+    // Dynamic banners
+    is_speaking:      'is speaking',
+    is_requesting:    'is requesting the floor…',
+    // Take-floor prompt — English only, FALC style, uses "speak"
+    take_floor_title: 'Your turn to speak!',
+    take_floor_desc:  'Tap the button to start',
+    take_floor_btn:   '🎤 Speak now',
+    // Language picker
+    lang_picker_title: 'Change language',
+    lang_picker_desc:  'Choose the language you want to read subtitles in.',
+    lang_picker_close: 'Cancel',
+  },
+  fr: {
+    title_page:       'TranslateTheWorld — Session',
+    mic_open:         '🎤 Micro ouvert — parlez maintenant',
+    empty_msg:        'En attente de sous-titres…<br>L\'orateur n\'a pas encore commencé.',
+    session_ended:    '⏹ La session est terminée.',
+    // Hand button states
+    hand_idle:        '✋ Raise hand',
+    hand_pending:     '⏳ Hand raised — tap to cancel',
+    hand_speaking:    '🎤 Release mic',
+    // Status lines
+    status_pending:   'En attente de l\'autorisation du président…',
+    status_speaking:  'Votre micro est ouvert — parlez !',
+    status_requesting:'🎤 Demande d\'accès au microphone…',
+    status_mic_denied:'🎤 L\'accès au microphone est nécessaire. Autorisez-le dans les réglages de votre navigateur, ou ouvrez ce lien dans Safari ou Chrome.',
+    status_net_error: 'Erreur réseau, veuillez réessayer',
+    status_other_req: 'Une autre demande est en cours, patientez',
+    status_cancelled: 'Demande annulée',
+    // Dynamic banners
+    is_speaking:      'parle',
+    is_requesting:    'demande la parole…',
+    // Take-floor prompt — affiché en anglais quelle que soit la langue UI
+    take_floor_title: 'Your turn to speak!',
+    take_floor_desc:  'Tap the button to start',
+    take_floor_btn:   '🎤 Speak now',
+    // Language picker
+    lang_picker_title: 'Changer de langue',
+    lang_picker_desc:  'Choisissez la langue dans laquelle vous voulez lire les sous-titres.',
+    lang_picker_close: 'Cancel',
+  }
+};
+
+let uiLang = 'en';
+
+function t(key){ return (I18N[uiLang]||I18N.en)[key] || key; }
+
+// Initialise from URL param `ui`, then localStorage, then default EN
+(function initUiLang(){
+  let initial = 'en';
+  const fromUrl = new URLSearchParams(window.location.search).get('ui');
+  if(fromUrl === 'fr' || fromUrl === 'en') initial = fromUrl;
+  else {
+    try {
+      const stored = localStorage.getItem('ttw-ui-lang');
+      if(stored === 'fr' || stored === 'en') initial = stored;
+    } catch(e){}
+  }
+  uiLang = initial;
+  document.documentElement.lang = initial;
+})();
+
+// ── Language picker (let participant change subtitle language during session) ──
+function openLangPicker(){
+  const list = document.getElementById('langPickerList');
+  if(!list) return;
+  list.innerHTML = '';
+  // Use allLangs from session config if available, otherwise just show current
+  const langs = (typeof allLangs !== 'undefined' && Array.isArray(allLangs) && allLangs.length>0)
+    ? allLangs : [myLang];
+  langs.forEach(code=>{
+    const isCurrent = (code === myLang);
+    const flag = FLAGS[code] || 'un';
+    const name = LANG_NAMES[code] || code.toUpperCase();
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'lang-picker-item' + (isCurrent ? ' current' : '');
+    btn.innerHTML =
+      '<img src="https://flagcdn.com/w40/'+flag+'.png" alt="">'+
+      '<span>'+name+'</span>'+
+      (isCurrent ? '<span class="lang-picker-item-check">✓</span>' : '');
+    if(!isCurrent){
+      btn.onclick = function(){ switchToLang(code); };
+    } else {
+      btn.onclick = closeLangPicker;
+    }
+    list.appendChild(btn);
+  });
+  document.getElementById('langPickerOverlay').classList.add('show');
+}
+
+function closeLangPicker(){
+  const ov = document.getElementById('langPickerOverlay');
+  if(ov) ov.classList.remove('show');
+}
+
+function switchToLang(newLang){
+  if(!newLang || newLang === myLang){ closeLangPicker(); return; }
+  // Try to clean up our current participant entry before reloading
+  try {
+    if(typeof db !== 'undefined' && db && room && deviceId){
+      db.ref('sessions/'+room+'/participants/'+deviceId).remove();
+    }
+  } catch(e){ /* ignore — reload will happen anyway */ }
+  // Rebuild URL with new lang param, preserving everything else
+  const url = new URL(window.location.href);
+  url.searchParams.set('lang', newLang);
+  // Keep current UI lang preference
+  url.searchParams.set('ui', uiLang);
+  // Small delay to let Firebase remove call go through
+  setTimeout(()=>{ window.location.href = url.toString(); }, 150);
+}
+
+function setUiLang(l){
+  if(l !== 'fr' && l !== 'en') l = 'en';
+  uiLang = l;
+  document.documentElement.lang = l;
+  try { localStorage.setItem('ttw-ui-lang', l); } catch(e){}
+  const fb = document.getElementById('btnLangFr');
+  const eb = document.getElementById('btnLangEn');
+  if(fb) fb.classList.toggle('active', l==='fr');
+  if(eb) eb.classList.toggle('active', l==='en');
+  applyTranslations();
+}
+
+function applyTranslations(){
+  document.title = t('title_page');
+
+  const setTxt = (id, txt)=>{ const el = document.getElementById(id); if(el) el.textContent = txt; };
+  const setHtml = (id, html)=>{ const el = document.getElementById(id); if(el) el.innerHTML = html; };
+
+  setTxt('youSpeakBannerText', t('mic_open'));
+  setHtml('emptyMsgText',      t('empty_msg'));
+  setTxt('endedBannerText',    t('session_ended'));
+
+  // Language picker
+  setTxt('langPickerTitle',    t('lang_picker_title'));
+  setTxt('langPickerDesc',     t('lang_picker_desc'));
+  setTxt('langPickerCloseBtn', t('lang_picker_close'));
+  const changeBtn = document.getElementById('changeLangBtn');
+  if(changeBtn) changeBtn.title = t('lang_picker_title');
+
+  // Re-render hand button in current state
+  setHandState(handState, lastStatusText);
+
+  // Re-render active speaker banner if visible
+  if(db && room){
+    db.ref('sessions/'+room+'/activeSpeaker').once('value', snap=>{
+      const data = snap.val();
+      const banner = document.getElementById('activeSpeakerBanner');
+      if(data && data.deviceId !== deviceId && banner && banner.style.display !== 'none'){
+        const flag = FLAGS[data.lang]||'un';
+        const who = data.role==='host' ? '👑 '+escHtml(data.name) : escHtml(data.name);
+        banner.innerHTML = '🎙️ <img src="https://flagcdn.com/w40/'+flag+'.png" style="width:16px;height:12px;border-radius:2px;vertical-align:middle;margin:0 5px"> <strong>'+who+'</strong> '+t('is_speaking');
+      }
+    });
+  }
+}
+
+function getP(n){return new URLSearchParams(window.location.search).get(n)||'';}
+
+const room     = getP('room');
+const myLang   = getP('lang')||'en';
+const myName   = getP('name')||'Participant';
+const exp      = parseInt(getP('exp'))||0;
+const deviceId = 'part_'+Date.now()+'_'+Math.random().toString(36).slice(2,7);
+
+let mode        = 'participant';
+let db          = null;
+let recognition = null;
+let allLangs    = [];
+let targetLangs = [];
+
+// ── INIT ──
+window.addEventListener('DOMContentLoaded', ()=>{
+  // Apply initial UI language (already resolved by initUiLang IIFE)
+  applyTranslations();
+  const fb = document.getElementById('btnLangFr');
+  const eb = document.getElementById('btnLangEn');
+  if(fb) fb.classList.toggle('active', uiLang==='fr');
+  if(eb) eb.classList.toggle('active', uiLang==='en');
+
+  // Header
+  document.getElementById('hName').textContent = myName;
+  document.getElementById('hRoom').textContent = room||'—';
+  const flag = FLAGS[myLang]||'un';
+  document.getElementById('hFlagImg').src = 'https://flagcdn.com/w40/'+flag+'.png';
+  document.getElementById('hLangLabel').textContent = LANG_NAMES[myLang]||myLang;
+  if(RTL_LANGS.has(myLang)) document.getElementById('subtitles').setAttribute('dir','rtl');
+
+  // Expiry
+  if(exp>0&&Math.floor(Date.now()/1000)>exp){
+    document.getElementById('endedBanner').classList.add('show');
+    return;
+  }
+
+  initFirebase();
+  // iOS silent audio unlock
+  unlockAudio();
+});
+
+function unlockAudio(){
+  const ctx=new(window.AudioContext||window.webkitAudioContext)();
+  const buf=ctx.createBuffer(1,1,22050);
+  const src=ctx.createBufferSource();
+  src.buffer=buf;src.connect(ctx.destination);src.start(0);
+  document.addEventListener('touchstart',()=>{if(ctx.state==='suspended')ctx.resume();},{once:true});
+}
+
+// ── FIREBASE ──
+function initFirebase(){
+  if(!firebase.apps.length) firebase.initializeApp(FB_CFG);
+  db = firebase.database();
+
+  // Read session config for languages
+  db.ref('sessions/'+room+'/config').once('value',snap=>{
+    const cfg=snap.val();
+    if(cfg){
+      allLangs   = cfg.languages||[myLang];
+      targetLangs = allLangs.filter(l=>l!==myLang);
+      if(cfg.ended) document.getElementById('endedBanner').classList.add('show');
+    }
+    registerParticipant();
+    listenSubtitles();
+    listenSessionEnd();
+    listenActiveSpeaker();    // ← écoute qui a le micro
+    listenFloorRequest();     // ← écoute les demandes de parole
+    setHandState('idle');     // ← état initial du bouton
+  });
+}
+
+function registerParticipant(){
+  if(!db) return;
+  const ref=db.ref('sessions/'+room+'/participants/'+deviceId);
+  ref.set({name:myName,lang:myLang,role:'participant',joinedAt:Date.now(),active:true});
+  ref.onDisconnect().update({active:false,leftAt:Date.now()});
+}
+
+function listenSubtitles(){
+  if(!db) return;
+  // Sous-titres finaux (historique)
+  db.ref('sessions/'+room+'/subtitles/'+myLang).limitToLast(80).on('child_added',snap=>{
+    const d=snap.val();
+    if(d&&!d.interim) addSubtitle(d.text, d.fromLang, d.speaker, false);
+  });
+  // Sous-titres temps réel sur subtitles_live (clé fixe, mise à jour continue).
+  // Quand l'orateur finalise sa phrase, le noeud est effacé → l'aperçu disparaît
+  // et la phrase finale (ci-dessus) prend le relais dans l'historique.
+  db.ref('sessions/'+room+'/subtitles_live/'+myLang).on('value',snap=>{
+    const d=snap.val();
+    if(d&&d.text&&d.speaker!==myName) showRemoteInterim(d.text, d.fromLang, d.speaker);
+    else clearRemoteInterim();
+  });
+}
+
+function listenSessionEnd(){
+  if(!db) return;
+  db.ref('sessions/'+room+'/config/ended').on('value',snap=>{
+    if(snap.val()===true) document.getElementById('endedBanner').classList.add('show');
+  });
+}
+
+// ── MODE SWITCHING ──
+// Dans le modèle président de séance, le participant NE PEUT PAS décider seul
+// de prendre le micro. Il doit lever la main et attendre l'autorisation de l'hôte.
+// setMode reste une fonction interne mais n'est plus appelée que par les listeners.
+function setMode(m){
+  mode=m;
+  const liveDot=document.getElementById('liveDot');
+  const micViz=document.getElementById('micViz');
+  micViz.classList.toggle('show',m==='speaker');
+  if(m==='speaker'){
+    liveDot.classList.add('speaking');
+    startRecognition();
+  } else {
+    liveDot.classList.remove('speaking');
+    stopRecognition();
+  }
+  if(db) db.ref('sessions/'+room+'/participants/'+deviceId).update({mode:m});
+}
+
+// ── ÉTAT DU BOUTON LEVER LA MAIN ──
+// États possibles :
+//  'idle'     → bouton "🙋 Lever la main" (prêt)
+//  'pending'  → bouton "⏳ Main levée — annuler" (demande en cours)
+//  'speaking' → bouton "🎤 Rendre le micro" (la parole m'est accordée)
+//  'blocked'  → bouton grisé (quelqu'un d'autre a la parole ou demande en cours)
+let handState = 'idle';
+let lastStatusText = '';       // Remembered for re-render on UI lang switch
+let lastStatusKey  = null;     // If the status text came from a translation key
+
+function setHandState(s, statusText, statusKey){
+  handState = s;
+  // If a statusKey is provided, resolve it now (and remember for re-renders)
+  if(statusKey){
+    lastStatusKey = statusKey;
+    statusText = t(statusKey);
+  } else if(statusText !== undefined){
+    // Free-form text (dynamic names) — store as-is, forget any previous key
+    lastStatusKey = null;
+  } else {
+    // No status argument provided → keep whatever we had
+    statusText = lastStatusText;
+  }
+  lastStatusText = statusText || '';
+
+  const btn = document.getElementById('btnRaiseHand');
+  const line = document.getElementById('handStatusLine');
+  btn.classList.remove('idle','pending','speaking','disabled','participant','active');
+
+  if(s==='idle'){
+    btn.classList.add('idle');
+    btn.innerHTML = t('hand_idle');
+    btn.disabled = false;
+    line.textContent = lastStatusText;
+  } else if(s==='pending'){
+    btn.classList.add('pending');
+    btn.innerHTML = t('hand_pending');
+    btn.disabled = false;
+    line.textContent = lastStatusText || t('status_pending');
+  } else if(s==='speaking'){
+    btn.classList.add('speaking');
+    btn.innerHTML = t('hand_speaking');
+    btn.disabled = false;
+    line.textContent = lastStatusText || t('status_speaking');
+  } else if(s==='blocked'){
+    btn.classList.add('disabled');
+    btn.innerHTML = t('hand_idle');
+    btn.disabled = true;
+    line.textContent = lastStatusText;
+  }
+}
+
+// ── ACTION DU BOUTON LEVER LA MAIN ──
+function toggleRaiseHand(){
+  if(handState === 'idle')         { requestFloor(); }
+  else if(handState === 'pending') { cancelFloorRequest(); }
+  else if(handState === 'speaking'){ releaseFloor(); }
+}
+
+// ── DEMANDE DE PAROLE (Firebase transaction pour garantir l'exclusivité) ──
+let floorRequestDisconnect = null;
+let micPermissionGranted = false;   // Mémorise si l'utilisateur a déjà autorisé le micro
+
+function requestFloor(){
+  if(!db) return;
+
+  // ═══ ÉTAPE 1 : Demander l'autorisation micro MAINTENANT, pendant le clic ═══
+  // iOS Safari impose que getUserMedia soit appelé directement à partir d'un
+  // "user gesture" (clic/touch). Si on attend l'autorisation de l'hôte, iOS
+  // refusera silencieusement. On le fait donc pendant le clic sur "Lever la main".
+  if(!micPermissionGranted){
+    setHandState('pending', null, 'status_requesting');
+    navigator.mediaDevices.getUserMedia({audio:true})
+      .then(stream=>{
+        micPermissionGranted = true;
+        stream.getTracks().forEach(track=>track.stop());
+        actuallyRequestFloor();
+      })
+      .catch(err=>{
+        console.error('Mic permission denied:', err);
+        setHandState('idle', null, 'status_mic_denied');
+        setTimeout(()=>{ if(handState==='idle') setHandState('idle',''); }, 12000);
+      });
+    return;
+  }
+
+  // Si on a déjà l'autorisation, on inscrit directement la demande
+  actuallyRequestFloor();
+}
+
+function actuallyRequestFloor(){
+  db.ref('sessions/'+room+'/floorRequest').transaction(current=>{
+    // Si le slot est libre, on s'y inscrit
+    if(current === null || current === undefined){
+      return { deviceId, name: myName, lang: myLang, ts: Date.now() };
+    }
+    // Sinon on abandonne la transaction (quelqu'un demande déjà)
+    return;
+  }, (err, committed, snap)=>{
+    if(err){
+      setHandState('idle', null, 'status_net_error');
+      return;
+    }
+    if(committed){
+      // Ma demande est inscrite
+      setHandState('pending');
+      // Sécurité : si je ferme brutalement le navigateur, ma demande est libérée
+      floorRequestDisconnect = db.ref('sessions/'+room+'/floorRequest').onDisconnect();
+      floorRequestDisconnect.remove();
+    } else {
+      // Quelqu'un d'autre a déjà levé la main
+      setHandState('idle', null, 'status_other_req');
+      setTimeout(()=>{ if(handState==='idle') setHandState('idle',''); }, 4000);
+    }
+  });
+}
+
+function cancelFloorRequest(){
+  if(!db) return;
+  db.ref('sessions/'+room+'/floorRequest').transaction(current=>{
+    if(current && current.deviceId === deviceId) return null;
+    return;
+  });
+  if(floorRequestDisconnect){
+    floorRequestDisconnect.cancel();
+    floorRequestDisconnect = null;
+  }
+  setHandState('idle', null, 'status_cancelled');
+  setTimeout(()=>{ if(handState==='idle') setHandState('idle',''); }, 2000);
+}
+
+function releaseFloor(){
+  // Le participant rend volontairement le micro
+  if(!db) return;
+  db.ref('sessions/'+room+'/activeSpeaker').transaction(current=>{
+    if(current && current.deviceId === deviceId) return null;
+    return;
+  });
+  // le listener activeSpeaker déclenchera la coupure du micro et le retour à idle
+}
+
+// ── ÉCOUTE DE L'ORATEUR ACTIF ──
+// C'est CE listener qui ouvre/ferme mon micro en fonction de ce que décide l'hôte.
+let speakerLockDisconnect = null;
+
+function listenActiveSpeaker(){
+  if(!db) return;
+  db.ref('sessions/'+room+'/activeSpeaker').on('value', snap=>{
+    const data = snap.val();
+    const banner = document.getElementById('activeSpeakerBanner');
+    const youBanner = document.getElementById('youSpeakBanner');
+
+    if(data && data.deviceId === deviceId){
+      // L'hôte m'a donné la parole (ou je l'avais déjà).
+      // ⚠️ iOS Safari : on ne lance PAS le micro automatiquement.
+      // Au lieu de ça, on affiche un overlay avec un GROS bouton.
+      // Le tap utilisateur sur ce bouton est ce qui déverrouille getUserMedia().
+      if(mode !== 'speaker'){
+        // Pas encore en mode speaker → on attend le tap utilisateur
+        showTakeFloorPrompt();
+      }
+      setHandState('speaking');
+      if(banner) banner.style.display='none';
+      // Le bandeau "Micro ouvert" ne s'affiche QUE quand le micro est vraiment ouvert
+      // (déclenché par confirmTakeFloor après le tap)
+      if(mode === 'speaker' && youBanner) youBanner.style.display='block';
+      // Protection en cas de déconnexion brutale
+      speakerLockDisconnect = db.ref('sessions/'+room+'/activeSpeaker').onDisconnect();
+      speakerLockDisconnect.remove();
+    } else if(data){
+      // Quelqu'un d'autre parle → mon micro est coupé,
+      // MAIS le bouton lever la main reste disponible !
+      hideTakeFloorPrompt();  // si l'overlay était affiché, on le retire
+      if(mode === 'speaker') setMode('participant');
+      if(speakerLockDisconnect){ speakerLockDisconnect.cancel(); speakerLockDisconnect=null; }
+      if(youBanner) youBanner.style.display='none';
+      if(banner){
+        const flag = FLAGS[data.lang]||'un';
+        const who = data.role==='host' ? '👑 '+escHtml(data.name) : escHtml(data.name);
+        banner.innerHTML = '🎙️ <img src="https://flagcdn.com/w40/'+flag+'.png" style="width:16px;height:12px;border-radius:2px;vertical-align:middle;margin:0 5px"> <strong>'+who+'</strong> '+t('is_speaking');
+        banner.style.display = 'block';
+      }
+      // IMPORTANT : on ne touche PAS à l'état du bouton ici.
+      // C'est listenFloorRequest qui décide si le bouton est idle/pending/blocked.
+      // Si on est en pending (main déjà levée), on ne veut pas revenir à idle.
+      if(handState !== 'pending') refreshHandStateFromFloor();
+    } else {
+      // Personne ne parle (rare)
+      hideTakeFloorPrompt();
+      if(mode === 'speaker') setMode('participant');
+      if(speakerLockDisconnect){ speakerLockDisconnect.cancel(); speakerLockDisconnect=null; }
+      if(banner) banner.style.display='none';
+      if(youBanner) youBanner.style.display='none';
+      if(handState !== 'pending') refreshHandStateFromFloor();
+    }
+  });
+}
+
+// ── Overlay "Prendre la parole" (iOS-friendly) ──
+// Affiche un gros bouton que l'utilisateur DOIT toucher pour ouvrir son micro.
+// Sans ce tap explicite, iOS Safari refuse l'accès au micro.
+function showTakeFloorPrompt(){
+  const overlay = document.getElementById('takeFloorOverlay');
+  if(!overlay) return;
+  // Mettre à jour les textes selon la langue UI
+  const title = document.getElementById('takeFloorTitle');
+  const desc  = document.getElementById('takeFloorDesc');
+  const btn   = document.getElementById('takeFloorBtn');
+  if(title) title.textContent = t('take_floor_title');
+  if(desc)  desc.textContent  = t('take_floor_desc');
+  if(btn)   btn.textContent   = t('take_floor_btn');
+  overlay.style.display = 'flex';
+}
+
+function hideTakeFloorPrompt(){
+  const overlay = document.getElementById('takeFloorOverlay');
+  if(overlay) overlay.style.display = 'none';
+}
+
+// Le tap utilisateur sur le bouton — c'est ICI que le micro s'ouvre vraiment
+function confirmTakeFloor(){
+  const btn = document.getElementById('takeFloorBtn');
+  if(btn){
+    btn.disabled = true;
+    btn.textContent = '⏳ Opening mic…';
+  }
+
+  // ═══ ÉTAPE CRUCIALE iOS ═══
+  // On demande EXPLICITEMENT le micro MAINTENANT (dans le tap utilisateur).
+  // Même si l'autorisation était déjà accordée, ce getUserMedia synchrone
+  // garantit que l'AudioContext est "déverrouillé" (iOS suspend les contextes
+  // créés hors d'un geste utilisateur).
+  // Le SDK Azure, qui fait son propre getUserMedia ensuite, profite alors
+  // de ce contexte déverrouillé.
+  navigator.mediaDevices.getUserMedia({audio:true})
+    .then(stream=>{
+      micPermissionGranted = true;
+      // On libère le stream tout de suite — Azure va le re-demander
+      // mais cette fois il n'aura plus à passer par iOS.
+      stream.getTracks().forEach(t=>t.stop());
+
+      // Maintenant on peut ouvrir le micro pour de vrai via Azure
+      hideTakeFloorPrompt();
+      setMode('speaker');
+
+      // Bandeau "micro ouvert"
+      const youBanner = document.getElementById('youSpeakBanner');
+      if(youBanner) youBanner.style.display='block';
+
+      // Reset bouton (pour la prochaine fois)
+      if(btn){
+        btn.disabled = false;
+        btn.textContent = '🎤 Speak now';
+      }
+    })
+    .catch(err=>{
+      console.error('[take-floor] mic access denied:', err);
+      // Affiche un message d'erreur sur l'overlay
+      const desc = document.getElementById('takeFloorDesc');
+      if(desc){
+        desc.innerHTML = '⚠️ Microphone access denied.<br>Please allow it in your browser settings, then close and re-open this page.';
+        desc.style.color = '#f87171';
+      }
+      if(btn){
+        btn.disabled = false;
+        btn.textContent = '🎤 Try again';
+      }
+    });
+}
+
+// Attache le bouton dès que le DOM est prêt
+document.addEventListener('DOMContentLoaded', function(){
+  const btn = document.getElementById('takeFloorBtn');
+  if(btn && !btn.dataset.bound){
+    btn.addEventListener('click', confirmTakeFloor);
+    btn.dataset.bound = '1';
+  }
+});
+
+// Petit helper : relit l'état actuel de floorRequest et met à jour le bouton
+function refreshHandStateFromFloor(){
+  if(!db) return;
+  db.ref('sessions/'+room+'/floorRequest').once('value', snap=>{
+    const data = snap.val();
+    if(!data){
+      setHandState('idle');
+    } else if(data.deviceId === deviceId){
+      setHandState('pending');
+    } else {
+      setHandState('blocked', escHtml(data.name)+' '+t('is_requesting'));
+    }
+  });
+}
+
+// ── ÉCOUTE DES DEMANDES DE PAROLE ──
+// Met à jour l'état du bouton en temps réel :
+//  - Si personne ne demande → mon bouton est "🙋 Lever la main" (idle)
+//  - Si moi je demande → mon bouton est "⏳ Main levée — annuler" (pending)
+//  - Si quelqu'un d'autre demande → mon bouton est grisé "X demande la parole..." (blocked)
+function listenFloorRequest(){
+  if(!db) return;
+  db.ref('sessions/'+room+'/floorRequest').on('value', snap=>{
+    const data = snap.val();
+    // Ne pas toucher au bouton si je suis en train de parler
+    if(handState === 'speaking') return;
+
+    if(!data){
+      setHandState('idle');
+    } else if(data.deviceId === deviceId){
+      setHandState('pending');
+    } else {
+      setHandState('blocked', escHtml(data.name)+' '+t('is_requesting'));
+    }
+  });
+}
+
+// ── AZURE RECOGNITION ──
+function startRecognition(){
+  if(!window.SpeechSDK) return;
+  stopRecognition();
+
+  if(targetLangs.length===0){
+    // Solo mode — just transcribe
+    targetLangs = allLangs.filter(l=>l!==myLang);
+  }
+
+  try{
+    const speechConfig = SpeechSDK.SpeechTranslationConfig.fromSubscription(AZURE_KEY, AZURE_REGION);
+    speechConfig.speechRecognitionLanguage = AZ_LANG[myLang]||'en-US';
+    targetLangs.forEach(l=>{ if(AZ_LANG[l]) speechConfig.addTargetLanguage(AZ_LANG[l].split('-')[0]); });
+
+    // ── Timeout de silence adapté à la langue ──
+    // Par défaut : 300 ms (réactivité maximale, comme dans nos références
+    // anglais ↔ hébreu qui fonctionnent très bien sans réglage).
+    // Exception : russe → 600 ms (élocution plus longue, évite que les
+    // phrases soient coupées en morceaux).
+    const SLOW_LANGS = new Set(['ru']);
+    const silenceMs = SLOW_LANGS.has(myLang) ? '600' : '300';
+    speechConfig.setProperty('SpeechServiceConnection_InitialSilenceTimeoutMs','10000');
+    speechConfig.setProperty('Speech_SegmentationSilenceTimeoutMs', silenceMs);
+
+    const audioConfig = SpeechSDK.AudioConfig.fromDefaultMicrophoneInput();
+    recognition = new SpeechSDK.TranslationRecognizer(speechConfig, audioConfig);
+
+    // ── Anti-spam : limite à 1 écriture toutes les 400 ms ──
+    // Évite de saturer Firebase tout en gardant une expérience temps réel fluide.
+    let lastLiveSent = 0;
+    const LIVE_THROTTLE_MS = 400;
+
+    recognition.recognizing = (s,e)=>{
+      if(!e.result.text) return;
+      // Affichage local instantané sur mon propre écran
+      showMyInterim(e.result.text);
+
+      // Diffusion temps réel aux autres via Firebase, sur un canal séparé
+      // (subtitles_live) pour ne pas polluer l'historique des phrases finales.
+      const now = Date.now();
+      if(now - lastLiveSent < LIVE_THROTTLE_MS) return;
+      lastLiveSent = now;
+
+      if(!db) return;
+      const original = e.result.text;
+      const translations = e.result.translations;
+
+      // Original dans ma langue
+      db.ref('sessions/'+room+'/subtitles_live/'+myLang).set({
+        text: original, fromLang: myLang, speaker: myName, ts: now
+      });
+
+      // Traductions en cours pour les autres langues
+      targetLangs.forEach(tl=>{
+        const azCode = AZ_LANG[tl] ? AZ_LANG[tl].split('-')[0] : tl;
+        const translated = translations.get(azCode) || translations.get(tl) || '';
+        if(translated){
+          db.ref('sessions/'+room+'/subtitles_live/'+tl).set({
+            text: translated, fromLang: myLang, speaker: myName, ts: now
+          });
+        }
+      });
+    };
+
+    recognition.recognized = (s,e)=>{
+      if(e.result.reason===SpeechSDK.ResultReason.TranslatedSpeech){
+        const original=e.result.text;
+        if(!original||!original.trim()) return;
+        const translations=e.result.translations;
+        const ts=Date.now();
+
+        console.log('🟢 [PARTICIPANT] Phrase reconnue:', original, '| myLang=', myLang, '| targetLangs=', targetLangs);
+
+        if(db){
+          db.ref('sessions/'+room+'/subtitles/'+myLang+'/'+ts).set({text:original,fromLang:myLang,speaker:myName,ts});
+          // Nettoie le sous-titre live (la phrase finale prend le relais)
+          db.ref('sessions/'+room+'/subtitles_live/'+myLang).remove();
+          console.log('🟢 [PARTICIPANT] → Firebase subtitles/'+myLang+'/'+ts+' (original)');
+        }
+
+        targetLangs.forEach(tl=>{
+          const azCode=AZ_LANG[tl]?AZ_LANG[tl].split('-')[0]:tl;
+          const translated=translations.get(azCode)||translations.get(tl)||'';
+          if(translated&&db){
+            db.ref('sessions/'+room+'/subtitles/'+tl+'/'+ts).set({text:translated,fromLang:myLang,speaker:myName,ts});
+            db.ref('sessions/'+room+'/subtitles_live/'+tl).remove();
+            console.log('🟢 [PARTICIPANT] → Firebase subtitles/'+tl+'/'+ts+' (traduction):', translated.substring(0,50));
+          } else if(!translated){
+            console.warn('🟠 [PARTICIPANT] Pas de traduction pour', tl, '(azCode=', azCode, ')');
+          }
+        });
+
+        if(db){
+          const entry={original,fromLang:myLang,speaker:myName,ts};
+          targetLangs.forEach(tl=>{const azCode=AZ_LANG[tl]?AZ_LANG[tl].split('-')[0]:tl;entry['t_'+tl]=translations.get(azCode)||'';});
+          db.ref('sessions/'+room+'/transcript/'+ts).set(entry);
+        }
+        clearMyInterim();
+        animateMicViz();
+      }
+    };
+
+    recognition.canceled = ()=>{ stopRecognition(); };
+
+    recognition.startContinuousRecognitionAsync(
+      ()=>{}, err=>console.error('Start err:',err)
+    );
+  } catch(e){ console.error(e); }
+}
+
+function stopRecognition(){
+  if(recognition){
+    recognition.stopContinuousRecognitionAsync(()=>{recognition=null;},()=>{recognition=null;});
+  }
+}
+
+// ── SUBTITLE RENDERING ──
+let myInterimEl = null;
+
+function addSubtitle(text, fromLang, speaker, isOwn){
+  const container=document.getElementById('subtitles');
+  document.getElementById('emptyMsg').style.display='none';
+  const entry=document.createElement('div');
+  entry.className='sub-entry';
+  const flagCode=FLAGS[fromLang]||'un';
+  const isRTL=RTL_LANGS.has(myLang);
+  entry.innerHTML=
+    '<div class="sub-speaker"><img src="https://flagcdn.com/w40/'+flagCode+'.png"> '+(speaker||'')+'</div>'+
+    '<div class="sub-text'+(isOwn?' mine':'')+'"'+(isRTL?' dir="rtl"':'')+'>'+escHtml(text)+'</div>';
+  container.appendChild(entry);
+  if(!scrollPaused){
+    container.scrollTop=container.scrollHeight;
+  } else {
+    notifyNewSubsDuringPause();
+  }
+}
+
+function showMyInterim(text){
+  const container=document.getElementById('subtitles');
+  document.getElementById('emptyMsg').style.display='none';
+  if(!myInterimEl){
+    myInterimEl=document.createElement('div');
+    myInterimEl.className='sub-entry';
+    container.appendChild(myInterimEl);
+  }
+  const flagCode=FLAGS[myLang]||'un';
+  myInterimEl.innerHTML=
+    '<div class="sub-speaker"><img src="https://flagcdn.com/w40/'+flagCode+'.png"> '+escHtml(myName)+'</div>'+
+    '<div class="sub-text interim">'+escHtml(text)+'</div>';
+  if(!scrollPaused) container.scrollTop=container.scrollHeight;
+}
+function clearMyInterim(){
+  if(myInterimEl){document.getElementById('subtitles').removeChild(myInterimEl);myInterimEl=null;}
+}
+
+function animateMicViz(){
+  document.querySelectorAll('.bar').forEach(b=>{b.style.height=(3+Math.random()*14)+'px';});
+  setInterval(()=>document.querySelectorAll('.bar').forEach(b=>{b.style.height=(3+Math.random()*14)+'px';}),100);
+}
+
+function escHtml(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')}
+
+// ─────────────────────────────────────────────────────
+// PAUSE DU DÉFILEMENT (UX participant)
+// Quand le participant active la pause, on n'auto-scroll plus.
+// Il peut alors lire à son rythme et remonter dans l'historique.
+// Une pastille "↓ Nouveaux sous-titres" apparaît s'il y a du nouveau contenu.
+// ─────────────────────────────────────────────────────
+let scrollPaused = false;
+function togglePauseScroll(){
+  scrollPaused = !scrollPaused;
+  const btn   = document.getElementById('btnPauseScroll');
+  const icon  = document.getElementById('pauseIcon');
+  const lbl   = document.getElementById('pauseLabel');
+  const isFr  = (typeof uiLang!=='undefined' && uiLang==='fr');
+  if(scrollPaused){
+    btn.classList.add('paused');
+    if(icon) icon.textContent = '▶️';
+    if(lbl)  lbl.textContent = isFr ? 'Reprendre' : 'Resume';
+  } else {
+    btn.classList.remove('paused');
+    if(icon) icon.textContent = '⏸';
+    if(lbl)  lbl.textContent = isFr ? 'Pause' : 'Pause';
+    // En sortant de pause : on cache la pastille et on saute à la dernière ligne
+    const pill = document.getElementById('newSubsPill');
+    if(pill) pill.style.display = 'none';
+    const c = document.getElementById('subtitles');
+    if(c) c.scrollTop = c.scrollHeight;
+  }
+}
+function resumeAndScroll(){
+  // Appelé quand le participant clique sur la pastille pour rejoindre la live
+  if(scrollPaused) togglePauseScroll();
+}
+// Appelé chaque fois qu'un nouveau sous-titre arrive PENDANT la pause
+function notifyNewSubsDuringPause(){
+  if(!scrollPaused) return;
+  const pill = document.getElementById('newSubsPill');
+  if(pill) pill.style.display = 'block';
+}
+
+// ─────────────────────────────────────────────────────
+// QUITTER LA SESSION (sortie volontaire)
+// Demande confirmation pour éviter les sorties accidentelles.
+// ─────────────────────────────────────────────────────
+function confirmLeave(){
+  const isFr = (typeof uiLang!=='undefined' && uiLang==='fr');
+  const msg = isFr
+    ? 'Quitter la réunion ? Vous ne recevrez plus les sous-titres.'
+    : 'Leave the session? You will stop receiving subtitles.';
+  if(confirm(msg)){
+    leaveSession();
+  }
+}
+function leaveSession(){
+  // On redirige vers la home translatetheworld.com (sortie propre)
+  try { if(typeof recognition !== 'undefined' && recognition){ recognition.stopContinuousRecognitionAsync(()=>{},()=>{}); } } catch(e){}
+  window.location.href = 'https://translatetheworld.com';
+}
+
+// Intermédiaire reçu d'un autre orateur
+let remoteInterimEl = null;
+function showRemoteInterim(text, fromLang, speaker){
+  const container=document.getElementById('subtitles');
+  document.getElementById('emptyMsg').style.display='none';
+  if(!remoteInterimEl){
+    remoteInterimEl=document.createElement('div');
+    remoteInterimEl.className='sub-entry';
+    container.appendChild(remoteInterimEl);
+  }
+  const flagCode=FLAGS[fromLang]||'un';
+  remoteInterimEl.innerHTML=
+    '<div class="sub-speaker"><img src="https://flagcdn.com/w40/'+flagCode+'.png"> '+escHtml(speaker||'')+'</div>'+
+    '<div class="sub-text interim">'+escHtml(text)+'</div>';
+  if(!scrollPaused){
+    container.scrollTop=container.scrollHeight;
+  } else {
+    notifyNewSubsDuringPause();
+  }
+}
+function clearRemoteInterim(){
+  if(remoteInterimEl){
+    const c=document.getElementById('subtitles');
+    if(c.contains(remoteInterimEl)) c.removeChild(remoteInterimEl);
+    remoteInterimEl=null;
+  }
+}
+</script>
+</body>
+</html>

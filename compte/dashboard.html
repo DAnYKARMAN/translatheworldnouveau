@@ -1,0 +1,902 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Mon Tableau de bord — TranslateTheWorld</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --teal:#157a6e;--teal-light:#e6f4f2;--teal-dark:#0f5a51;
+  --text:#0f1923;--muted:#6b7a8d;--border:#e2e8f0;
+  --bg:#f7f9fb;--white:#fff;--error:#dc2626;--warn:#ea580c;--ok:#16a34a;
+  --radius:14px;--shadow:0 4px 24px rgba(0,0,0,.07);
+}
+html,body{min-height:100%;font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text)}
+body::before{content:'';position:fixed;inset:0;z-index:0;
+  background:radial-gradient(ellipse 50% 40% at 90% 5%,rgba(21,122,110,.1) 0%,transparent 60%),
+             radial-gradient(ellipse 35% 35% at 5% 95%,rgba(21,122,110,.07) 0%,transparent 60%);
+  pointer-events:none}
+
+/* ── NAV ── */
+nav{position:sticky;top:0;z-index:100;background:rgba(255,255,255,.92);backdrop-filter:blur(12px);
+    border-bottom:1px solid var(--border);padding:0 24px;display:flex;align-items:center;
+    justify-content:space-between;height:60px}
+.nav-logo{display:flex;align-items:center;gap:9px;text-decoration:none}
+.nav-logo-icon{width:32px;height:32px;background:var(--teal);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:17px}
+.nav-logo-text{font-size:13px;font-weight:700;color:var(--teal);letter-spacing:.06em;text-transform:uppercase}
+.nav-right{display:flex;align-items:center;gap:12px}
+.nav-user{font-size:13px;color:var(--muted);font-weight:500}
+.btn-sm{padding:8px 16px;border-radius:999px;border:none;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;transition:all .2s}
+.btn-outline{background:transparent;border:1.5px solid var(--border);color:var(--text)}
+.btn-outline:hover{border-color:var(--teal);color:var(--teal)}
+.btn-teal{background:var(--teal);color:#fff}
+.btn-teal:hover{background:var(--teal-dark)}
+
+/* ── LAYOUT ── */
+.wrap{max-width:960px;margin:0 auto;padding:32px 20px;position:relative;z-index:1}
+
+/* ── PAGE HEADER ── */
+.page-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:28px;flex-wrap:wrap;gap:12px}
+.page-title{font-size:26px;font-weight:800}
+.page-sub{font-size:14px;color:var(--muted);margin-top:3px}
+
+/* ── STATS BAR ── */
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:28px}
+@media(max-width:560px){.stats{grid-template-columns:1fr 1fr}}
+.stat-card{background:var(--white);border-radius:var(--radius);padding:18px 20px;border:1px solid var(--border);box-shadow:var(--shadow)}
+.stat-label{font-size:12px;color:var(--muted);font-weight:600;text-transform:uppercase;letter-spacing:.05em;margin-bottom:6px}
+.stat-value{font-size:22px;font-weight:800;color:var(--text)}
+.stat-value.teal{color:var(--teal)}
+
+/* ── ROOMS ── */
+.rooms-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
+.rooms-title{font-size:16px;font-weight:700}
+.rooms-empty{text-align:center;padding:48px 24px;background:var(--white);border-radius:var(--radius);border:2px dashed var(--border)}
+.rooms-empty p{font-size:15px;color:var(--muted);margin-bottom:16px}
+
+.room-card{background:var(--white);border-radius:var(--radius);border:1px solid var(--border);
+           box-shadow:var(--shadow);margin-bottom:12px;overflow:hidden;transition:box-shadow .2s}
+.room-card:hover{box-shadow:0 8px 32px rgba(0,0,0,.1)}
+.room-top{display:flex;align-items:center;gap:16px;padding:18px 20px}
+.room-status{width:10px;height:10px;border-radius:50%;flex-shrink:0}
+.room-status.active{background:var(--ok);box-shadow:0 0 0 3px rgba(22,163,74,.15)}
+.room-status.empty{background:#d1d5db}
+.room-info{flex:1;min-width:0}
+.room-name{font-size:16px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.room-id{font-size:12px;color:var(--muted);font-family:'DM Mono',monospace;margin-top:2px}
+.room-meta{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-top:6px}
+.badge{display:inline-flex;align-items:center;gap:4px;padding:3px 9px;border-radius:999px;font-size:11px;font-weight:700}
+.badge-plan{background:rgba(21,122,110,.12);color:var(--teal)}
+.badge-ok{background:rgba(22,163,74,.12);color:var(--ok)}
+.badge-warn{background:rgba(234,88,12,.12);color:var(--warn)}
+.badge-err{background:rgba(220,38,38,.12);color:var(--error)}
+.badge-neutral{background:#f1f5f9;color:var(--muted)}
+
+/* ── TIMER ── */
+.room-timer{text-align:right;flex-shrink:0}
+.timer-display{font-family:'DM Mono',monospace;font-size:22px;font-weight:700;color:var(--text);letter-spacing:.02em}
+.timer-display.warn{color:var(--warn)}
+.timer-display.empty{color:var(--error)}
+.timer-label{font-size:11px;color:var(--muted);margin-top:2px;text-align:right}
+
+/* ── ROOM FOOTER ── */
+.room-foot{border-top:1px solid var(--border);padding:12px 20px;display:flex;align-items:center;gap:8px;flex-wrap:wrap;background:#fafbfc}
+.lang-pill{display:inline-flex;align-items:center;gap:5px;padding:4px 10px;border-radius:999px;font-size:12px;font-weight:600;background:var(--teal-light);color:var(--teal)}
+.lang-pill.src{background:rgba(21,122,110,.25)}
+.lang-pill-list{display:flex;flex-wrap:wrap;gap:6px;flex:1}
+.btn-icon{background:none;border:1.5px solid var(--border);border-radius:8px;padding:6px 10px;cursor:pointer;font-size:14px;transition:all .2s;font-family:inherit}
+.btn-icon:hover{border-color:var(--teal);background:var(--teal-light)}
+.btn-join{background:var(--teal);color:#fff;border:none;border-radius:8px;padding:7px 14px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;transition:background .2s;white-space:nowrap}
+.btn-join:hover{background:var(--teal-dark)}
+.btn-add-time{background:#7c3aed;color:#fff;border:none;border-radius:8px;padding:7px 14px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;white-space:nowrap}
+.btn-share{background:var(--teal);color:#fff;border:none;border-radius:8px;padding:7px 14px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;white-space:nowrap}
+.btn-share:hover{background:var(--teal-dark)}
+.share-link-box{background:#f5f5f5;border:1px solid var(--border);border-radius:8px;padding:10px 14px;font-family:monospace;font-size:11px;word-break:break-all;color:#333;margin:12px 0;cursor:pointer;transition:background .2s}
+.share-link-box:hover{background:#e8f5f0}
+.share-btns{display:flex;gap:10px;flex-wrap:wrap;margin-top:14px}
+.share-btn-wa{background:#25D366;color:#fff;border:none;border-radius:8px;padding:10px 18px;font-size:13px;font-weight:700;cursor:pointer;flex:1;min-width:120px}
+.share-btn-sms{background:#007AFF;color:#fff;border:none;border-radius:8px;padding:10px 18px;font-size:13px;font-weight:700;cursor:pointer;flex:1;min-width:120px}
+.share-btn-email{background:#333;color:#fff;border:none;border-radius:8px;padding:10px 18px;font-size:13px;font-weight:700;cursor:pointer;flex:1;min-width:120px}
+.share-qr{text-align:center;margin:14px 0}
+.share-qr img{border-radius:8px;border:1px solid var(--border)}
+.copy-toast{display:none;background:var(--teal);color:#fff;text-align:center;padding:6px;border-radius:6px;font-size:12px;margin-top:6px}
+.btn-add-time:hover{background:#6d28d9}
+
+/* ── MODAL ── */
+.overlay{display:none;position:fixed;inset:0;z-index:500;background:rgba(0,0,0,.4);align-items:center;justify-content:center;padding:20px}
+.overlay.open{display:flex}
+.modal{background:var(--white);border-radius:20px;padding:28px;width:min(480px,100%);box-shadow:0 24px 80px rgba(0,0,0,.18);max-height:90vh;overflow-y:auto}
+.modal-title{font-size:18px;font-weight:800;margin-bottom:6px}
+.modal-sub{font-size:13px;color:var(--muted);margin-bottom:22px;line-height:1.5}
+.modal-close{float:right;background:none;border:none;font-size:20px;cursor:pointer;color:var(--muted);margin-top:-4px}
+.field{margin-bottom:14px}
+.field label{display:block;font-size:13px;font-weight:600;margin-bottom:5px}
+.field input,.field select{width:100%;border:1.5px solid var(--border);border-radius:9px;padding:11px 13px;font-size:14px;font-family:inherit;outline:none;transition:border-color .2s;background:var(--white)}
+.field input:focus,.field select:focus{border-color:var(--teal)}
+.lang-select-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-top:6px}
+.lang-opt{border:1.5px solid var(--border);border-radius:9px;padding:9px 6px;text-align:center;cursor:pointer;font-size:13px;font-weight:600;transition:all .2s;user-select:none}
+.lang-opt:hover{border-color:var(--teal);background:var(--teal-light)}
+.lang-opt.sel{border-color:var(--teal);background:var(--teal);color:#fff}
+.lang-opt.src-lang{border-color:#0ea5e9;background:#e0f2fe;color:#0369a1;cursor:default}
+.modal-note{font-size:12px;color:var(--muted);background:#f8fafc;border-radius:8px;padding:10px 12px;margin-bottom:16px;line-height:1.5}
+.btn-full{width:100%;padding:13px;border:none;border-radius:10px;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;transition:background .2s;display:flex;align-items:center;justify-content:center;gap:8px}
+.btn-full.teal{background:var(--teal);color:#fff}
+.btn-full.teal:hover{background:var(--teal-dark)}
+.btn-full.pur{background:#7c3aed;color:#fff}
+.btn-full.pur:hover{background:#6d28d9}
+.btn-full .spinner{width:16px;height:16px;border:2px solid rgba(255,255,255,.4);border-top-color:#fff;border-radius:50%;animation:spin .7s linear infinite;display:none}
+.btn-full.loading .spinner{display:block}
+.btn-full.loading .btn-label{display:none}
+@keyframes spin{to{transform:rotate(360deg)}}
+.alert-modal{border-radius:8px;padding:10px 12px;font-size:13px;font-weight:500;margin-bottom:12px;display:none;line-height:1.5}
+.alert-modal.err{background:#fef2f2;color:var(--error);border:1px solid #fecaca;display:block}
+.alert-modal.ok{background:#f0fdf4;color:var(--ok);border:1px solid #bbf7d0;display:block}
+
+/* ── Skeleton loader ── */
+.skeleton{background:linear-gradient(90deg,#f0f0f0 25%,#e0e0e0 50%,#f0f0f0 75%);background-size:200% 100%;animation:shimmer 1.4s infinite;border-radius:8px}
+@keyframes shimmer{to{background-position:-200% 0}}
+.skel-card{height:120px;border-radius:var(--radius);margin-bottom:12px}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <a class="nav-logo" href="https://translatetheworld.com">
+    <div class="nav-logo-icon">🌍</div>
+    <span class="nav-logo-text">TranslateTheWorld</span>
+  </a>
+  <div class="nav-right">
+    <span class="nav-user" id="navUser"></span>
+    <button class="btn-sm btn-outline" onclick="doLogout()">Déconnexion</button>
+  </div>
+</nav>
+
+<div class="wrap">
+
+  <!-- PAGE HEADER -->
+  <div class="page-header">
+    <div>
+      <h1 class="page-title">Mes salles 🎙️</h1>
+      <p class="page-sub">Gérez vos conférences et votre crédit temps</p>
+    </div>
+    <button class="btn-sm btn-teal" onclick="openNewRoom()">+ Nouvelle salle</button>
+  </div>
+
+  <!-- STATS -->
+  <div class="stats">
+    <div class="stat-card">
+      <div class="stat-label">Salles actives</div>
+      <div class="stat-value teal" id="statRooms">—</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Heures restantes (total)</div>
+      <div class="stat-value" id="statHours">—</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Langues configurées</div>
+      <div class="stat-value" id="statLangs">—</div>
+    </div>
+  </div>
+
+  <!-- ROOMS LIST -->
+  <div class="rooms-header">
+    <span class="rooms-title">Vos salles</span>
+  </div>
+  <div id="roomsList">
+    <div class="skeleton skel-card"></div>
+    <div class="skeleton skel-card"></div>
+  </div>
+
+</div>
+
+<!-- ── MODAL : NOUVELLE SALLE ── -->
+<div class="overlay" id="overlayNew" onclick="closeIfBg(event,'overlayNew')">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal('overlayNew')">✕</button>
+    <h2 class="modal-title">Nouvelle salle</h2>
+    <p class="modal-sub">Donnez un nom à votre salle et choisissez les langues. Vous choisirez le plan ensuite.</p>
+    <div id="alertNew" class="alert-modal"></div>
+
+    <div class="field">
+      <label>Nom de la salle</label>
+      <input type="text" id="newRoomLabel" placeholder="ex: AtelierMarketing, ConferenceAnnuelle…" maxlength="20">
+      <div style="font-size:11px;color:var(--muted);margin-top:4px">Lettres et chiffres uniquement · max 20 caractères · un code à 5 chiffres sera ajouté automatiquement</div>
+    </div>
+
+    <div class="field">
+      <label>Langue de l'orateur</label>
+      <select id="newSrcLang">
+        <option value="fr">🇫🇷 Français</option>
+        <option value="en">🇬🇧 Anglais</option>
+        <option value="de">🇩🇪 Allemand</option>
+        <option value="es">🇪🇸 Espagnol</option>
+        <option value="it">🇮🇹 Italien</option>
+        <option value="pt">🇵🇹 Portugais</option>
+        <option value="ru">🇷🇺 Russe</option>
+        <option value="ar">🇸🇦 Arabe</option>
+        <option value="zh">🇨🇳 Chinois</option>
+        <option value="ja">🇯🇵 Japonais</option>
+        <option value="ko">🇰🇷 Coréen</option>
+        <option value="he">🇮🇱 Hébreu</option>
+        <option value="hi">🇮🇳 Hindi</option>
+        <option value="nl">🇳🇱 Néerlandais</option>
+        <option value="pl">🇵🇱 Polonais</option>
+        <option value="tr">🇹🇷 Turc</option>
+        <option value="uk">🇺🇦 Ukrainien</option>
+      </select>
+    </div>
+
+    <div class="field">
+      <label>Langues des participants <span style="color:var(--muted);font-weight:400">(jusqu'à 5)</span></label>
+      <div class="lang-select-grid" id="tgtLangGrid"></div>
+    </div>
+
+    <div class="modal-note" id="pricingNote">Sélectionnez les langues pour voir le tarif.</div>
+
+    <button class="btn-full teal" id="btnCreateRoom" onclick="createRoom()">
+      <span class="btn-label">Continuer vers le paiement →</span>
+      <div class="spinner"></div>
+    </button>
+  </div>
+</div>
+
+<!-- ── MODAL : MODIFIER LANGUES ── -->
+<div class="overlay" id="overlayEdit" onclick="closeIfBg(event,'overlayEdit')">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal('overlayEdit')">✕</button>
+    <h2 class="modal-title">Modifier les langues</h2>
+    <p class="modal-sub" id="editModalSub"></p>
+    <div id="alertEdit" class="alert-modal"></div>
+
+    <div class="field">
+      <label>Langue de l'orateur</label>
+      <select id="editSrcLang"></select>
+    </div>
+    <div class="field">
+      <label>Langues des participants <span style="color:var(--muted);font-weight:400">(jusqu'à 5)</span></label>
+      <div class="lang-select-grid" id="editTgtGrid"></div>
+    </div>
+
+    <button class="btn-full teal" id="btnSaveEdit" onclick="saveLangs()">
+      <span class="btn-label">💾 Enregistrer</span>
+      <div class="spinner"></div>
+    </button>
+  </div>
+</div>
+
+<!-- ── MODAL : AJOUTER HEURES ── -->
+<div class="overlay" id="overlayTopup" onclick="closeIfBg(event,'overlayTopup')">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal('overlayTopup')">✕</button>
+    <h2 class="modal-title">Ajouter des heures</h2>
+    <p class="modal-sub" id="topupSub"></p>
+    <div id="alertTopup" class="alert-modal"></div>
+
+    <!-- Sélecteur heures -->
+    <div style="margin-bottom:16px">
+      <label style="font-size:12px;font-weight:700;color:var(--muted);letter-spacing:.08em;text-transform:uppercase;display:block;margin-bottom:8px">Nombre d&#39;heures</label>
+      <div style="display:flex;align-items:center;gap:12px">
+        <button onclick="changeTopupHours(-1)" style="width:36px;height:36px;border-radius:50%;border:2px solid var(--border);background:#fff;font-size:18px;cursor:pointer;font-weight:700">−</button>
+        <span id="topupHoursVal" style="font-size:28px;font-weight:900;min-width:40px;text-align:center">1</span>
+        <button onclick="changeTopupHours(1)" style="width:36px;height:36px;border-radius:50%;border:2px solid var(--teal);background:var(--teal);color:#fff;font-size:18px;cursor:pointer;font-weight:700">+</button>
+        <span style="font-size:13px;color:var(--muted)">heure(s)</span>
+      </div>
+    </div>
+
+    <!-- Prix calculé -->
+    <div style="background:var(--teal-light);border:1.5px solid var(--teal);border-radius:12px;padding:14px 16px;margin-bottom:16px;display:flex;justify-content:space-between;align-items:center">
+      <div>
+        <div style="font-size:12px;color:var(--teal);font-weight:600" id="topupDesc">1h · 2 langues</div>
+        <div style="font-size:11px;color:var(--muted)" id="topupHT">50,00 € HT</div>
+      </div>
+      <div style="font-size:28px;font-weight:900;color:var(--teal)" id="topupPrice">59,99 €</div>
+    </div>
+
+    <button class="btn-full pur" id="btnTopup" onclick="doTopup()">
+      <span class="btn-label">💳 Payer →</span>
+      <div class="spinner"></div>
+    </button>
+  </div>
+</div>
+
+<!-- ── MODAL : PARTAGER ── -->
+<div class="overlay" id="overlayShare" onclick="closeIfBg(event,'overlayShare')">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal('overlayShare')">✕</button>
+    <h2 class="modal-title">📤 Partager la conférence</h2>
+    <p class="modal-sub" id="shareSub"></p>
+
+    <div class="share-qr">
+      <img id="shareQrImg" src="" width="160" height="160" alt="QR Code">
+    </div>
+
+    <div class="share-link-box" id="shareLink" onclick="copyShareLink()" title="Cliquer pour copier">
+      —
+    </div>
+    <div class="copy-toast" id="copyToast">✅ Lien copié !</div>
+
+    <div class="share-btns">
+      <button class="share-btn-wa"    onclick="shareVia('whatsapp')">💬 WhatsApp</button>
+      <button class="share-btn-sms"   onclick="shareVia('sms')">📱 SMS</button>
+      <button class="share-btn-email" onclick="shareVia('email')">✉️ Email</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ══ FIREBASE ══
+firebase.initializeApp({
+  apiKey:'AIzaSyCQZ_htYiPyUv50oIObwN3eGSJ9SneO7sI',
+  authDomain:'sogevoxreunion.firebaseapp.com',
+  databaseURL:'https://sogevoxreunion-default-rtdb.europe-west1.firebasedatabase.app',
+  projectId:'sogevoxreunion',storageBucket:'sogevoxreunion.appspot.com',
+  messagingSenderId:'719780110234',appId:'1:719780110234:web:02766642e9cfedd9446423'
+});
+var auth = firebase.auth();
+var db   = firebase.database();
+
+// ══ LANGUES ══
+var LANGS = {
+  fr:'🇫🇷 Français',en:'🇬🇧 Anglais',de:'🇩🇪 Allemand',es:'🇪🇸 Espagnol',
+  it:'🇮🇹 Italien',pt:'🇵🇹 Portugais',ru:'🇷🇺 Russe',ar:'🇸🇦 Arabe',
+  zh:'🇨🇳 Chinois',ja:'🇯🇵 Japonais',ko:'🇰🇷 Coréen',he:'🇮🇱 Hébreu',
+  hi:'🇮🇳 Hindi',nl:'🇳🇱 Néerlandais',pl:'🇵🇱 Polonais',tr:'🇹🇷 Turc',uk:'🇺🇦 Ukrainien'
+};
+
+// ══ TARIFS ══
+var BASE_TTC   = 59.99;  // 1h, 2 langues incluses
+var EXTRA_H    = 49.99;  // par heure supplémentaire
+var EXTRA_LANG = 49.99;  // par langue supplémentaire par heure
+
+function calcTotal(hours, extraLangs){
+  return BASE_TTC + (hours-1)*EXTRA_H + extraLangs*hours*EXTRA_LANG;
+}
+
+// ══ STATE ══
+var currentUser = null;
+var rooms       = {};
+var timers      = {};
+var editingRoom = null;
+var topupRoom    = null;
+var topupHours   = 1;
+var selectedHours = 1;
+var selectedTgt = [];
+var editTgt     = [];
+
+// ══ AUTH ══
+auth.onAuthStateChanged(function(user){
+  if(!user){ window.location.href='/compte/index.html'; return; }
+  currentUser = user;
+  document.getElementById('navUser').textContent = user.displayName || user.email;
+  loadRooms();
+  buildTgtGrid('tgtLangGrid', selectedTgt, 'fr', false);
+});
+
+function doLogout(){
+  auth.signOut().then(function(){ window.location.href='/compte/index.html'; });
+}
+
+// ══ LOAD ROOMS ══
+function loadRooms(){
+  db.ref('subscriptions').orderByChild('ownerUid').equalTo(currentUser.uid)
+    .on('value', function(snap){
+      rooms = {};
+      if(snap.val()) rooms = snap.val();
+      renderRooms();
+    });
+}
+
+// ══ RENDER ROOMS ══
+function renderRooms(){
+  // Arrêter anciens timers
+  Object.values(timers).forEach(function(t){ clearInterval(t); });
+  timers = {};
+
+  var list = document.getElementById('roomsList');
+  var keys = Object.keys(rooms);
+
+  // Stats
+  var totalMins = 0, totalLangs = 0;
+  keys.forEach(function(k){
+    var r=rooms[k];
+    var left = (r.minutesAllowed||0)-(r.minutesUsed||0);
+    if(left>0) totalMins+=left;
+    totalLangs += ((r.to||'').split(',').filter(Boolean).length + 1);
+  });
+  document.getElementById('statRooms').textContent  = keys.length;
+  document.getElementById('statHours').textContent  = fmtH(totalMins);
+  document.getElementById('statLangs').textContent  = totalLangs || '—';
+
+  if(!keys.length){
+    list.innerHTML = '<div class="rooms-empty"><p>Vous n\'avez pas encore de salle.</p><button class="btn-sm btn-teal" onclick="openNewRoom()">+ Créer ma première salle</button></div>';
+    return;
+  }
+
+  list.innerHTML = '';
+  keys.forEach(function(roomId){
+    var r = rooms[roomId];
+    list.appendChild(buildRoomCard(roomId, r));
+    startRoomTimer(roomId);
+  });
+}
+
+function fmtH(mins){
+  if(!mins) return '0 min';
+  var h=Math.floor(mins/60), m=mins%60;
+  return h>0 ? h+'h'+String(m).padStart(2,'0') : m+' min';
+}
+
+function fmtCountdown(secs){
+  if(secs<=0) return '0:00:00';
+  var h=Math.floor(secs/3600),m=Math.floor((secs%3600)/60),s=secs%60;
+  return h+':'+String(m).padStart(2,'0')+':'+String(s).padStart(2,'0');
+}
+
+function buildRoomCard(roomId, r){
+  var left     = Math.max(0,(r.minutesAllowed||0)-(r.minutesUsed||0));
+  var leftSecs = left*60;
+  var pct      = r.minutesAllowed ? left/r.minutesAllowed : 0;
+  var timerCls = pct<0.1 ? 'empty' : pct<0.25 ? 'warn' : '';
+  var statusCls= left>0 ? 'active' : 'empty';
+  var srcLang  = r.lang || 'fr';
+  var tgtLangs = (r.to||'').split(',').filter(Boolean);
+
+  var div = document.createElement('div');
+  div.className='room-card'; div.id='card-'+roomId;
+
+  // Badge quota
+  var qBadge = left<=0
+    ? '<span class="badge badge-err">⛔ Quota épuisé</span>'
+    : pct<0.1
+    ? '<span class="badge badge-warn">⚠️ Bientôt épuisé</span>'
+    : '<span class="badge badge-ok">✅ Actif</span>';
+
+  // Langues pills
+  var pillsHTML = '<span class="lang-pill src">'+LANGS[srcLang]+'</span>';
+  tgtLangs.forEach(function(l){
+    if(LANGS[l]) pillsHTML += '<span class="lang-pill">'+LANGS[l]+'</span>';
+  });
+
+  div.innerHTML =
+    '<div class="room-top">'+
+      '<div class="room-status '+statusCls+'"></div>'+
+      '<div class="room-info">'+
+        '<div class="room-name">'+escH(roomId)+'</div>'+
+        '<div class="room-id">Room ID : '+escH(roomId)+'</div>'+
+        '<div class="room-meta">'+
+          '<span class="badge badge-plan">'+escH(r.plan||'—')+'</span>'+
+          qBadge+
+          '<span class="badge badge-neutral">'+fmtH(r.minutesAllowed||0)+' achetées</span>'+
+        '</div>'+
+      '</div>'+
+      '<div class="room-timer">'+
+        '<div class="timer-display '+timerCls+'" id="timer-'+roomId+'">'+fmtCountdown(leftSecs)+'</div>'+
+        '<div class="timer-label">restantes</div>'+
+      '</div>'+
+    '</div>'+
+    '<div class="room-foot">'+
+      '<div class="lang-pill-list">'+pillsHTML+'</div>'+
+      '<button class="btn-icon" title="Modifier les langues" onclick="openEdit(\''+roomId+'\')">✏️</button>'+
+      '<button class="btn-share" onclick="openShare(\''+roomId+'\')">📤 Partager</button>'+
+      '<button class="btn-add-time" onclick="openTopup(\''+roomId+'\')">+ Heures</button>'+
+      '<button class="btn-join" onclick="joinRoom(\''+roomId+'\')">▶ Ouvrir la salle</button>'+
+    '</div>';
+
+  return div;
+}
+
+function startRoomTimer(roomId){
+  var r = rooms[roomId];
+  var left = Math.max(0,(r.minutesAllowed||0)-(r.minutesUsed||0));
+  var secs = left*60;
+  var el   = document.getElementById('timer-'+roomId);
+  if(!el) return;
+  if(secs<=0){ el.textContent='0:00:00'; el.className='timer-display empty'; return; }
+
+  timers[roomId] = setInterval(function(){
+    secs--;
+    if(!el) return;
+    el.textContent = fmtCountdown(secs);
+    var r2 = rooms[roomId];
+    var allowed = r2 ? r2.minutesAllowed : left;
+    var pct = allowed ? secs/(allowed*60) : 0;
+    el.className = 'timer-display '+(secs<=0?'empty':pct<0.1?'warn':'');
+    if(secs<=0){ clearInterval(timers[roomId]); }
+  },1000);
+}
+
+function joinRoom(roomId){
+  var r = rooms[roomId];
+  if(!r) return;
+  var url = 'https://translatetheworld.com/r/?room='+encodeURIComponent(roomId)
+    +'&lang='+(r.lang||'fr')+'&to='+(r.to||'en')+'&dur='+Math.max(1,Math.round(((r.minutesAllowed||0)-(r.minutesUsed||0))));
+  window.open(url,'_blank');
+}
+
+var shareUrl = '';
+
+function buildRoomUrl(roomId){
+  var r = rooms[roomId];
+  if(!r) return '';
+  return 'https://translatetheworld.com/r/?room='+encodeURIComponent(roomId)
+    +'&lang='+(r.lang||'fr')+'&to='+(r.to||'en')+'&dur='+Math.max(1,Math.round(((r.minutesAllowed||0)-(r.minutesUsed||0))));
+}
+
+function openShare(roomId){
+  var r = rooms[roomId];
+  if(!r) return;
+  shareUrl = buildRoomUrl(roomId);
+  var langs = [r.lang||'fr'].concat((r.to||'').split(',').filter(Boolean));
+  document.getElementById('shareSub').textContent = roomId+' · '+langs.length+' langue'+(langs.length>1?'s':'');
+  document.getElementById('shareLink').textContent = shareUrl;
+  document.getElementById('shareQrImg').src = 'https://quickchart.io/qr?size=160&text='+encodeURIComponent(shareUrl);
+  document.getElementById('copyToast').style.display='none';
+  openModal('overlayShare');
+}
+
+function copyShareLink(){
+  if(!shareUrl) return;
+  navigator.clipboard.writeText(shareUrl).then(function(){
+    var t = document.getElementById('copyToast');
+    t.style.display='block';
+    setTimeout(function(){ t.style.display='none'; }, 2000);
+  });
+}
+
+function shareVia(channel){
+  if(!shareUrl) return;
+  var msg = 'Rejoignez ma conférence TranslateTheWorld en temps réel : '+shareUrl;
+  var encoded = encodeURIComponent(msg);
+  if(channel==='whatsapp'){
+    window.open('https://wa.me/?text='+encoded,'_blank');
+  } else if(channel==='sms'){
+    window.location.href = 'sms:?body='+encoded;
+  } else if(channel==='email'){
+    window.location.href = 'mailto:?subject='+encodeURIComponent('Votre lien de conférence TranslateTheWorld')+'&body='+encoded;
+  }
+}
+
+function escH(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+
+// ══ BUILD LANG GRID ══
+function buildTgtGrid(gridId, selArr, srcVal, isEdit){
+  var grid = document.getElementById(gridId);
+  grid.innerHTML='';
+  Object.keys(LANGS).forEach(function(code){
+    var div=document.createElement('div');
+    div.className='lang-opt'+(code===srcVal?' src-lang':selArr.includes(code)?' sel':'');
+    div.textContent=LANGS[code];
+    div.dataset.code=code;
+    if(code!==srcVal){
+      div.onclick=function(){
+        if(div.classList.contains('sel')){ div.classList.remove('sel'); var i=selArr.indexOf(code); if(i>-1)selArr.splice(i,1); }
+        else if(selArr.length<5){ div.classList.add('sel'); selArr.push(code); }
+        if(!isEdit) updatePricingNote();
+      };
+    }
+  });
+  Object.keys(LANGS).forEach(function(code){
+    grid.appendChild(createLangOpt(code, code===srcVal, selArr, isEdit));
+  });
+}
+
+function createLangOpt(code, isSrc, selArr, isEdit){
+  var div=document.createElement('div');
+  div.className='lang-opt'+(isSrc?' src-lang':selArr.includes(code)?' sel':'');
+  div.textContent=LANGS[code];
+  div.dataset.code=code;
+  if(!isSrc){
+    div.onclick=function(){
+      if(div.classList.contains('sel')){ div.classList.remove('sel'); var i=selArr.indexOf(code); if(i>-1)selArr.splice(i,1); }
+      else if(selArr.length<5){ div.classList.add('sel'); selArr.push(code); }
+      if(!isEdit) updatePricingNote();
+    };
+  }
+  return div;
+}
+
+// Sync src lang change → rebuild grid
+document.getElementById('newSrcLang').addEventListener('change',function(){
+  var src=this.value;
+  selectedTgt=selectedTgt.filter(function(c){return c!==src;});
+  buildTgtGrid('tgtLangGrid',selectedTgt,src,false);
+  updatePricingNote();
+});
+
+function updatePricingNote(){
+  var n=selectedTgt.length;
+  var note=document.getElementById('pricingNote');
+  if(!n){note.textContent='Sélectionnez au moins une langue pour les participants.';return;}
+  var lines=Object.keys(PLANS).map(function(k){
+    var p=PLANS[k];
+    var total = p.basePrice + Math.max(0,n-2)*p.extraPrice;
+    var ht    = (total/1.2).toFixed(2);
+    return '<strong>'+p.label+'</strong> — '+total+'€ TTC ('+ht+'€ HT) pour '+n+' langue'+(n>1?'s':'');
+  });
+  note.innerHTML='<strong>Tarifs pour '+n+' langue'+(n>1?'s':'')+'&nbsp;:</strong><br>'+lines.join('<br>');
+}
+
+// ══ MODAL : NOUVELLE SALLE ══
+function openNewRoom(){
+  selectedTgt=[];
+  document.getElementById('newRoomLabel').value='';
+  buildTgtGrid('tgtLangGrid',selectedTgt,'fr',false);
+  updatePricingNote();
+  document.getElementById('alertNew').className='alert-modal';
+  openModal('overlayNew');
+}
+
+function createRoom(){
+  var label = document.getElementById('newRoomLabel').value.trim().replace(/[^a-zA-Z0-9]/g,'');
+  var src   = document.getElementById('newSrcLang').value;
+  if(!label){ showAlertModal('alertNew','Entrez un nom de salle (lettres/chiffres)','err'); return; }
+  if(!selectedTgt.length){ showAlertModal('alertNew','Choisissez au moins une langue participant','err'); return; }
+
+  // Générer code 5 chiffres
+  var code5   = String(Math.floor(10000+Math.random()*90000));
+  var roomId  = label + code5;
+
+  // Sauvegarder en Firebase (sans plan pour l'instant — plan sera défini après Stripe)
+  setLoading('btnCreateRoom',true);
+  db.ref('subscriptions/'+roomId).set({
+    ownerUid:      currentUser.uid,
+    ownerEmail:    currentUser.email,
+    label:         label,
+    roomId:        roomId,
+    lang:          src,
+    to:            selectedTgt.join(','),
+    plan:          null,
+    minutesAllowed:0,
+    minutesUsed:   0,
+    active:        false,
+    createdAt:     Date.now()
+  })
+  .then(function(){
+    closeModal('overlayNew');
+    setLoading('btnCreateRoom',false);
+    // Redirection vers Stripe
+    closeModal('overlayNew');
+    openPlanChooser(roomId, src, selectedTgt.slice());
+  })
+  .catch(function(e){
+    showAlertModal('alertNew','Erreur : '+e.message,'err');
+    setLoading('btnCreateRoom',false);
+  });
+}
+
+// ══ MODAL : MODIFIER LANGUES ══
+function openEdit(roomId){
+  editingRoom = roomId;
+  var r = rooms[roomId];
+  editTgt = (r.to||'').split(',').filter(Boolean).slice();
+  document.getElementById('editModalSub').textContent = 'Salle : '+roomId;
+  document.getElementById('alertEdit').className='alert-modal';
+
+  // Rebuild src select
+  var sel = document.getElementById('editSrcLang');
+  sel.innerHTML='';
+  Object.keys(LANGS).forEach(function(code){
+    var o=document.createElement('option');
+    o.value=code; o.textContent=LANGS[code];
+    if(code===(r.lang||'fr')) o.selected=true;
+    sel.appendChild(o);
+  });
+
+  buildEditGrid(r.lang||'fr');
+  sel.onchange=function(){ buildEditGrid(this.value); };
+  openModal('overlayEdit');
+}
+
+function buildEditGrid(srcVal){
+  var grid=document.getElementById('editTgtGrid');
+  grid.innerHTML='';
+  Object.keys(LANGS).forEach(function(code){
+    grid.appendChild(createLangOpt(code,code===srcVal,editTgt,true));
+  });
+}
+
+function saveLangs(){
+  var src = document.getElementById('editSrcLang').value;
+  editTgt = editTgt.filter(function(c){return c!==src;});
+  if(!editTgt.length){ showAlertModal('alertEdit','Choisissez au moins une langue participant','err'); return; }
+  setLoading('btnSaveEdit',true);
+  db.ref('subscriptions/'+editingRoom).update({ lang:src, to:editTgt.join(',') })
+    .then(function(){
+      closeModal('overlayEdit');
+      setLoading('btnSaveEdit',false);
+    })
+    .catch(function(e){
+      showAlertModal('alertEdit','Erreur : '+e.message,'err');
+      setLoading('btnSaveEdit',false);
+    });
+}
+
+// ══ MODAL : AJOUTER HEURES ══
+function changeTopupHours(delta){
+  var r = rooms[topupRoom];
+  var n = ((r.to||'').split(',').filter(Boolean).length)+1;
+  var extraLangs = Math.max(0, n-2);
+  topupHours = Math.max(1, Math.min(20, topupHours+delta));
+  document.getElementById('topupHoursVal').textContent = topupHours;
+  var total = calcTotal(topupHours, extraLangs);
+  var ht    = (total/1.2).toFixed(2).replace('.',',');
+  document.getElementById('topupPrice').textContent = total.toFixed(2).replace('.',',')+' €';
+  document.getElementById('topupHT').textContent    = ht+' € HT';
+  document.getElementById('topupDesc').textContent  = topupHours+'h · '+n+' langue'+(n>1?'s':'');
+}
+
+function openTopup(roomId){
+  topupRoom  = roomId;
+  topupHours = 1;
+  var r = rooms[roomId];
+  var n = ((r.to||'').split(',').filter(Boolean).length)+1;
+  var extraLangs = Math.max(0, n-2);
+  document.getElementById('topupSub').textContent = 'Salle : '+roomId+' — '+fmtH((r.minutesAllowed||0)-(r.minutesUsed||0))+' restantes';
+  document.getElementById('alertTopup').className='alert-modal';
+  document.getElementById('topupHoursVal').textContent = '1';
+  var total = calcTotal(1, extraLangs);
+  document.getElementById('topupPrice').textContent = total.toFixed(2).replace('.',',')+' €';
+  document.getElementById('topupHT').textContent    = (total/1.2).toFixed(2).replace('.',',')+' € HT';
+  document.getElementById('topupDesc').textContent  = '1h · '+n+' langue'+(n>1?'s':'');
+  openModal('overlayTopup');
+}
+
+function doTopup(){
+  if(!topupRoom) return;
+  var r = rooms[topupRoom];
+  var allLangs = [r.lang||'fr'].concat((r.to||'').split(',').filter(Boolean));
+  callStripe({
+    hours:      topupHours,
+    room:       topupRoom,
+    ownerUid:   currentUser.uid,
+    ownerEmail: currentUser.email,
+    languages:  allLangs.join(','),
+    isTopup:    true
+  }, 'btnTopup', 'alertTopup');
+}
+
+// ══ UTILS MODAUX ══
+function openModal(id){ document.getElementById(id).classList.add('open'); }
+function closeModal(id){ document.getElementById(id).classList.remove('open'); }
+function closeIfBg(e,id){ if(e.target.id===id) closeModal(id); }
+function showAlertModal(id,msg,type){ var el=document.getElementById(id); el.textContent=msg; el.className='alert-modal '+type; }
+
+// ══ PLAN CHOOSER (après création salle) ══
+var pendingRoomId  = null;
+var pendingLangs   = [];
+var selectedPlan   = null;
+
+function openPlanChooser(roomId, src, tgtArr){
+  pendingRoomId = roomId;
+  pendingLangs  = [src].concat(tgtArr);
+  selectedPlan  = null;
+  document.getElementById('btnPay').style.display = 'none';
+  document.getElementById('alertPlan').className  = 'alert-modal';
+  document.getElementById('planModalSub').textContent = 'Salle : '+roomId+' · '+pendingLangs.length+' langue'+(pendingLangs.length>1?'s':'');
+
+  var n = pendingLangs.length;
+  var extraLangs = Math.max(0, n-2);
+  selectedHours = 1;
+
+  // Injecter le sélecteur d'heures dans planChoices
+  var div = document.getElementById('planChoices');
+  div.innerHTML =
+    '<div style="margin-bottom:16px">'+
+      '<label style="font-size:12px;font-weight:700;color:var(--muted);letter-spacing:.08em;text-transform:uppercase;display:block;margin-bottom:8px">Nombre d&#39;heures</label>'+
+      '<div style="display:flex;align-items:center;gap:12px">'+
+        '<button onclick="changeNewHours(-1)" style="width:36px;height:36px;border-radius:50%;border:2px solid var(--border);background:#fff;font-size:18px;cursor:pointer;font-weight:700">−</button>'+
+        '<span id="newHoursVal" style="font-size:28px;font-weight:900;min-width:40px;text-align:center">1</span>'+
+        '<button onclick="changeNewHours(1)" style="width:36px;height:36px;border-radius:50%;border:2px solid var(--teal);background:var(--teal);color:#fff;font-size:18px;cursor:pointer;font-weight:700">+</button>'+
+        '<span style="font-size:13px;color:var(--muted)">heure(s)</span>'+
+      '</div>'+
+    '</div>'+
+    '<div style="background:var(--teal-light);border:1.5px solid var(--teal);border-radius:12px;padding:14px 16px;display:flex;justify-content:space-between;align-items:center">'+
+      '<div>'+
+        '<div style="font-size:12px;color:var(--teal);font-weight:600" id="newPlanDesc">1h · '+n+' langue'+(n>1?'s':'')+'</div>'+
+        '<div style="font-size:11px;color:var(--muted)" id="newPlanHT">'+(calcTotal(1,extraLangs)/1.2).toFixed(2).replace('.',',')+' € HT</div>'+
+      '</div>'+
+      '<div style="font-size:28px;font-weight:900;color:var(--teal)" id="newPlanPrice">'+calcTotal(1,extraLangs).toFixed(2).replace('.',',')+'€</div>'+
+    '</div>';
+
+  document.getElementById('btnPay').style.display = 'flex';
+  openModal('overlayPlan');
+}
+
+function changeNewHours(delta){
+  var n = pendingLangs.length;
+  var extraLangs = Math.max(0, n-2);
+  selectedHours = Math.max(1, Math.min(20, selectedHours+delta));
+  document.getElementById('newHoursVal').textContent = selectedHours;
+  var total = calcTotal(selectedHours, extraLangs);
+  document.getElementById('newPlanPrice').textContent = total.toFixed(2).replace('.',',')+' €';
+  document.getElementById('newPlanHT').textContent    = (total/1.2).toFixed(2).replace('.',',')+' € HT';
+  document.getElementById('newPlanDesc').textContent  = selectedHours+'h · '+n+' langue'+(n>1?'s':'');
+}
+
+function doPay(){
+  if(!pendingRoomId) return;
+  callStripe({
+    hours:      selectedHours,
+    room:       pendingRoomId,
+    ownerUid:   currentUser.uid,
+    ownerEmail: currentUser.email,
+    languages:  pendingLangs.join(','),
+    isTopup:    false
+  }, 'btnPay', 'alertPlan');
+}
+
+// ══ APPEL STRIPE ══
+function setLoading(btnId,on){
+  var btn=document.getElementById(btnId);
+  if(!btn) return;
+  btn.classList.toggle('loading',on);
+  btn.disabled=on;
+}
+
+function callStripe(payload, btnId, alertId){
+  setLoading(btnId, true);
+  fetch('/.netlify/functions/create-checkout', {
+    method:  'POST',
+    headers: {'Content-Type':'application/json'},
+    body:    JSON.stringify(payload)
+  })
+  .then(function(r){ return r.json(); })
+  .then(function(data){
+    if(data.url){
+      window.location.href = data.url; // → page Stripe
+    } else {
+      showAlertModal(alertId, 'Erreur Stripe : '+(data.error||'inconnue'), 'err');
+      setLoading(btnId, false);
+    }
+  })
+  .catch(function(e){
+    showAlertModal(alertId, 'Erreur réseau : '+e.message, 'err');
+    setLoading(btnId, false);
+  });
+}
+
+// ══ MESSAGE RETOUR STRIPE ══
+(function(){
+  var p = new URLSearchParams(window.location.search);
+  if(p.get('activated')==='ok'){
+    var room = p.get('room'), plan = p.get('plan');
+    setTimeout(function(){
+      alert('✅ Salle "'+room+'" activée ! Plan '+plan+' — vous pouvez maintenant ouvrir la salle.');
+      history.replaceState(null,'','/compte/dashboard.html');
+    }, 800);
+  }
+  if(p.get('topup')==='ok'){
+    var room2 = p.get('room'), plan2 = p.get('plan');
+    setTimeout(function(){
+      alert('✅ Heures ajoutées à la salle "'+room2+'" ! Plan '+plan2+' complémentaire activé.');
+      history.replaceState(null,'','/compte/dashboard.html');
+    }, 800);
+  }
+})();
+
+
+</script>
+<!-- ── MODAL : CHOIX DU PLAN (après création salle) ── -->
+<div class="overlay" id="overlayPlan" onclick="closeIfBg(event,'overlayPlan')">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal('overlayPlan')">✕</button>
+    <h2 class="modal-title">Choisissez votre plan</h2>
+    <p class="modal-sub" id="planModalSub"></p>
+    <div id="alertPlan" class="alert-modal"></div>
+    <div style="display:grid;gap:10px;margin-bottom:20px" id="planChoices"></div>
+    <button class="btn-full teal" id="btnPay" onclick="doPay()" style="display:none">
+      <span class="btn-label">💳 Payer et activer la salle →</span>
+      <div class="spinner"></div>
+    </button>
+    <p style="font-size:11px;color:var(--muted);text-align:center;margin-top:12px">Paiement sécurisé par Stripe · TVA incluse</p>
+  </div>
+</div>
+
+</body>
+</html>

@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Come funziona — TranslateTheWorld</title>
+<meta name="description" content="Guida semplice di TranslateTheWorld. 30 secondi per capire tutto.">
+<style>
+*{box-sizing:border-box}
+body{margin:0;padding:0;background:#f4f6f8;font-family:Arial,'Helvetica Neue',Helvetica,sans-serif;color:#0d1f1a;line-height:1.6}
+.wrap{max-width:680px;margin:0 auto;padding:24px 18px 60px}
+.header{background:#157a6e;color:#fff;border-radius:14px 14px 0 0;padding:28px 24px;text-align:center}
+.logo{font-size:24px;font-weight:900;letter-spacing:-.02em;line-height:1;margin-bottom:6px}
+.logo span:first-of-type{color:#f5c842}
+.logo span:last-of-type{color:#e8690a}
+.welcome{font-size:14px;color:#cdf0e7;font-weight:500}
+.card{background:#fff;border-radius:0 0 14px 14px;padding:28px 24px;box-shadow:0 4px 18px rgba(0,0,0,.06)}
+.read-time{display:inline-block;background:#eaf7f3;border:1.5px solid #157a6e;color:#0d1f1a;font-weight:700;font-size:14px;padding:8px 16px;border-radius:999px;margin-bottom:20px}
+h1{font-size:26px;font-weight:800;letter-spacing:-.02em;margin:0 0 8px 0;color:#0d1f1a}
+h1 strong{color:#157a6e}
+.subtitle{font-size:16px;color:#555;margin:0 0 24px 0}
+h2{font-size:19px;font-weight:800;color:#157a6e;margin:28px 0 10px 0;display:flex;align-items:center;gap:10px}
+h2 .num{display:inline-flex;align-items:center;justify-content:center;background:#157a6e;color:#fff;width:30px;height:30px;border-radius:50%;font-size:15px;font-weight:900;flex-shrink:0}
+p{font-size:16px;margin:0 0 12px 0;color:#222}
+.intro-box{background:#f7f8f6;border-radius:10px;padding:16px 18px;margin-bottom:20px;font-size:16px;line-height:1.55}
+.intro-box strong{color:#157a6e}
+.actions{list-style:none;padding:0;margin:0 0 12px 0}
+.actions li{display:flex;align-items:flex-start;gap:10px;margin-bottom:6px;font-size:16px}
+.actions li .ico{font-size:18px;flex-shrink:0;width:24px;text-align:center}
+.link-box{display:flex;gap:12px;background:#fff8e6;border:2px solid #f0d68c;border-radius:10px;padding:14px 16px;margin:10px 0}
+.link-box.green{background:#eaf7f3;border-color:#157a6e}
+.link-box .ico{font-size:24px;flex-shrink:0;line-height:1.4}
+.link-box .body{font-size:15px;line-height:1.5}
+.link-box .body strong{display:block;margin-bottom:2px;font-size:16px;color:#0d1f1a}
+.btn-row{display:flex;gap:8px;flex-wrap:wrap;margin:8px 0 0 0}
+.btn-mini{display:inline-block;background:#157a6e;color:#fff;font-size:12px;font-weight:700;padding:6px 12px;border-radius:999px}
+.btn-mini.orange{background:#e8690a}
+.btn-mini.red{background:#dc2626}
+.btn-mini.gray{background:#5b6770}
+.rule{background:#fff8e6;border:2px solid #e8690a;border-radius:10px;padding:18px 20px;margin:20px 0}
+.rule-title{font-size:16px;font-weight:800;color:#7a3f00;margin-bottom:8px}
+.bye{text-align:center;font-size:22px;font-weight:800;color:#157a6e;margin:28px 0 8px 0}
+.help-foot{text-align:center;font-size:13px;color:#666;margin-top:18px;padding-top:16px;border-top:1px solid #eee}
+.help-foot a{color:#157a6e;font-weight:700;text-decoration:none}
+.flag-switch{text-align:center;margin:20px 0 0 0;padding-top:18px;border-top:1px solid #eee}
+.flag-switch-label{font-size:12px;color:#888;font-weight:700;letter-spacing:.06em;text-transform:uppercase;margin-bottom:10px}
+.flag-switch a{display:inline-block;margin:4px 6px;padding:6px 10px;border:1.5px solid #ddd;border-radius:8px;text-decoration:none;color:#444;font-size:13px;font-weight:700}
+.flag-switch a:hover{border-color:#157a6e;color:#157a6e}
+.flag-switch a img{width:18px;height:13px;vertical-align:middle;margin-right:4px;border-radius:2px}
+.btn-back{display:block;text-align:center;background:#157a6e;color:#fff;text-decoration:none;font-weight:800;padding:14px;border-radius:10px;margin-top:18px;font-size:15px}
+@media(max-width:520px){
+  h1{font-size:22px}
+  .wrap{padding:14px 10px}
+  .header,.card{padding:22px 18px}
+}
+</style>
+</head>
+<body>
+
+<div class="wrap">
+
+  <div class="header">
+    <div class="logo">Translate<span>The</span><span>World</span></div>
+    <div class="welcome">Benvenuto</div>
+  </div>
+
+  <div class="card">
+
+    <div class="read-time">⏱️ 30 secondi per capire tutto</div>
+
+    <h1>Come <strong>funziona</strong></h1>
+    <p class="subtitle">Grazie per aver scelto TranslateTheWorld.</p>
+
+    <div class="intro-box">
+      Lei è l'<strong>host</strong> della conferenza.<br>
+      Significa: Lei è l'organizzatore.<br><br>
+      È Lei che:
+      <ul class="actions" style="margin-top:8px">
+        <li><span class="ico">🎬</span> avvia la conferenza</li>
+        <li><span class="ico">🎤</span> parla per primo</li>
+        <li><span class="ico">👥</span> dà la parola ai partecipanti</li>
+        <li><span class="ico">🛑</span> termina la conferenza</li>
+      </ul>
+    </div>
+
+    <h2><span class="num">1</span> I suoi due link</h2>
+    <p>Nella sua email ci sono <strong>due link</strong>. Sono diversi.</p>
+
+    <div class="link-box green">
+      <div class="ico">🟢</div>
+      <div class="body">
+        <strong>Il link Host</strong>
+        È il suo. Lo tenga per Lei.<br>
+        Lo usi per avviare la conferenza.
+      </div>
+    </div>
+
+    <div class="link-box">
+      <div class="ico">🟠</div>
+      <div class="body">
+        <strong>Il link Partecipanti</strong>
+        È per i suoi invitati.<br>
+        Lo invii prima della conferenza tramite:
+        <div class="btn-row">
+          <span class="btn-mini orange">📧 Email</span>
+          <span class="btn-mini">💬 WhatsApp</span>
+          <span class="btn-mini gray">📱 SMS</span>
+          <span class="btn-mini" style="background:#0d1f1a">📷 QR code</span>
+        </div>
+      </div>
+    </div>
+
+    <h2><span class="num">2</span> Avvia la conferenza</h2>
+    <ol style="padding-left:20px;margin:0;font-size:16px">
+      <li style="margin-bottom:6px">Clicchi sul suo <strong>link Host</strong>.</li>
+      <li style="margin-bottom:6px">Scelga la lingua in cui parlerà.</li>
+      <li style="margin-bottom:6px">La sessione si avvia.</li>
+      <li style="margin-bottom:6px">Condivida il link con i suoi partecipanti via email, SMS, WhatsApp o QR code cliccando su <strong>Share</strong> in alto nell'interfaccia oratore.</li>
+      <li style="margin-bottom:6px">Parli normalmente.</li>
+      <li>I partecipanti leggono i sottotitoli nella loro lingua, sul loro telefono.</li>
+    </ol>
+
+    <h2><span class="num">3</span> Dare la parola</h2>
+    <p>Durante la conferenza, un partecipante può voler parlare.</p>
+
+    <p style="font-weight:700;margin-top:14px">Come la richiede:</p>
+    <ul class="actions">
+      <li><span class="ico">✋</span> Sul suo schermo, preme <span class="btn-mini">Raise hand</span></li>
+      <li><span class="ico">🔔</span> La sua richiesta appare sul suo schermo</li>
+    </ul>
+
+    <p style="font-weight:700;margin-top:14px">Lei decide:</p>
+    <ul class="actions">
+      <li><span class="ico">✅</span> Per <strong>concedere</strong>: prema <span class="btn-mini">Grant</span>. Il suo microfono si chiude. Quello del partecipante si apre.</li>
+      <li><span class="ico">❌</span> Per <strong>rifiutare</strong>: prema <span class="btn-mini red">Decline</span>. Lei mantiene la parola.</li>
+    </ul>
+
+    <p style="font-weight:700;margin-top:14px">Per riprendere il microfono:</p>
+    <ul class="actions">
+      <li><span class="ico">🔄</span> O il partecipante preme <span class="btn-mini gray">Release mic</span></li>
+      <li><span class="ico">↩️</span> O Lei preme <span class="btn-mini">Take the floor back</span></li>
+    </ul>
+
+    <p style="margin-top:14px">In entrambi i casi:</p>
+    <ul class="actions">
+      <li><span class="ico">🎤</span> Appare un banner verde: <em>"A Lei la parola!"</em></li>
+      <li><span class="ico">🔴</span> Si accende una spia rossa <em>"MIC ON"</em></li>
+      <li><span class="ico">💬</span> Lei può parlare</li>
+    </ul>
+
+    <div class="rule">
+      <div class="rule-title">⭐ Regola d'oro</div>
+      <p style="margin:0;font-size:15px;line-height:1.5">
+        <strong>Un solo microfono è aperto alla volta.</strong><br>
+        O il suo, o quello di un partecipante.<br>
+        Mai entrambi insieme.<br>
+        <span style="color:#666;font-size:13px">Questo garantisce che i sottotitoli restino chiari.</span>
+      </p>
+    </div>
+
+    <div class="bye">🎉 Buona conferenza!</div>
+
+    <!-- Blocco azione : mostra i link cliccabili se presenti in localStorage -->
+    <div id="ttw-actions-loaded" style="display:none">
+      <div style="background:#f0fdf4;border:2px solid #157a6e;border-radius:14px;padding:22px;margin:24px 0">
+        <div style="font-weight:700;font-size:18px;color:#157a6e;text-align:center;margin-bottom:6px">🚀 I tuoi due link sono pronti</div>
+        <div style="text-align:center;color:#666;font-size:13px;margin-bottom:18px">Salvati nel tuo browser per 30 minuti</div>
+
+        <a id="ttw-host-btn" href="#" style="display:block;background:#157a6e;color:#fff;text-align:center;padding:16px 20px;border-radius:10px;text-decoration:none;font-weight:700;font-size:16px;margin-bottom:18px">
+          🎤 Avvia la mia conferenza
+        </a>
+
+        <div style="font-size:14px;color:#555;text-align:center;margin-bottom:10px"><strong>Invia il link ai miei partecipanti:</strong></div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap">
+          <a id="ttw-email-btn" href="#" style="flex:1;min-width:90px;background:#f97316;color:#fff;text-align:center;padding:12px 8px;border-radius:8px;text-decoration:none;font-weight:600;font-size:14px">📧 Email</a>
+          <a id="ttw-whatsapp-btn" href="#" target="_blank" rel="noopener" style="flex:1;min-width:90px;background:#25d366;color:#fff;text-align:center;padding:12px 8px;border-radius:8px;text-decoration:none;font-weight:600;font-size:14px">💬 WhatsApp</a>
+          <a id="ttw-sms-btn" href="#" style="flex:1;min-width:90px;background:#64748b;color:#fff;text-align:center;padding:12px 8px;border-radius:8px;text-decoration:none;font-weight:600;font-size:14px">📱 SMS</a>
+        </div>
+      </div>
+    </div>
+
+    <a id="ttw-actions-fallback" href="https://translatetheworld.com" class="btn-back">← Torna a TranslateTheWorld</a>
+
+    <script>
+    (function(){
+      function getLinks(){
+        try{
+          var p = new URLSearchParams(window.location.search);
+          var host = p.get('host');
+          var part = p.get('part');
+          if(host && part){
+            var subject = encodeURIComponent('Conferenza multilingue TranslateTheWorld');
+            var body    = encodeURIComponent('Ecco il tuo link per la conferenza: ' + part);
+            return {
+              host: host,
+              participant: part,
+              share_email:    'mailto:?subject=' + subject + '&body=' + body,
+              share_whatsapp: 'https://api.whatsapp.com/send?text=' + body,
+              share_sms:      'sms:?&body=' + body
+            };
+          }
+        }catch(e){}
+        try{
+          var raw = localStorage.getItem('ttw_recent_links');
+          if(!raw) return null;
+          var d = JSON.parse(raw);
+          if(!d.saved_at || (Date.now() - d.saved_at) > 30*60*1000) return null;
+          if(!d.host || !d.participant) return null;
+          return d;
+        }catch(e){ return null; }
+      }
+
+      var links = getLinks();
+      if(links){
+        document.getElementById('ttw-host-btn').href     = links.host;
+        document.getElementById('ttw-email-btn').href    = links.share_email    || '#';
+        document.getElementById('ttw-whatsapp-btn').href = links.share_whatsapp || '#';
+        document.getElementById('ttw-sms-btn').href      = links.share_sms      || '#';
+        document.getElementById('ttw-actions-loaded').style.display = 'block';
+
+        var fb = document.getElementById('ttw-actions-fallback');
+        if(fb){
+          fb.href = links.host;
+          fb.textContent = '🎤 Avvia la mia conferenza';
+        }
+      }
+    })();
+    </script>
+
+    <div class="help-foot">
+      Una domanda? <a href="mailto:info@sogedicom.com">info@sogedicom.com</a>
+      · <a href="tel:+33149260526">+33 1 49 26 05 26</a>
+    </div>
+
+    <div class="flag-switch">
+      <div class="flag-switch-label">Read in another language</div>
+      <a href="/aide-fr.html"><img src="https://flagcdn.com/w40/fr.png" alt="FR"> Français</a>
+      <a href="/aide-en.html"><img src="https://flagcdn.com/w40/gb.png" alt="EN"> English</a>
+      <a href="/aide-es.html"><img src="https://flagcdn.com/w40/es.png" alt="ES"> Español</a>
+    </div>
+
+  </div>
+</div>
+
+</body>
+</html>

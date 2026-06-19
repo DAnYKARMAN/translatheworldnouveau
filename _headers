@@ -1,0 +1,18 @@
+# ════════════════════════════════════════════════════════════════
+# CONFIGURATION CACHE — TranslateTheWorld
+# ════════════════════════════════════════════════════════════════
+# Ce fichier indique aux navigateurs de NE PAS conserver les pages
+# en cache. Sans ça, un participant qui a ouvert un lien il y a
+# quelques jours peut voir une version périmée du site (avec
+# d'anciens bugs), même après un redéploiement.
+#
+# "no-cache" ne veut PAS dire "ne stocke rien" : ça veut dire
+# "vérifie toujours auprès du serveur avant d'afficher la page".
+# Si rien n'a changé, le serveur répond "pas de changement" en
+# quelques millisecondes — donc aucune perte de vitesse.
+# Si la page a été mise à jour, le navigateur récupère la nouvelle
+# version automatiquement.
+# ════════════════════════════════════════════════════════════════
+
+/*
+  Cache-Control: public, max-age=0, must-revalidate

@@ -13,11 +13,100 @@
   <meta name="apple-mobile-web-app-title" content="TranslateTheWorld">
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>TranslateTheWorld — Parlez et comprenez 70 langues</title>
+<title>TranslateTheWorld — Plateforme de traduction IA pour réunions et conférences multilingues</title>
+
+<!-- ═════════════════════════════════════════════════════════
+     SEO & SOCIAL — Métadonnées pour Google, WhatsApp, LinkedIn…
+     ═════════════════════════════════════════════════════════ -->
+
+<!-- Description courte qui apparaît dans Google et au survol des liens -->
+<meta name="description" content="Plateforme de traduction par IA pour réunions et conférences multilingues. Sous-titrage en temps réel sur le smartphone de chaque participant. 70 langues, sans application, sans matériel. À partir de 59,99 € TTC.">
+
+<!-- Mots-clés (peu utilisés par Google mais utiles pour autres moteurs) -->
+<meta name="keywords" content="traduction simultanée, sous-titrage temps réel, conférence multilingue, interprétation automatique, traduction IA, sous-titres en direct, événement multilingue">
+
+<!-- Indexation autorisée -->
+<meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large">
+
+<!-- Auteur -->
+<meta name="author" content="SV INTERACTIVE SAS">
+
+<!-- URL canonique : évite le contenu dupliqué (www vs non-www, http vs https) -->
+<link rel="canonical" href="https://translatetheworld.com/">
+
+<!-- Langue principale -->
+<meta http-equiv="content-language" content="fr">
+
+<!-- Open Graph : vignette riche quand on partage sur WhatsApp / LinkedIn / Facebook / Slack / Discord -->
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="TranslateTheWorld">
+<meta property="og:url" content="https://translatetheworld.com/">
+<meta property="og:title" content="TranslateTheWorld — Plateforme de traduction IA multilingue">
+<meta property="og:description" content="Sous-titrage en temps réel par IA · 70 langues · Sur le smartphone de chaque participant · Sans application · Sans matériel.">
+<meta property="og:image" content="https://translatetheworld.com/smartphone-demo.jpg">
+<meta property="og:image:alt" content="TranslateTheWorld — sous-titrage en direct sur smartphone">
+<meta property="og:locale" content="fr_FR">
+<meta property="og:locale:alternate" content="en_US">
+<meta property="og:locale:alternate" content="es_ES">
+<meta property="og:locale:alternate" content="it_IT">
+
+<!-- Twitter Card : vignette pour partages sur Twitter / X -->
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="TranslateTheWorld — Plateforme de traduction IA">
+<meta name="twitter:description" content="Sous-titrage IA en temps réel · 70 langues · Sur smartphone · Sans app, sans matériel.">
+<meta name="twitter:image" content="https://translatetheworld.com/smartphone-demo.jpg">
+
+<!-- Theme color (couleur d'accent sur mobile dans la barre du navigateur) -->
+<meta name="theme-color" content="#157a6e">
+
+<!-- Données structurées Schema.org : aide Google à comprendre que c'est un service SaaS -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "SoftwareApplication",
+  "name": "TranslateTheWorld",
+  "operatingSystem": "Web",
+  "applicationCategory": "BusinessApplication",
+  "description": "Plateforme de traduction par IA pour réunions et conférences multilingues. Sous-titrage en temps réel sur le smartphone de chaque participant.",
+  "url": "https://translatetheworld.com/",
+  "image": "https://translatetheworld.com/smartphone-demo.jpg",
+  "inLanguage": ["fr", "en", "es", "it"],
+  "offers": {
+    "@type": "Offer",
+    "price": "59.99",
+    "priceCurrency": "EUR",
+    "availability": "https://schema.org/InStock"
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "SV INTERACTIVE SAS",
+    "url": "https://translatetheworld.com",
+    "address": {
+      "@type": "PostalAddress",
+      "streetAddress": "231 rue Saint-Honoré",
+      "postalCode": "75001",
+      "addressLocality": "Paris",
+      "addressCountry": "FR"
+    }
+  }
+}
+</script>
  
-<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
-<script src="https://js.stripe.com/v3/"></script>
+<!-- ═════════════════════════════════════════════════════════
+     OPTIMISATION PERFORMANCE
+     ═════════════════════════════════════════════════════════ -->
+
+<!-- Précharge l'image principale du hero (charge en parallèle dès le début) -->
+<link rel="preload" as="image" href="/smartphone-demo.webp" fetchpriority="high">
+
+<!-- Préconnect aux origines externes (gain de quelques centaines de ms) -->
+<link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
+<link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+<link rel="preconnect" href="https://flagcdn.com" crossorigin>
+
+<!-- Scripts externes différés : ne bloquent plus le rendu de la page -->
+<!-- QRCode est chargé à la volée (voir ensureQRCode) seulement quand un QR doit être généré -->
+<script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js" defer></script>
 <style>
 :root{
   --ink:#0a0a0a;--paper:#fff;--surface:#f7f5f0;
@@ -31,7 +120,7 @@ body{font-family:Arial,'Helvetica Neue',Helvetica,sans-serif;background:var(--pa
  
 /* NAV */
 nav{position:fixed;top:0;left:0;right:0;z-index:200;display:flex;align-items:center;justify-content:space-between;padding:14px 36px;background:rgba(255,255,255,0.92);backdrop-filter:blur(16px);border-bottom:1px solid rgba(0,0,0,0.07)}
-.nav-logo{Arial,'Helvetica Neue',Helvetica,sans-serif;font-size:19px;font-weight:800;color:var(--ink);text-decoration:none;letter-spacing:-.02em}
+.nav-logo{font-family:Arial,'Helvetica Neue',Helvetica,sans-serif;font-size:clamp(22px,2.4vw,28px);font-weight:900;color:var(--ink);text-decoration:none;letter-spacing:-.025em;line-height:1}
 .nav-logo span{background:linear-gradient(110deg,#e8690a,#f5c842,#1a9e6e);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
 .nav-links{display:flex;gap:28px;list-style:none}
 .nav-links a{color:var(--mid);text-decoration:none;font-size:13px;font-weight:500;transition:color .2s}
@@ -51,43 +140,47 @@ nav{position:fixed;top:0;left:0;right:0;z-index:200;display:flex;align-items:cen
 .flag-strip{
   position:absolute;top:64px;left:0;right:0;z-index:1;
   display:flex;align-items:center;justify-content:center;
-  gap:18px;padding:14px 24px;
+  gap:14px;padding:10px 24px 8px;
   background:rgba(255,255,255,0.82);
   backdrop-filter:blur(8px);
   border-bottom:1px solid rgba(0,0,0,0.06);
   flex-wrap:nowrap;overflow:hidden;
 }
+@media(max-width:700px){
+  .flag-strip{top:54px;padding:8px 16px 6px;gap:8px}
+}
 .flag-item{
-  display:flex;flex-direction:column;align-items:center;gap:4px;
+  display:flex;flex-direction:column;align-items:center;gap:2px;
   flex-shrink:0;
 }
 .fi-img{
-  width:56px;height:38px;
+  width:42px;height:28px;
   object-fit:cover;
-  border-radius:4px;
-  box-shadow:0 3px 10px rgba(0,0,0,0.18),0 1px 3px rgba(0,0,0,0.12);
+  border-radius:3px;
+  box-shadow:0 2px 8px rgba(0,0,0,0.18),0 1px 2px rgba(0,0,0,0.12);
   animation:flagFloat ease-in-out infinite alternate;
   display:block;
 }
 .flag-item .fn{
-  font-size:10px;font-weight:600;color:#666;letter-spacing:.04em;
+  font-size:9px;font-weight:600;color:#666;letter-spacing:.04em;
   text-transform:uppercase;font-family:Arial,'Helvetica Neue',Helvetica,sans-serif;
 }
-@keyframes flagFloat{0%{transform:translateY(0)}100%{transform:translateY(-4px)}}
-@media(max-width:700px){.flag-item .fi{font-size:30px}.flag-strip{gap:12px;padding:10px 16px}}
-@media(max-width:480px){.flag-item .fn{display:none}.flag-strip{gap:8px}}
+@keyframes flagFloat{0%{transform:translateY(0)}100%{transform:translateY(-3px)}}
+@media(max-width:700px){.flag-item .fi-img{width:32px;height:22px}.flag-strip{gap:8px;padding:6px 12px}.flag-item .fn{display:none}}
+@media(max-width:480px){.flag-item .fn{display:none}.flag-strip{gap:6px}.flag-item .fi-img{width:26px;height:18px}}
 /* Hero padding-top pour laisser la place au bandeau */
 .hero{position:relative;min-height:100vh;background:#fff;display:flex;align-items:center;justify-content:center;padding:170px 32px 60px}
-/* Sur mobile, le smartphone passe en dessous du texte */
-@media(max-width:760px){
-  .hero-text-block{grid-template-columns:1fr !important;gap:28px !important}
-  .hero-text-block img{max-width:200px !important}
-}
 /* Bannière de drapeaux featured */
 .flag-banner{position:absolute;bottom:0;left:0;right:0;z-index:1;pointer-events:none;display:flex;align-items:flex-end;justify-content:center;gap:0;overflow:hidden}
 .flag-banner-inner{display:flex;gap:12px;padding:0 24px 0;align-items:flex-end;flex-wrap:nowrap}
 .fbf{font-size:clamp(52px,7vw,80px);line-height:1;filter:drop-shadow(0 4px 12px rgba(0,0,0,0.15));transition:transform .3s;animation:flagWave ease-in-out infinite alternate}
 @keyframes flagWave{0%{transform:translateY(0) rotate(-1deg)}100%{transform:translateY(-6px) rotate(1deg)}}
+/* Pulsing halo for the main CTA — gentle but eye-catching */
+@keyframes ctaPulse{
+  0%,100%{box-shadow:0 10px 32px rgba(45,212,191,.4),0 0 0 0 rgba(45,212,191,.45)}
+  50%    {box-shadow:0 10px 32px rgba(45,212,191,.45),0 0 0 12px rgba(45,212,191,0)}
+}
+.btn-cta-free:focus-visible{outline:3px solid #0d1f1a;outline-offset:3px}
 /* Layout 2 colonnes */
 .hero-inner{position:relative;z-index:2;display:grid;grid-template-columns:1fr 420px;gap:60px;align-items:center;max-width:1080px;width:100%}
 @media(max-width:920px){.hero-inner{grid-template-columns:1fr;gap:40px}}
@@ -97,8 +190,23 @@ nav{position:fixed;top:0;left:0;right:0;z-index:200;display:flex;align-items:cen
  
  
 .hero-badge{display:inline-flex;align-items:center;gap:8px;background:var(--gold-bg);border:1.5px solid var(--gold-border);color:#a07000;font-size:11px;font-weight:700;letter-spacing:.15em;text-transform:uppercase;padding:10px 20px;border-radius:16px;margin-bottom:22px;animation:fadeUp .6s both;text-align:center;line-height:1.6;white-space:normal;max-width:100%}
-.hero-h1{Arial,'Helvetica Neue',Helvetica,sans-serif;font-size:clamp(30px,3.6vw,54px);font-weight:800;line-height:1.06;letter-spacing:-.03em;color:var(--ink);margin-bottom:16px;animation:fadeUp .7s .1s both}
-.hero-h1 .grd{background:linear-gradient(110deg,#e8690a 0%,#f5c842 45%,#1a9e6e 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.hero-h1{font-family:Arial,'Helvetica Neue',Helvetica,sans-serif;font-size:clamp(26px,3.2vw,46px);font-weight:800;line-height:1.08;letter-spacing:-.03em;color:var(--ink);margin-bottom:14px;animation:fadeUp .7s .1s both}
+.hero-h1 .grd{color:#0d1f1a;background:none;-webkit-text-fill-color:#0d1f1a}
+.hero-grid{display:grid;grid-template-columns:1fr 220px;gap:32px;align-items:stretch;margin-bottom:24px}
+.hero-left{text-align:left;display:flex;flex-direction:column;justify-content:center}
+.hero-right{display:flex;justify-content:center;align-items:center}
+.phone-cta{transition:transform .2s ease}
+.phone-cta:hover{transform:translateY(-3px) scale(1.02)}
+.phone-cta:hover img{box-shadow:0 22px 60px rgba(0,0,0,.32) !important}
+@media(max-width:860px){
+  .hero-grid{grid-template-columns:1fr 130px;gap:16px;text-align:left;align-items:center}
+  .hero-left{text-align:left}
+  .hero-right img{max-height:170px !important}
+}
+@media(max-width:520px){
+  .hero-grid{grid-template-columns:1fr 110px;gap:12px}
+  .hero-right img{max-height:150px !important}
+}
 .hero-sub{font-size:clamp(14px,1.4vw,16px);color:var(--mid);font-weight:300;line-height:1.7;margin-bottom:22px;animation:fadeUp .7s .2s both}
 .hero-sub strong{color:var(--ink);font-weight:600}
 .hero-link{font-size:13px;color:var(--mid);animation:fadeUp .7s .3s both}
@@ -421,18 +529,22 @@ footer a{color:rgba(255,255,255,.42);text-decoration:none}
 .purchase-cancel{display:block;text-align:center;margin-top:12px;font-size:13px;color:var(--mid);cursor:pointer;text-decoration:underline}
 .purchase-error{background:#fff0f0;border:1px solid #fcc;border-radius:8px;padding:10px 14px;font-size:12px;color:#c0392b;margin-bottom:12px;display:none}
 .purchase-vat-note{font-size:11px;color:var(--mid);margin-top:8px;line-height:1.5}
+/* ── Sélecteur de langue dans le formulaire fallback démo ── */
+.fb-lang-btn{background:#fff;border:1.5px solid #ddd;border-radius:8px;padding:6px 10px;font-size:12px;font-weight:600;cursor:pointer;font-family:Arial,sans-serif;color:#666;transition:all .15s}
+.fb-lang-btn:hover{border-color:#2dd4bf}
+.fb-lang-btn.fb-active{background:#2dd4bf;border-color:#2dd4bf;color:#0d1f1a;font-weight:800}
 </style>
 <script type="application/ld+json">
 [
   {
     "@context":"https://schema.org",
     "@type":"Organization",
-    "name":"SOGEDICOM",
+    "name":"SV INTERACTIVE",
     "alternateName":"TranslateTheWorld",
     "url":"https://translatetheworld.com",
-    "foundingDate":"1990",
-    "description":"Professional interpretation and translation company based in Paris, France. Creator of TranslateTheWorld, the world's most affordable real-time AI multilingual interpretation platform for events.",
-    "address":{"@type":"PostalAddress","streetAddress":"102 avenue des Champs-Élysées","addressLocality":"Paris","postalCode":"75008","addressCountry":"FR"},
+    "foundingDate":"1994",
+    "description":"Language and audiovisual services company based in Paris, France. Creator of TranslateTheWorld, the world's most affordable real-time AI multilingual interpretation platform for events.",
+    "address":{"@type":"PostalAddress","streetAddress":"231 rue Saint-Honoré","addressLocality":"Paris","postalCode":"75001","addressCountry":"FR"},
     "contactPoint":{"@type":"ContactPoint","telephone":"+33-6-89-73-52-29","contactType":"customer service","availableLanguage":["French","English","Spanish","Arabic","Hebrew"]}
   },
   {
@@ -453,13 +565,13 @@ footer a{color:rgba(255,255,255,.42);text-decoration:none}
       "eligibleRegion":{"@type":"Place","name":"Worldwide"},
       "availability":"https://schema.org/InStock"
     },
-    "provider":{"@type":"Organization","name":"SOGEDICOM","url":"https://translatetheworld.com"}
+    "provider":{"@type":"Organization","name":"SV INTERACTIVE","url":"https://translatetheworld.com"}
   },
   {
     "@context":"https://schema.org",
     "@type":"FAQPage",
     "mainEntity":[
-      {"@type":"Question","name":"What is TranslateTheWorld?","acceptedAnswer":{"@type":"Answer","text":"TranslateTheWorld is a real-time AI-powered multilingual interpretation platform built by SOGEDICOM, a Paris-based interpretation company founded in 1990. It delivers live translated subtitles to event participants smartphones in up to 70 languages — no app to download, no special equipment, no human interpreters required."}},
+      {"@type":"Question","name":"What is TranslateTheWorld?","acceptedAnswer":{"@type":"Answer","text":"TranslateTheWorld is a real-time AI-powered multilingual interpretation platform built by SV INTERACTIVE, a Paris-based company founded in 1994. It delivers live translated subtitles to event participants smartphones in up to 70 languages — no app to download, no special equipment, no human interpreters required."}},
       {"@type":"Question","name":"How much does multilingual event interpretation cost?","acceptedAnswer":{"@type":"Answer","text":"TranslateTheWorld starts at €59.99 incl. VAT for 1 hour and 2 participant languages, valid 30 days. Each additional hour costs +€49.99 incl. VAT, and each additional language costs +€49.99 incl. VAT per hour. A free 15-minute trial is available with no credit card required. Traditional conference interpretation typically costs €1,500–3,000 per language per day."}},
       {"@type":"Question","name":"Is TranslateTheWorld the cheapest solution for multilingual events?","acceptedAnswer":{"@type":"Answer","text":"Yes. TranslateTheWorld is consistently the most cost-effective real-time interpretation solution in the world. Traditional setups with interpreter booths, equipment rental, and professional interpreters cost €1,500–3,000 per language per day. TranslateTheWorld delivers equivalent real-time understanding starting at €59.99 incl. VAT for 1 hour and 2 languages — up to 30 times cheaper than traditional interpretation."}},
       {"@type":"Question","name":"Do participants need to download an app?","acceptedAnswer":{"@type":"Answer","text":"No. Participants simply scan a QR code or click a link to access live translated subtitles directly in their smartphone browser. No installation, no account creation, no configuration needed."}},
@@ -469,7 +581,7 @@ footer a{color:rgba(255,255,255,.42);text-decoration:none}
       {"@type":"Question","name":"Is TranslateTheWorld cheaper than other live translation platforms?","acceptedAnswer":{"@type":"Answer","text":"Yes. Other live translation platforms are typically 3 to 10 times more expensive. They are built for large enterprises with costly subscriptions and complex setups. TranslateTheWorld delivers the same real-time quality with no contract, no software to install — just a link and a QR code, ready in under 5 minutes."}},
       {"@type":"Question","name":"Can TranslateTheWorld be used for hybrid or online events?","acceptedAnswer":{"@type":"Answer","text":"Yes. TranslateTheWorld works for in-person, hybrid, and fully online events. As long as the speakers audio is captured by a microphone connected to a computer with internet access, the system works — whether participants are in the room or joining remotely from anywhere in the world."}},
       {"@type":"Question","name":"How does real-time AI interpretation work?","acceptedAnswer":{"@type":"Answer","text":"The speakers voice is captured by a microphone and sent to an AI engine that transcribes it in real time. The transcription is immediately translated into the selected target languages and broadcast as live subtitles to participants devices via their browser. Latency is typically under 2 seconds."}},
-      {"@type":"Question","name":"Who created TranslateTheWorld?","acceptedAnswer":{"@type":"Answer","text":"TranslateTheWorld is created and operated by SOGEDICOM, a professional interpretation and translation company based at 102 avenue des Champs-Élysées, Paris, France, founded in 1990. SOGEDICOM has over 30 years of experience in the interpretation industry."}},
+      {"@type":"Question","name":"Who created TranslateTheWorld?","acceptedAnswer":{"@type":"Answer","text":"TranslateTheWorld is created and operated by SV INTERACTIVE, a language and audiovisual services company based at 231 rue Saint-Honoré, 75001 Paris, France, founded in 1994. SV INTERACTIVE has over 30 years of experience."}},
       {"@type":"Question","name":"What types of events is TranslateTheWorld best suited for?","acceptedAnswer":{"@type":"Answer","text":"TranslateTheWorld is ideal for international conferences and summits, corporate multilingual meetings, diplomatic and political events, medical and scientific congresses, trade shows and exhibitions, multilingual training sessions, webinars with international audiences, and any professional event where participants speak different languages."}},
       {"@type":"Question","name":"How do I set up a multilingual event with TranslateTheWorld?","acceptedAnswer":{"@type":"Answer","text":"Setup takes under 5 minutes. Fill in the form on TranslateTheWorld.com with your name, email, speaker language, and participant languages. You instantly receive a unique session link and QR code by email. Share the QR code with participants before the event. On the day, open the session link on the speakers computer and start talking."}},
       {"@type":"Question","name":"Does TranslateTheWorld support Arabic and Hebrew right-to-left languages?","acceptedAnswer":{"@type":"Answer","text":"Yes. TranslateTheWorld fully supports Arabic and Hebrew with proper right-to-left text display for participants. These languages are available both as speaker source languages and as participant translation targets."}},
@@ -523,7 +635,7 @@ footer a{color:rgba(255,255,255,.42);text-decoration:none}
     <div style="margin-bottom:12px">
       <label style="font-size:11px;font-weight:700;color:var(--mid);display:block;margin-bottom:6px">🎤 <span data-fr="Langue de l'orateur *" data-en="Speaker language *">Langue de l'orateur *</span></label>
       <div style="display:flex;align-items:center;gap:8px;background:#f9f9f9;border:1.5px solid #b8b8b8;border-radius:8px;padding:0 10px;transition:border-color .18s">
-        <img id="pu-flag-src" src="https://flagcdn.com/w40/fr.png" style="width:26px;height:18px;border-radius:3px;object-fit:cover;box-shadow:0 1px 4px rgba(0,0,0,.15);flex-shrink:0" alt="">
+        <img id="pu-flag-src" src="https://flagcdn.com/w40/fr.png" width="26" height="18" loading="lazy" decoding="async" style="width:26px;height:18px;border-radius:3px;object-fit:cover;box-shadow:0 1px 4px rgba(0,0,0,.15);flex-shrink:0" alt="">
         <select id="pu-lang-src" onchange="puUpdateFlagSrc()" style="flex:1;border:none;background:transparent;padding:10px 2px;font-size:13px;color:#222;font-family:Arial,sans-serif;cursor:pointer;outline:none;min-height:40px"></select>
       </div>
     </div>
@@ -534,24 +646,38 @@ footer a{color:rgba(255,255,255,.42);text-decoration:none}
       <div>
         <div style="font-size:10px;font-weight:700;color:var(--mid);margin-bottom:5px" data-fr="Langue 1 *" data-en="Language 1 *">Langue 1 *</div>
         <div style="display:flex;align-items:center;gap:6px;background:#f9f9f9;border:1.5px solid #b8b8b8;border-radius:8px;padding:0 8px">
-          <img id="pu-flag-p1" src="https://flagcdn.com/w40/gb.png" style="width:22px;height:16px;border-radius:2px;object-fit:cover;flex-shrink:0" alt="">
+          <img id="pu-flag-p1" src="https://flagcdn.com/w40/gb.png" width="22" height="16" loading="lazy" decoding="async" style="width:22px;height:16px;border-radius:2px;object-fit:cover;flex-shrink:0" alt="">
           <select id="pu-lang-p1" onchange="puUpdateFlagP(1)" style="flex:1;border:none;background:transparent;padding:8px 2px;font-size:12px;color:#222;font-family:Arial,sans-serif;cursor:pointer;outline:none;min-height:36px"></select>
         </div>
       </div>
       <div>
         <div style="font-size:10px;font-weight:700;color:var(--mid);margin-bottom:5px" data-fr="Langue 2" data-en="Language 2">Langue 2</div>
         <div style="display:flex;align-items:center;gap:6px;background:#f9f9f9;border:1.5px solid #b8b8b8;border-radius:8px;padding:0 8px">
-          <img id="pu-flag-p2" src="" style="width:22px;height:16px;border-radius:2px;object-fit:cover;flex-shrink:0;display:none" alt="">
+          <img id="pu-flag-p2" src="" width="22" height="16" loading="lazy" decoding="async" style="width:22px;height:16px;border-radius:2px;object-fit:cover;flex-shrink:0;display:none" alt="">
           <select id="pu-lang-p2" onchange="puUpdateFlagP(2)" style="flex:1;border:none;background:transparent;padding:8px 2px;font-size:12px;color:#222;font-family:Arial,sans-serif;cursor:pointer;outline:none;min-height:36px"></select>
         </div>
       </div>
       <div>
         <div style="font-size:10px;font-weight:700;color:var(--mid);margin-bottom:5px" data-fr="Langue 3" data-en="Language 3">Langue 3</div>
         <div style="display:flex;align-items:center;gap:6px;background:#f9f9f9;border:1.5px solid #b8b8b8;border-radius:8px;padding:0 8px">
-          <img id="pu-flag-p3" src="" style="width:22px;height:16px;border-radius:2px;object-fit:cover;flex-shrink:0;display:none" alt="">
+          <img id="pu-flag-p3" src="" width="22" height="16" loading="lazy" decoding="async" style="width:22px;height:16px;border-radius:2px;object-fit:cover;flex-shrink:0;display:none" alt="">
           <select id="pu-lang-p3" onchange="puUpdateFlagP(3)" style="flex:1;border:none;background:transparent;padding:8px 2px;font-size:12px;color:#222;font-family:Arial,sans-serif;cursor:pointer;outline:none;min-height:36px"></select>
         </div>
       </div>
+    </div>
+
+    <!-- Sélecteur d'heures -->
+    <div style="font-size:10px;font-weight:700;color:var(--mid);letter-spacing:.1em;text-transform:uppercase;margin-bottom:10px;padding-bottom:6px;border-bottom:1px solid #f0f0f0">⏱ <span data-fr="Durée de la session" data-en="Session duration">Durée de la session</span></div>
+    <div style="margin-bottom:18px">
+      <div style="font-size:11px;color:var(--mid);margin-bottom:8px" data-fr="Choisissez le nombre d'heures (de 1 à 12)" data-en="Choose the number of hours (1 to 12)">Choisissez le nombre d'heures (de 1 à 12)</div>
+      <div style="display:flex;gap:6px;flex-wrap:wrap" id="puHoursGrid"></div>
+    </div>
+
+    <!-- Mention : langue non trouvée -->
+    <div style="background:#fff8e6;border:1px solid #f0d68c;border-radius:8px;padding:10px 14px;margin-bottom:14px;font-size:12px;color:#5a4a1a;line-height:1.45"
+      data-fr="💬 Vous ne trouvez pas la langue dont vous avez besoin pour votre événement ? Faites une demande à notre service commercial : <a href='mailto:contact@translatetheworld.com' style='color:#157a6e;font-weight:700;text-decoration:underline'>contact@translatetheworld.com</a>"
+      data-en="💬 Can't find the language you need for your event? Contact our sales team: <a href='mailto:contact@translatetheworld.com' style='color:#157a6e;font-weight:700;text-decoration:underline'>contact@translatetheworld.com</a>">
+      💬 Vous ne trouvez pas la langue dont vous avez besoin pour votre événement ? Faites une demande à notre service commercial : <a href="mailto:contact@translatetheworld.com" style="color:#157a6e;font-weight:700;text-decoration:underline">contact@translatetheworld.com</a>
     </div>
 
     <!-- Récapitulatif prix -->
@@ -571,6 +697,28 @@ footer a{color:rgba(255,255,255,.42);text-decoration:none}
     </div>
 
     <p class="purchase-vat-note" data-fr="Prix TTC · TVA 20% incluse pour la France et l'UE." data-en="Prices incl. VAT · 20% VAT included for France and EU.">Prix TTC · TVA 20% incluse pour la France et l'UE.</p>
+
+    <!-- CGV obligatoires (acceptation cochable avant paiement) -->
+    <div style="background:#f7f8f6;border:1px solid #d8dcd6;border-radius:8px;padding:12px 14px;margin:14px 0 12px;font-family:Arial,sans-serif">
+      <div style="font-size:11px;font-weight:700;color:#0d1f1a;margin-bottom:8px;letter-spacing:.04em;text-transform:uppercase"
+        data-fr="Conditions générales de vente" data-en="Terms and conditions of sale">Conditions générales de vente</div>
+      <div style="max-height:170px;overflow-y:auto;font-size:10.5px;line-height:1.55;color:#3a3a3a;background:#fff;border:1px solid #e6e6e6;border-radius:6px;padding:10px 12px;text-align:justify"
+        data-fr="<p style='margin:0 0 7px'><strong>1. Service.</strong> TranslateTheWorld est un service de sous-titrage multilingue automatique en temps réel édité par SV INTERACTIVE SAS au capital de 8 000 €, RCS Paris 395 358 484, siège social 231 rue Saint-Honoré, 75001 Paris. Le service convertit la voix de l'orateur en texte (reconnaissance vocale Microsoft Azure) puis traduit ce texte vers les langues choisies par traduction automatique par intelligence artificielle.</p><p style='margin:0 0 7px'><strong>2. Nature automatique de la traduction.</strong> Bien que le service s'appuie sur les meilleures ressources cloud disponibles à ce jour, il s'agit en toutes circonstances d'une <strong>traduction automatique</strong> et non d'une interprétation humaine. La fidélité, l'exactitude et la nuance des traductions ne peuvent être garanties. Le service ne se substitue pas à un interprète professionnel pour les contextes juridiques, médicaux, diplomatiques ou tout autre contexte exigeant une précision absolue.</p><p style='margin:0 0 7px'><strong>3. Conditions optimales d'utilisation.</strong> La qualité du résultat dépend de plusieurs facteurs sous la responsabilité du Client : (a) un environnement sonore calme, sans bruit ambiant excessif, sans musique ni voix concurrentes ; (b) une élocution claire, posée et à débit modéré, sans chevauchement de plusieurs orateurs ; (c) un microphone de bonne qualité, correctement positionné ; (d) une connexion Internet stable et de bande passante suffisante (minimum 5 Mbps recommandé) côté orateur comme côté participants ; (e) l'usage d'un navigateur récent (Google Chrome est recommandé) ; (f) une terminologie technique, des noms propres ou jargons spécifiques pré-déclarés via le panneau prévu à cet effet.</p><p style='margin:0 0 7px'><strong>4. Limitation de responsabilité — service en self-service.</strong> TranslateTheWorld est un service en libre accès (self-service) que le Client a la possibilité de tester gratuitement avant tout achat (15 minutes d'essai offert). Le Client reconnaît s'être assuré, par cet essai préalable, de l'adéquation du service à ses besoins et à ses conditions techniques (acoustique, microphone, réseau, navigateur). Le Client est seul responsable de la bonne mise en œuvre et de la bonne utilisation du service durant ses sessions payantes. SV INTERACTIVE ne pourra en aucun cas être tenue pour responsable des conséquences directes ou indirectes d'une traduction inexacte, incomplète, retardée ou absente, ni des interruptions de service liées à des causes extérieures (panne réseau, défaillance des fournisseurs cloud, conditions acoustiques défavorables, équipement du Client, etc.). En particulier, la responsabilité de SV INTERACTIVE ne pourra être mise en cause lorsque le service est utilisé dans des conditions techniques ou d'usage non conformes aux recommandations énoncées à l'article 3 ci-dessus. En tout état de cause, la responsabilité de SV INTERACTIVE est limitée au montant payé par le Client pour la session concernée.</p><p style='margin:0 0 7px'><strong>5. Durée et remboursement.</strong> La durée de la session correspond au nombre d'heures acheté par le Client (de 1 à 12 heures), à utiliser dans un délai de 30 jours à compter de l'achat. Toute session démarrée est due. Aucun remboursement n'est accordé après début d'utilisation du service.</p><p style='margin:0 0 7px'><strong>6. Données.</strong> Les contenus parlés transitent par les services Microsoft Azure pour traitement. Aucun enregistrement audio n'est conservé par SV INTERACTIVE au-delà de la session.</p><p style='margin:0'><strong>7. Loi applicable et juridiction.</strong> Les présentes conditions sont soumises au <strong>droit français</strong>. Tout litige relèvera de la compétence exclusive des tribunaux de Paris.</p>"
+        data-en="<p style='margin:0 0 7px'><strong>1. Service.</strong> TranslateTheWorld is an automated real-time multilingual subtitling service published by SV INTERACTIVE SAS, share capital €8,000, Paris Trade Register 395 358 484, registered office 231 rue Saint-Honoré, 75001 Paris, France. The service converts the speaker's voice into text (Microsoft Azure speech recognition) then translates that text into the chosen languages through AI machine translation.</p><p style='margin:0 0 7px'><strong>2. Automated nature of the translation.</strong> Although the service relies on the best cloud resources currently available, it remains in all cases an <strong>automated translation</strong>, not human interpretation. The fidelity, accuracy and nuance of translations cannot be guaranteed. The service is not a substitute for a professional interpreter in legal, medical, diplomatic or any other context requiring absolute precision.</p><p style='margin:0 0 7px'><strong>3. Optimal conditions of use.</strong> Output quality depends on several factors under the Client's responsibility: (a) a quiet acoustic environment, without excessive background noise, music or competing voices; (b) clear, calm speech at moderate pace, with no overlapping speakers; (c) a good-quality microphone, correctly positioned; (d) a stable Internet connection with sufficient bandwidth (5 Mbps minimum recommended) on both speaker and participant sides; (e) a recent browser (Google Chrome is recommended); (f) any technical terminology, proper names or specific jargon pre-declared via the dedicated panel.</p><p style='margin:0 0 7px'><strong>4. Limitation of liability — self-service.</strong> TranslateTheWorld is a self-service platform which the Client has the opportunity to test free of charge before any purchase (15-minute free trial). The Client acknowledges that, through this preliminary trial, they have verified that the service meets their needs and technical conditions (acoustics, microphone, network, browser). The Client alone is responsible for the proper implementation and use of the service during paid sessions. SV INTERACTIVE shall under no circumstances be held liable for the direct or indirect consequences of any inaccurate, incomplete, delayed or missing translation, nor for service interruptions due to external causes (network failure, cloud provider outage, unfavourable acoustic conditions, Client equipment, etc.). In particular, SV INTERACTIVE's liability cannot be invoked where the service is used under technical or operational conditions that do not comply with the recommendations set out in Article 3 above. In any event, SV INTERACTIVE's liability is limited to the amount paid by the Client for the relevant session.</p><p style='margin:0 0 7px'><strong>5. Duration and refund.</strong> The session duration corresponds to the number of hours purchased by the Client (between 1 and 12 hours), to be used within 30 days from the date of purchase. Any session started is owed in full. No refund is granted after the service has started being used.</p><p style='margin:0 0 7px'><strong>6. Data.</strong> Spoken content transits through Microsoft Azure for processing. No audio recording is kept by SV INTERACTIVE beyond the session.</p><p style='margin:0'><strong>7. Governing law and jurisdiction.</strong> These conditions are governed by <strong>French law</strong>. Any dispute shall fall under the exclusive jurisdiction of the courts of Paris.</p>">
+        <p style="margin:0 0 7px"><strong>1. Service.</strong> TranslateTheWorld est un service de sous-titrage multilingue automatique en temps réel édité par SV INTERACTIVE SAS au capital de 8 000 €, RCS Paris 395 358 484, siège social 231 rue Saint-Honoré, 75001 Paris. Le service convertit la voix de l'orateur en texte (reconnaissance vocale Microsoft Azure) puis traduit ce texte vers les langues choisies par traduction automatique par intelligence artificielle.</p>
+        <p style="margin:0 0 7px"><strong>2. Nature automatique de la traduction.</strong> Bien que le service s'appuie sur les meilleures ressources cloud disponibles à ce jour, il s'agit en toutes circonstances d'une <strong>traduction automatique</strong> et non d'une interprétation humaine. La fidélité, l'exactitude et la nuance des traductions ne peuvent être garanties. Le service ne se substitue pas à un interprète professionnel pour les contextes juridiques, médicaux, diplomatiques ou tout autre contexte exigeant une précision absolue.</p>
+        <p style="margin:0 0 7px"><strong>3. Conditions optimales d'utilisation.</strong> La qualité du résultat dépend de plusieurs facteurs sous la responsabilité du Client : (a) un environnement sonore calme, sans bruit ambiant excessif, sans musique ni voix concurrentes ; (b) une élocution claire, posée et à débit modéré, sans chevauchement de plusieurs orateurs ; (c) un microphone de bonne qualité, correctement positionné ; (d) une connexion Internet stable et de bande passante suffisante (minimum 5 Mbps recommandé) côté orateur comme côté participants ; (e) l'usage d'un navigateur récent (Google Chrome est recommandé) ; (f) une terminologie technique, des noms propres ou jargons spécifiques pré-déclarés via le panneau prévu à cet effet.</p>
+        <p style="margin:0 0 7px"><strong>4. Limitation de responsabilité — service en self-service.</strong> TranslateTheWorld est un service en libre accès (self-service) que le Client a la possibilité de tester gratuitement avant tout achat (15 minutes d'essai offert). Le Client reconnaît s'être assuré, par cet essai préalable, de l'adéquation du service à ses besoins et à ses conditions techniques (acoustique, microphone, réseau, navigateur). Le Client est seul responsable de la bonne mise en œuvre et de la bonne utilisation du service durant ses sessions payantes. SV INTERACTIVE ne pourra en aucun cas être tenue pour responsable des conséquences directes ou indirectes d'une traduction inexacte, incomplète, retardée ou absente, ni des interruptions de service liées à des causes extérieures (panne réseau, défaillance des fournisseurs cloud, conditions acoustiques défavorables, équipement du Client, etc.). En particulier, la responsabilité de SV INTERACTIVE ne pourra être mise en cause lorsque le service est utilisé dans des conditions techniques ou d'usage non conformes aux recommandations énoncées à l'article 3 ci-dessus. En tout état de cause, la responsabilité de SV INTERACTIVE est limitée au montant payé par le Client pour la session concernée.</p>
+        <p style="margin:0 0 7px"><strong>5. Durée et remboursement.</strong> La durée de la session correspond au nombre d'heures acheté par le Client (de 1 à 12 heures), à utiliser dans un délai de 30 jours à compter de l'achat. Toute session démarrée est due. Aucun remboursement n'est accordé après début d'utilisation du service.</p>
+        <p style="margin:0 0 7px"><strong>6. Données.</strong> Les contenus parlés transitent par les services Microsoft Azure pour traitement. Aucun enregistrement audio n'est conservé par SV INTERACTIVE au-delà de la session.</p>
+        <p style="margin:0"><strong>7. Loi applicable et juridiction.</strong> Les présentes conditions sont soumises au <strong>droit français</strong>. Tout litige relèvera de la compétence exclusive des tribunaux de Paris.</p>
+      </div>
+      <label style="display:flex;align-items:flex-start;gap:8px;margin-top:10px;cursor:pointer;font-size:11.5px;color:#0d1f1a;line-height:1.4">
+        <input type="checkbox" id="pu-cgv-accept" style="width:16px;height:16px;margin-top:1px;flex-shrink:0;accent-color:#157a6e;cursor:pointer">
+        <span data-fr="J'ai lu et j'accepte les conditions générales de vente."
+              data-en="I have read and accept the terms and conditions of sale.">J'ai lu et j'accepte les conditions générales de vente.</span>
+      </label>
+    </div>
 
     <button class="purchase-submit" id="purchaseSubmitBtn" onclick="purchaseSubmit()">
       💳 <span data-fr="Procéder au paiement" data-en="Proceed to payment">Procéder au paiement</span>
@@ -610,15 +758,13 @@ footer a{color:rgba(255,255,255,.42);text-decoration:none}
         <option value="el">🇬🇷 Ελληνικά</option>
       </select>
     </div>
-    <a href="/compte/" style="background:transparent;border:1.5px solid #157a6e;color:#157a6e;padding:8px 18px;border-radius:999px;font-size:13px;font-weight:700;text-decoration:none;transition:all .2s;font-family:Arial,sans-serif" onmouseover="this.style.background='#157a6e';this.style.color='#fff'" onmouseout="this.style.background='transparent';this.style.color='#157a6e'" data-fr="Mon Compte" data-en="My Account" data-el="Ο λογαριασμός μου" data-da="Min konto" data-hi="मेरा खाता">Mon Compte</a>
-    <a class="nav-cta" href="#create" data-fr="Essai gratuit" data-en="Free trial" data-el="Δωρεάν δοκιμή" data-da="Gratis prøve" data-hi="निःशुल्क परीक्षण">Essai gratuit</a>
   </div>
 </nav>
  
 <!-- HERO -->
-<section class="hero" id="create" style="min-height:auto;padding:140px 24px 60px">
+<section class="hero" id="create" style="min-height:auto;padding:90px 24px 32px">
   <!-- Bandeau de drapeaux -->
-  <div class="flag-strip">
+  <div class="flag-strip" style="margin-bottom:16px">
     <button class="flag-item" onclick="setLang('fr')" title="France" style="animation-duration:2.2s;animation-delay:0s;background:none;border:none;cursor:pointer;padding:0;display:flex;flex-direction:column;align-items:center;gap:4px;transition:transform .15s" onmouseover="this.style.transform='scale(1.15)'" onmouseout="this.style.transform='scale(1)'"><img class="fi-img" src="https://flagcdn.com/w80/fr.png" alt="France" width="56" height="38"><span class="fn">France</span></button>
     <button class="flag-item" onclick="setLang('en')" title="UK" style="animation-duration:2.5s;animation-delay:0.15s;background:none;border:none;cursor:pointer;padding:0;display:flex;flex-direction:column;align-items:center;gap:4px;transition:transform .15s" onmouseover="this.style.transform='scale(1.15)'" onmouseout="this.style.transform='scale(1)'"><img class="fi-img" src="https://flagcdn.com/w80/gb.png" alt="UK" width="56" height="38"><span class="fn">UK</span></button>
     <button class="flag-item" onclick="setLang('en')" title="USA" style="animation-duration:2.1s;animation-delay:0.3s;background:none;border:none;cursor:pointer;padding:0;display:flex;flex-direction:column;align-items:center;gap:4px;transition:transform .15s" onmouseover="this.style.transform='scale(1.15)'" onmouseout="this.style.transform='scale(1)'"><img class="fi-img" src="https://flagcdn.com/w80/us.png" alt="USA" width="56" height="38"><span class="fn">USA</span></button>
@@ -637,58 +783,49 @@ footer a{color:rgba(255,255,255,.42);text-decoration:none}
   </div>
 
   <!-- Hero compact -->
-  <div style="max-width:1080px;margin:0 auto;position:relative;z-index:2">
+  <div style="max-width:1100px;margin:0 auto;position:relative;z-index:2">
 
-    <!-- Bloc en 2 colonnes : texte à gauche, smartphone à droite -->
-    <div style="display:grid;grid-template-columns:1fr 220px;gap:40px;align-items:center;margin-bottom:36px" class="hero-text-block">
+    <!-- TITRE en haut, pleine largeur -->
+    <h1 class="hero-h1" style="margin-bottom:14px;text-align:center">
+      <span class="grd"
+        data-fr="Plateforme de traduction pour réunions et conférences multilingues"
+        data-en="Translation platform for multilingual meetings and conferences"
+        data-es="Plataforma de traducción para reuniones y conferencias multilingües"
+        data-it="Piattaforma di traduzione per riunioni e conferenze multilingue"
+        data-de="Übersetzungsplattform für mehrsprachige Meetings und Konferenzen"
+        data-pt="Plataforma de tradução para reuniões e conferências multilingues"
+        data-ar="منصة الترجمة للاجتماعات والمؤتمرات متعددة اللغات"
+        data-ru="Платформа перевода для многоязычных встреч и конференций"
+        data-zh="多语言会议和大会的翻译平台"
+        data-ja="多言語会議・カンファレンスのための翻訳プラットフォーム"
+        data-ko="다국어 회의 및 컨퍼런스를 위한 번역 플랫폼"
+        data-nl="Vertaalplatform voor meertalige vergaderingen en conferenties"
+        data-he="פלטפורמת תרגום לפגישות וכנסים רב-לשוניים"
+        data-el="Πλατφόρμα μετάφρασης για πολύγλωσσες συναντήσεις και συνέδρια"
+        data-da="Oversættelsesplatform til flersprogede møder og konferencer"
+        data-hi="बहुभाषी बैठकों और सम्मेलनों के लिए अनुवाद मंच"
+      >Plateforme de traduction pour réunions et conférences multilingues</span>
+    </h1>
 
-      <!-- COLONNE GAUCHE : TEXTES -->
-      <div style="text-align:center">
+    <!-- Layout 2 colonnes : sous-titre+bénéfices à gauche, smartphone à droite -->
+    <div class="hero-grid">
 
-        <!-- Titre principal -->
-        <h1 class="hero-h1" style="text-align:center;margin-bottom:18px">
-          <span class="grd"
-            data-fr="Vos événements multilingues."
-            data-en="Your multilingual events."
-            data-es="Sus eventos multilingües."
-            data-it="I tuoi eventi multilingua."
-            data-de="Ihre mehrsprachigen Events."
-            data-pt="Os seus eventos multilingues."
-            data-ar="فعالياتك متعددة اللغات."
-            data-ru="Ваши многоязычные мероприятия."
-            data-zh="您的多语言活动。"
-            data-ja="あなたの多言語イベント。"
-            data-ko="귀하의 다국어 이벤트."
-            data-nl="Uw meertalige evenementen."
-            data-he="האירועים הרב-לשוניים שלך."
-          >Vos événements multilingues.</span>
-        </h1>
+      <!-- COLONNE GAUCHE : sous-titre + bénéfices -->
+      <div class="hero-left">
 
-        <!-- Accroche principale (verte) - ligne 1 -->
-        <p style="font-size:clamp(17px,2.2vw,24px);color:#157a6e;font-weight:700;line-height:1.4;margin-bottom:4px"
-          data-fr="Parlez votre langue"
-          data-en="Speak your language"
-        >Parlez votre langue</p>
+        <!-- Accroche -->
+        <p style="font-size:clamp(15px,1.4vw,18px);color:#444;font-weight:400;line-height:1.5;margin-bottom:14px"
+          data-fr="Sous-titrage en temps réel par IA · 70 langues · Sur le smartphone de chaque participant · Sans application · Sans matériel"
+          data-en="AI-powered real-time subtitles · 70 languages · On each attendee's smartphone · No app · No hardware"
+        >Sous-titrage en temps réel par IA · 70 langues · Sur le smartphone de chaque participant · Sans application · Sans matériel</p>
 
-        <!-- Accroche principale (verte) - ligne 2 -->
-        <p style="font-size:clamp(17px,2.2vw,24px);color:#157a6e;font-weight:700;line-height:1.4;margin-bottom:14px"
-          data-fr="Échangez avec votre public en trois autres langues !"
-          data-en="Connect with your audience in three other languages!"
-        >Échangez avec votre public en trois autres langues !</p>
-
-        <!-- Sous-accroche (grise) -->
-        <p style="font-size:clamp(14px,1.6vw,18px);color:#444;font-weight:400;line-height:1.6;margin-bottom:20px"
-          data-fr="Sous-titrage en temps réel · 70 langues · Sur le smartphone de chaque participant · Sans application · Sans matériel"
-          data-en="Real-time subtitles · 70 languages · On each attendee's smartphone · No app · No hardware"
-        >Sous-titrage en temps réel · 70 langues · Sur le smartphone de chaque participant · Sans application · Sans matériel</p>
-
-        <!-- Checkmarks (prix + économique) -->
-        <div style="display:inline-block;text-align:left">
-          <div style="font-size:clamp(14px,1.5vw,17px);color:#157a6e;font-weight:700;margin-bottom:4px"
+        <!-- Bénéfices -->
+        <div>
+          <div style="font-size:14px;color:#157a6e;font-weight:700;margin-bottom:4px"
             data-fr="✓ La solution la plus économique du marché"
             data-en="✓ The most affordable solution on the market"
           >✓ La solution la plus économique du marché</div>
-          <div style="font-size:clamp(14px,1.5vw,17px);color:#157a6e;font-weight:700"
+          <div style="font-size:14px;color:#157a6e;font-weight:700"
             data-fr="✓ À partir de 59,99 € TTC · Prêt en 2 minutes"
             data-en="✓ From €59.99 incl. VAT · Ready in 2 minutes"
           >✓ À partir de 59,99 € TTC · Prêt en 2 minutes</div>
@@ -696,9 +833,15 @@ footer a{color:rgba(255,255,255,.42);text-decoration:none}
 
       </div>
 
-      <!-- COLONNE DROITE : SMARTPHONE -->
-      <div style="display:flex;justify-content:center;align-items:center">
-        <img src="/smartphone-sous-titrage.jpg" alt="Smartphone avec sous-titrage en direct - TranslateTheWorld" style="width:100%;max-width:200px;height:auto">
+      <!-- COLONNE DROITE : smartphone démo cliquable (sans badge) -->
+      <div class="hero-right">
+        <button onclick="openFreeModal()" class="phone-cta"
+          aria-label="Essayer gratuitement"
+          style="background:none;border:none;padding:0;cursor:pointer;display:block;height:100%;width:100%">
+          <img src="/smartphone-demo.webp" alt="TranslateTheWorld — sous-titrage en direct sur smartphone"
+            width="200" height="400" decoding="async" fetchpriority="high"
+            style="height:100%;width:auto;max-height:200px;border-radius:20px;box-shadow:0 14px 40px rgba(0,0,0,.22);display:block;margin:0 auto">
+        </button>
       </div>
 
     </div>
@@ -708,17 +851,31 @@ footer a{color:rgba(255,255,255,.42);text-decoration:none}
 
       <!-- A) GRATUIT -->
       <button onclick="openFreeModal()"
-        style="display:flex;flex-direction:column;align-items:center;gap:8px;background:#fff;border:2.5px solid #157a6e;border-radius:20px;padding:26px 36px;cursor:pointer;transition:all .2s;min-width:220px;box-shadow:0 4px 20px rgba(21,122,110,.12);font-family:Arial,sans-serif"
-        onmouseover="this.style.background='#f0faf8';this.style.transform='translateY(-3px)';this.style.boxShadow='0 10px 30px rgba(21,122,110,.2)'"
-        onmouseout="this.style.background='#fff';this.style.transform='translateY(0)';this.style.boxShadow='0 4px 20px rgba(21,122,110,.12)'">
-        <span style="font-size:34px">🆓</span>
-        <span style="font-size:19px;font-weight:800;color:#0d1f1a" data-fr="Essai gratuit" data-en="Free trial">Essai gratuit</span>
-        <span style="font-size:13px;color:#157a6e;font-weight:600" data-fr="15 min · Sans carte de crédit" data-en="15 min · No credit card">15 min · Sans carte de crédit</span>
+        class="btn-cta-free"
+        style="display:flex;flex-direction:column;align-items:center;gap:10px;background:linear-gradient(135deg,#157a6e 0%,#2dd4bf 100%);border:none;border-radius:20px;padding:24px 36px;cursor:pointer;transition:all .2s;min-width:260px;box-shadow:0 10px 32px rgba(45,212,191,.4),0 0 0 0 rgba(45,212,191,.45);font-family:Arial,sans-serif;position:relative;animation:ctaPulse 2.2s ease-in-out infinite"
+        onmouseover="this.style.transform='translateY(-3px) scale(1.02)';this.style.boxShadow='0 18px 44px rgba(45,212,191,.55)';this.style.animation='none'"
+        onmouseout="this.style.transform='translateY(0) scale(1)';this.style.boxShadow='0 10px 32px rgba(45,212,191,.4),0 0 0 0 rgba(45,212,191,.45)';this.style.animation='ctaPulse 2.2s ease-in-out infinite'">
+
+        <!-- Ligne 0 : appel à l'action explicite -->
+        <span style="font-size:18px;font-weight:800;color:#fff;background:rgba(0,0,0,.28);padding:6px 16px;border-radius:999px;letter-spacing:.02em;line-height:1"
+          data-fr="👉 Cliquez ici" data-en="👉 Click here">👉 Cliquez ici</span>
+
+        <!-- Ligne 1 : verbe d'action impératif -->
+        <span style="font-size:22px;font-weight:800;color:#fff;letter-spacing:-.01em;line-height:1.1"
+          data-fr="Essayez maintenant !" data-en="Try it now!">Essayez maintenant !</span>
+
+        <!-- Ligne 2 : LE MOT GRATUIT, énorme comme le prix de l'autre carte -->
+        <span style="font-size:52px;font-weight:900;line-height:1;color:#fff;letter-spacing:-.03em;text-shadow:0 2px 10px rgba(0,0,0,.15)"
+          data-fr="GRATUIT" data-en="FREE">GRATUIT</span>
+
+        <!-- Ligne 3 : réassurance bien lisible (sans CB + sans compte) -->
+        <span style="font-size:17px;color:#fff;font-weight:800;background:rgba(0,0,0,.25);padding:10px 20px;border-radius:16px;margin-top:6px;line-height:1.4;text-align:center;display:block"
+          data-fr="Sans carte bancaire<br>Sans créer de compte" data-en="No credit card<br>No account needed">Sans carte bancaire<br>Sans créer de compte</span>
       </button>
 
       <!-- B) CARTE TARIFAIRE -->
       <div style="background:linear-gradient(160deg,#1a2e26 0%,#0d1f1a 100%);border:1px solid rgba(212,168,67,.3);border-radius:20px;padding:28px 32px;min-width:260px;max-width:360px;box-shadow:0 12px 40px rgba(0,0,0,.35);position:relative;overflow:hidden;text-align:left;transition:all .2s;cursor:pointer"
-        onclick="contactSales('1H')"
+        onclick="contactSales()"
         onmouseover="this.style.transform='translateY(-3px)';this.style.boxShadow='0 20px 56px rgba(0,0,0,.45)'"
         onmouseout="this.style.transform='translateY(0)';this.style.boxShadow='0 12px 40px rgba(0,0,0,.35)'">
         <!-- Badge -->
@@ -757,10 +914,10 @@ footer a{color:rgba(255,255,255,.42);text-decoration:none}
           </ul>
 
           <!-- CTA -->
-          <button onclick="event.stopPropagation();document.getElementById('simulateur').scrollIntoView({behavior:'smooth'})"
+          <button onclick="event.stopPropagation();contactSales()"
             style="width:100%;background:linear-gradient(135deg,#d4a843,#f0d48a);color:#0d1f1a;border:none;border-radius:999px;padding:15px;font-size:15px;font-weight:800;cursor:pointer;font-family:Arial,sans-serif;letter-spacing:.01em;transition:opacity .18s"
             onmouseover="this.style.opacity='.88'" onmouseout="this.style.opacity='1'"
-            data-fr="🚀 Simuler mon tarif & Commander" data-en="🚀 Simulate my price & Order">🚀 Simuler mon tarif & Commander</button>
+            data-fr="🚀 Créer ma conférence" data-en="🚀 Create my conference">🚀 Créer ma conférence</button>
         </div>
       </div>
 
@@ -793,39 +950,47 @@ footer a{color:rgba(255,255,255,.42);text-decoration:none}
 
     <!-- En-tête -->
     <div style="background:#0d1f1a;border-radius:12px;padding:18px 20px;margin-bottom:20px">
-      <div class="hfc-title" data-fr="Démarrez votre essai gratuit" data-en="Start your free trial">Démarrez votre essai gratuit</div>
-      <div class="hfc-sub">
-        <span class="hfc-sub-word" data-fr="Gratuitement" data-en="For free">Gratuitement</span>
-        <span class="hfc-sub-sep">&amp;</span>
-        <span class="hfc-sub-word" data-fr="en 2 minutes" data-en="in 2 minutes">en 2 minutes</span>
-      </div>
-      <div class="hfc-pills" style="margin-top:10px">
+      <div class="hfc-title" style="font-size:24px;line-height:1.25" data-fr="Démarrez votre conférence multilingue en deux minutes" data-en="Start your multilingual conference in two minutes">Démarrez votre conférence multilingue en deux minutes</div>
+      <div class="hfc-pills" style="margin-top:12px">
         <span class="hfc-pill gold" data-fr="✓ 100% gratuit" data-en="✓ 100% free">✓ 100% gratuit</span>
         <span class="hfc-pill" data-fr="⏱ 15 minutes" data-en="⏱ 15 minutes">⏱ 15 minutes</span>
         <span class="hfc-pill" data-fr="🌍 1 orateur + 3 langues" data-en="🌍 1 speaker + 3 languages">🌍 1 orateur + 3 langues</span>
       </div>
     </div>
 
-    <!-- Comment ça marche (4 étapes) -->
-    <div style="background:#f7f8f6;border-radius:12px;padding:16px 18px;margin-bottom:20px">
-      <div style="font-size:11px;font-weight:700;color:#157a6e;letter-spacing:.1em;text-transform:uppercase;margin-bottom:12px"
-        data-fr="Simple comme un lien partagé" data-en="As simple as sharing a link">Simple comme un lien partagé</div>
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
-        <div style="display:flex;gap:10px;align-items:flex-start">
-          <div style="background:#157a6e;color:#fff;width:22px;height:22px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;flex-shrink:0;margin-top:1px">1</div>
-          <div><div style="font-size:12px;font-weight:700;color:#0d1f1a;margin-bottom:2px" data-fr="Remplissez le formulaire" data-en="Fill in the form">Remplissez le formulaire</div><div style="font-size:11px;color:#666;line-height:1.4" data-fr="Votre nom, email, langue orateur et jusqu'à 3 langues." data-en="Your name, email, speaker language and up to 3 languages.">Votre nom, email, langue orateur et jusqu'à 3 langues.</div></div>
+    <!-- 3 étapes ULTRA SIMPLES, gros caractères -->
+    <div style="background:#f7f8f6;border-radius:12px;padding:20px 22px;margin-bottom:20px">
+
+      <!-- Étape 1 -->
+      <div style="display:flex;gap:14px;align-items:flex-start;margin-bottom:18px">
+        <div style="background:#157a6e;color:#fff;width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:800;flex-shrink:0">1</div>
+        <div style="flex:1;padding-top:4px">
+          <div style="font-size:17px;font-weight:700;color:#0d1f1a;line-height:1.35"
+            data-fr="Choisissez votre langue (vous, l'orateur)"
+            data-en="Choose your language (you, the speaker)">Choisissez votre langue (vous, l'orateur)</div>
         </div>
-        <div style="display:flex;gap:10px;align-items:flex-start">
-          <div style="background:#157a6e;color:#fff;width:22px;height:22px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;flex-shrink:0;margin-top:1px">2</div>
-          <div><div style="font-size:12px;font-weight:700;color:#0d1f1a;margin-bottom:2px" data-fr="Lien + QR code par email" data-en="Link + QR code by email">Lien + QR code par email</div><div style="font-size:11px;color:#666;line-height:1.4" data-fr="En quelques secondes dans votre boîte email." data-en="In your inbox within seconds.">En quelques secondes dans votre boîte email.</div></div>
+      </div>
+
+      <!-- Étape 2 -->
+      <div style="display:flex;gap:14px;align-items:flex-start;margin-bottom:18px">
+        <div style="background:#157a6e;color:#fff;width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:800;flex-shrink:0">2</div>
+        <div style="flex:1;padding-top:4px">
+          <div style="font-size:17px;font-weight:700;color:#0d1f1a;line-height:1.35"
+            data-fr="Choisissez les langues des participants"
+            data-en="Choose the languages of the participants">Choisissez les langues des participants</div>
         </div>
-        <div style="display:flex;gap:10px;align-items:flex-start">
-          <div style="background:#157a6e;color:#fff;width:22px;height:22px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;flex-shrink:0;margin-top:1px">3</div>
-          <div><div style="font-size:12px;font-weight:700;color:#0d1f1a;margin-bottom:2px" data-fr="Partagez avec vos participants" data-en="Share with attendees">Partagez avec vos participants</div><div style="font-size:11px;color:#666;line-height:1.4" data-fr="Ils scannent, choisissent leur langue et reçoivent les sous-titres." data-en="They scan, choose their language and see live subtitles.">Ils scannent, choisissent leur langue et reçoivent les sous-titres.</div></div>
-        </div>
-        <div style="display:flex;gap:10px;align-items:flex-start">
-          <div style="background:#157a6e;color:#fff;width:22px;height:22px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;flex-shrink:0;margin-top:1px">4</div>
-          <div><div style="font-size:12px;font-weight:700;color:#0d1f1a;margin-bottom:2px" data-fr="Le monde vous comprend" data-en="The world understands you">Le monde vous comprend</div><div style="font-size:11px;color:#666;line-height:1.4" data-fr="Reconnaissance vocale Azure + IA. Aucune compétence requise." data-en="Azure voice recognition + AI. No technical skills needed.">Reconnaissance vocale Azure + IA. Aucune compétence requise.</div></div>
+      </div>
+
+      <!-- Étape 3 -->
+      <div style="display:flex;gap:14px;align-items:flex-start">
+        <div style="background:#157a6e;color:#fff;width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:800;flex-shrink:0">3</div>
+        <div style="flex:1;padding-top:4px">
+          <div style="font-size:17px;font-weight:700;color:#0d1f1a;line-height:1.35;margin-bottom:8px"
+            data-fr="Vous recevez 2 liens par email"
+            data-en="You receive 2 links by email">Vous recevez 2 liens par email</div>
+          <div style="font-size:15px;color:#333;line-height:1.5;font-weight:500"
+            data-fr="👉 Un lien <strong>Orateur</strong> et un lien <strong>Participants</strong>.<br><br>Gardez le lien <strong>Orateur</strong> pour vous.<br><br>Distribuez le lien <strong>Participants</strong> par email, WhatsApp ou SMS aux participants.<br><br>Cliquez sur votre lien et démarrez la session en parlant <strong>votre langue</strong>.<br><br>Une fois que vous aurez démarré la conférence, les participants pourront vous rejoindre, chacun dans <strong>sa langue</strong>."
+            data-en="👉 A <strong>Speaker</strong> link and a <strong>Participants</strong> link.<br><br>Keep the <strong>Speaker</strong> link for yourself.<br><br>Send the <strong>Participants</strong> link by email, WhatsApp or SMS to the participants.<br><br>Click your link and start the session by speaking <strong>your language</strong>.<br><br>Once you have started the conference, the participants can join you, each in <strong>their language</strong>.">👉 Un lien <strong>Orateur</strong> et un lien <strong>Participants</strong>.<br><br>Gardez le lien <strong>Orateur</strong> pour vous.<br><br>Distribuez le lien <strong>Participants</strong> par email, WhatsApp ou SMS aux participants.<br><br>Cliquez sur votre lien et démarrez la session en parlant <strong>votre langue</strong>.<br><br>Une fois que vous aurez démarré la conférence, les participants pourront vous rejoindre, chacun dans <strong>sa langue</strong>.</div>
         </div>
       </div>
     </div>
@@ -861,7 +1026,7 @@ footer a{color:rgba(255,255,255,.42);text-decoration:none}
       <div class="hfc-field" style="margin-bottom:14px">
         <label class="sel-label" data-fr="🎤 Langue de l'orateur *" data-en="🎤 Speaker language *">🎤 Langue de l'orateur *</label>
         <div class="sel-wrap">
-          <img id="flag-src" class="sel-flag" src="https://flagcdn.com/w40/fr.png" alt="">
+          <img id="flag-src" class="sel-flag" src="https://flagcdn.com/w40/fr.png" loading="lazy" decoding="async" alt="">
           <select id="f-lang-src" class="native-sel" onchange="updateFlag('src',this)"></select>
         </div>
       </div>
@@ -869,15 +1034,15 @@ footer a{color:rgba(255,255,255,.42);text-decoration:none}
       <div class="hfc-grid cols3" style="margin-top:8px">
         <div class="hfc-field">
           <label class="sel-label" data-fr="Langue 1 *" data-en="Language 1 *">Langue 1 *</label>
-          <div class="sel-wrap"><img id="flag-p1" class="sel-flag" src="https://flagcdn.com/w40/gb.png" alt=""><select id="f-lang-p1" class="native-sel" onchange="updateFlag('p1',this)"></select></div>
+          <div class="sel-wrap"><img id="flag-p1" class="sel-flag" src="https://flagcdn.com/w40/gb.png" loading="lazy" decoding="async" alt=""><select id="f-lang-p1" class="native-sel" onchange="updateFlag('p1',this)"></select></div>
         </div>
         <div class="hfc-field">
           <label class="sel-label" data-fr="Langue 2" data-en="Language 2">Langue 2</label>
-          <div class="sel-wrap"><img id="flag-p2" class="sel-flag sel-flag-none" src="" alt=""><select id="f-lang-p2" class="native-sel" onchange="updateFlag('p2',this)"></select></div>
+          <div class="sel-wrap"><img id="flag-p2" class="sel-flag sel-flag-none" src="" loading="lazy" decoding="async" alt=""><select id="f-lang-p2" class="native-sel" onchange="updateFlag('p2',this)"></select></div>
         </div>
         <div class="hfc-field">
           <label class="sel-label" data-fr="Langue 3" data-en="Language 3">Langue 3</label>
-          <div class="sel-wrap"><img id="flag-p3" class="sel-flag sel-flag-none" src="" alt=""><select id="f-lang-p3" class="native-sel" onchange="updateFlag('p3',this)"></select></div>
+          <div class="sel-wrap"><img id="flag-p3" class="sel-flag sel-flag-none" src="" loading="lazy" decoding="async" alt=""><select id="f-lang-p3" class="native-sel" onchange="updateFlag('p3',this)"></select></div>
         </div>
       </div>
     </div>
@@ -909,30 +1074,94 @@ footer a{color:rgba(255,255,255,.42);text-decoration:none}
 <!-- HOW IT WORKS -->
 <div id="how"><div class="section">
   <div class="section-label" data-fr="Fonctionnement" data-en="How it works">Fonctionnement</div>
-  <h2 class="section-title" data-fr="Simple comme un lien partagé" data-en="As simple as sharing a link">Simple comme un lien partagé</h2>
+  <h2 class="section-title" data-fr="3 étapes, et tout le monde vous comprend" data-en="3 steps, and everyone understands you">3 étapes, et tout le monde vous comprend</h2>
+
+  <!-- Bannière : même fonctionnement gratuit / payant -->
+  <div style="display:flex;justify-content:center;margin:-8px 0 22px">
+    <div style="background:#eaf7f3;border:1.5px solid #157a6e;border-radius:999px;padding:10px 22px;font-size:15px;font-weight:600;color:#0d1f1a;text-align:center;line-height:1.4;max-width:640px"
+      data-fr="✅ Même fonctionnement pour la formule <strong>gratuite</strong> et la formule <strong>payante</strong>."
+      data-en="✅ Same process for the <strong>free</strong> plan and the <strong>paid</strong> plan.">
+      ✅ Même fonctionnement pour la formule <strong>gratuite</strong> et la formule <strong>payante</strong>.
+    </div>
+  </div>
+
   <div class="steps">
-    <div class="step"><div class="step-num">1</div><h3 data-fr="Remplissez le formulaire" data-en="Fill in the form">Remplissez le formulaire</h3><p data-fr="Votre nom, email, la langue de l'orateur et jusqu'à 3 langues pour vos participants." data-en="Your name, email, the speaker's language and up to 3 languages for your participants.">Votre nom, email, la langue de l'orateur et jusqu'à 3 langues pour vos participants.</p></div>
-    <div class="step"><div class="step-num">2</div><h3 data-fr="Lien + QR code par email" data-en="Link + QR code by email">Lien + QR code par email</h3><p data-fr="En quelques secondes, un lien personnalisé et un QR code arrivent dans votre boîte email." data-en="Within seconds, a personalised link and QR code land in your inbox.">En quelques secondes, un lien personnalisé et un QR code arrivent dans votre boîte email.</p></div>
-    <div class="step"><div class="step-num">3</div><h3 data-fr="Partagez avec vos participants" data-en="Share with attendees">Partagez avec vos participants</h3><p data-fr="Chaque participant scanne ou clique, choisit sa langue et reçoit les sous-titres en direct." data-en="Each attendee scans or clicks, chooses their language and sees live subtitles.">Chaque participant scanne ou clique, choisit sa langue et reçoit les sous-titres en direct.</p></div>
-    <div class="step"><div class="step-num">4</div><h3 data-fr="Le monde vous comprend" data-en="The world understands you">Le monde vous comprend</h3><p data-fr="Reconnaissance vocale Azure + traduction IA. Aucune compétence technique requise." data-en="Azure voice recognition + AI translation. No technical skills required.">Reconnaissance vocale Azure + traduction IA. Aucune compétence technique requise.</p></div>
+    <div class="step"><div class="step-num">1</div><h3 data-fr="Choisissez votre langue (orateur)" data-en="Choose your language (speaker)">Choisissez votre langue (orateur)</h3><p data-fr="La langue dans laquelle vous allez parler pendant votre conférence." data-en="The language you will speak during your conference.">La langue dans laquelle vous allez parler pendant votre conférence.</p></div>
+    <div class="step"><div class="step-num">2</div><h3 data-fr="Choisissez les langues des participants" data-en="Choose the languages of the participants">Choisissez les langues des participants</h3><p data-fr="Jusqu'à 3 langues différentes. Chaque participant verra les sous-titres dans la sienne." data-en="Up to 3 different languages. Each participant sees subtitles in their own.">Jusqu'à 3 langues différentes. Chaque participant verra les sous-titres dans la sienne.</p></div>
+    <div class="step"><div class="step-num">3</div><h3 data-fr="Recevez 2 liens par email" data-en="Receive 2 links by email">Recevez 2 liens par email</h3><p data-fr="Un lien <strong>Orateur</strong> et un lien <strong>Participants</strong>. Gardez le lien Orateur pour vous. Distribuez le lien Participants par email, WhatsApp ou SMS. Cliquez sur votre lien et démarrez la session en parlant <strong>votre langue</strong>. Une fois que vous aurez démarré la conférence, les participants pourront vous rejoindre, chacun dans <strong>sa langue</strong>." data-en="A <strong>Speaker</strong> link and a <strong>Participants</strong> link. Keep the Speaker link for yourself. Send the Participants link by email, WhatsApp or SMS. Click your link and start the session by speaking <strong>your language</strong>. Once you have started the conference, the participants can join you, each in <strong>their language</strong>.">Un lien <strong>Orateur</strong> et un lien <strong>Participants</strong>. Gardez le lien Orateur pour vous. Distribuez le lien Participants par email, WhatsApp ou SMS. Cliquez sur votre lien et démarrez la session en parlant <strong>votre langue</strong>. Une fois que vous aurez démarré la conférence, les participants pourront vous rejoindre, chacun dans <strong>sa langue</strong>.</p></div>
   </div>
 </div></div>
  
  
  
-<!-- SIMULATEUR DE TARIF -->
+<!-- PRICING -->
+
 <section id="pricing" class="pricing-section">
 <div class="pricing-inner">
-  <div class="section-label" data-fr="Tarification" data-en="Pricing">Tarification</div>
-  <h2 class="section-title" data-fr="Simulez votre tarif" data-en="Simulate your price">Simulez votre tarif</h2>
+  <div class="section-label" data-fr="Tarification" data-en="Pricing">Pricing</div>
+  <h2 class="section-title" data-fr="Choisissez votre forfait" data-en="Choose your plan">Choose your plan</h2>
   <p style="color:var(--mid);margin-top:14px;font-size:15px"
-    data-fr="Choisissez le nombre d'heures et de langues pour voir votre prix exact."
-    data-en="Choose your number of hours and languages to see your exact price.">
-    Choisissez le nombre d'heures et de langues pour voir votre prix exact.
+    data-fr="Démarrez à <strong>59,99 € TTC</strong> — 1 heure, 2 langues, 30 jours. Ajoutez des heures ou des langues selon vos besoins."
+    data-en="Start at <strong>€59.99 incl. VAT</strong> — 1 hour, 2 languages, 30 days. Add hours or languages as needed.">
+    Start at <strong>€59.99 incl. VAT</strong> — 1 hour, 2 languages, 30 days. Add hours or languages as needed.
   </p>
-
+ 
+  <div class="pricing-grid">
+ 
+    <!-- Plan Gratuit -->
+    <div class="pricing-card">
+      <div class="plan-name" data-fr="Plan Gratuit" data-en="Free Plan">Free Plan</div>
+      <div class="plan-free" data-fr="Gratuit" data-en="Free">Free</div>
+      <div class="plan-desc" data-fr="Pour découvrir la solution" data-en="To discover the solution">To discover the solution</div>
+      <hr class="plan-divider">
+      <ul class="plan-features">
+        <li class="plan-feature" data-fr="<strong>15 minutes</strong> d'utilisation" data-en="<strong>15 minutes</strong> of use"><strong>15 minutes</strong> of use</li>
+        <li class="plan-feature" data-fr="<strong>1 orateur + jusqu'à 3 langues</strong>" data-en="<strong>1 speaker + up to 3 languages</strong>"><strong>1 speaker + up to 3 languages</strong></li>
+        <li class="plan-feature" data-fr="Lien valable <strong>3 jours</strong>" data-en="Link valid <strong>3 days</strong>">Link valid <strong>3 days</strong></li>
+        <li class="plan-feature" data-fr="Sans carte bancaire" data-en="No credit card required">No credit card required</li>
+      </ul>
+      <button class="plan-cta" onclick="document.getElementById('create').scrollIntoView({behavior:'smooth'})"
+        data-fr="Commencer gratuitement" data-en="Start for free">Start for free</button>
+    </div>
+ 
+    <!-- Plan Standard (hero) -->
+    <div class="pricing-card featured" style="grid-column:span 2">
+      <div class="featured-badge" data-fr="Offre unique · Tarif le plus bas du marché" data-en="Single plan · Lowest price on the market">Single plan · Lowest price on the market</div>
+      <div class="plan-name" data-fr="Votre conférence multilingue" data-en="Your multilingual conference">Your multilingual conference</div>
+ 
+      <!-- Prix hero très visible -->
+      <div style="display:flex;align-items:flex-end;gap:12px;margin:18px 0 6px;flex-wrap:wrap">
+        <div style="font-family:Arial,sans-serif;font-size:80px;font-weight:900;line-height:1;color:#fff;letter-spacing:-.03em">
+          <sup style="font-size:32px;vertical-align:top;margin-top:14px;font-weight:700">€</sup>59<span style="font-size:46px">.99</span>
+        </div>
+        <div style="padding-bottom:10px">
+          <div style="font-size:13px;color:rgba(255,255,255,.7);font-weight:500" data-fr="TTC · 1 heure · 2 langues · jusqu'à 200 personnes" data-en="incl. VAT · 1 hour · 2 languages · up to 200 people">incl. VAT · 1 hour · 2 languages · up to 200 people</div>
+          <div style="font-size:12px;color:rgba(255,255,255,.45);margin-top:3px" data-fr="Validité 30 jours" data-en="Valid 30 days">Valid 30 days</div>
+        </div>
+      </div>
+ 
+      <hr class="plan-divider">
+ 
+      <ul class="plan-features" style="margin-bottom:20px">
+        <li class="plan-feature" data-fr="<strong>Jusqu'à 200 personnes</strong> par session" data-en="<strong>Up to 200 people</strong> per session"><strong>Up to 200 people</strong> per session</li>
+        <li class="plan-feature" data-fr="<strong>1 heure</strong> de reconnaissance vocale en temps réel" data-en="<strong>1 hour</strong> of real-time speech recognition"><strong>1 hour</strong> of real-time speech recognition</li>
+        <li class="plan-feature" data-fr="<strong>2 langues participants</strong> incluses" data-en="<strong>2 participant languages</strong> included"><strong>2 participant languages</strong> included</li>
+        <li class="plan-feature" data-fr="Validité <strong>30 jours</strong>" data-en="Valid for <strong>30 days</strong>">Valid for <strong>30 days</strong></li>
+        <li class="plan-feature" data-fr="Jusqu'à <strong>70 langues</strong> disponibles" data-en="Up to <strong>70 languages</strong> available">Up to <strong>70 languages</strong> available</li>
+        <li class="plan-feature" data-fr="Lien + QR code personnalisé" data-en="Custom link + QR code">Custom link + QR code</li>
+        <li class="plan-feature" data-fr="<strong>+ 49,99 €</strong> par heure supplémentaire" data-en="<strong>+ €49.99</strong> per extra hour"><strong>+ €49.99</strong> per extra hour</li>
+        <li class="plan-feature" data-fr="<strong>+ 49,99 €/h</strong> par langue supplémentaire" data-en="<strong>+ €49.99/h</strong> per extra language"><strong>+ €49.99/h</strong> per extra language</li>
+      </ul>
+ 
+      <button class="plan-cta" onclick="window.location.href='https://translatetheworld.com/compte/dashboard.html'"
+        style="background:var(--gold);color:var(--ink);border-color:var(--gold);font-size:16px;padding:15px"
+        data-fr="🚀 Créer ma conférence" data-en="🚀 Create my conference">🚀 Create my conference</button>
+    </div>
+ 
+  </div>
+ 
   <!-- CALCULATEUR -->
-  <div class="calc-box" id="simulateur" style="margin-top:32px">
+  <div class="calc-box">
     <div class="calc-title" data-fr="Simulez votre tarif" data-en="Simulate your price">Simulate your price</div>
     <div class="calc-sub"
       data-fr="Choisissez le nombre d'heures et de langues pour voir votre prix exact."
@@ -974,19 +1203,6 @@ footer a{color:rgba(255,255,255,.42);text-decoration:none}
       <input type="checkbox" id="calcHue" onchange="calcRender()">
       <span data-fr="Adresse de facturation hors Union européenne (exonération TVA)" data-en="Billing address outside the EU (VAT exemption)">Billing address outside the EU (VAT exemption)</span>
     </label>
-
-    <!-- Bouton Commander -->
-    <div style="margin-top:28px;text-align:center">
-      <button id="calcOrderBtn" onclick="launchOrderFromCalc()"
-        style="background:linear-gradient(135deg,#157a6e,#2dd4bf);color:#fff;border:none;border-radius:14px;padding:16px 48px;font-size:17px;font-weight:800;cursor:pointer;font-family:Arial,sans-serif;box-shadow:0 6px 24px rgba(21,122,110,.3);transition:all .2s;letter-spacing:.01em"
-        onmouseover="this.style.transform='translateY(-2px)';this.style.boxShadow='0 10px 32px rgba(21,122,110,.45)'"
-        onmouseout="this.style.transform='translateY(0)';this.style.boxShadow='0 6px 24px rgba(21,122,110,.3)'"
-        data-fr="💳 Commander — Créer mon compte" data-en="💳 Order — Create my account">💳 Commander — Créer mon compte</button>
-      <p style="font-size:12px;color:#aaa;margin-top:10px"
-        data-fr="Paiement sécurisé · Liens envoyés par email immédiatement après paiement"
-        data-en="Secure payment · Links sent by email immediately after payment">
-        Paiement sécurisé · Liens envoyés par email immédiatement après paiement</p>
-    </div>
   </div>
  
   <div class="tva-note">
@@ -998,41 +1214,17 @@ footer a{color:rgba(255,255,255,.42);text-decoration:none}
  
 <!-- CONTACT COMMERCIAL -->
 <section style="background:#0d1f1a;padding:72px 24px">
-  <div style="max-width:720px;margin:0 auto;text-align:center">
-
+  <div style="max-width:680px;margin:0 auto;text-align:center">
+ 
     <div style="font-size:11px;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:#2dd4bf;margin-bottom:14px">
-      SOGEDICOM · Experts de la traduction événementielle
+      Custom services
     </div>
-
-    <h2 style="font-family:Arial,sans-serif;font-size:clamp(22px,3vw,36px);font-weight:800;color:#fff;margin-bottom:16px;line-height:1.2"
-      data-fr="Vous avez un besoin spécifique ?"
-      data-en="Do you have a specific request?">
-      Vous avez un besoin spécifique ?
+    <h2 style="font-family:Arial,sans-serif;font-size:clamp(24px,3vw,38px);font-weight:800;color:#fff;margin-bottom:12px;line-height:1.15">
+      Do you have a specific request?
     </h2>
-
-    <!-- Message expertise -->
-    <div style="background:rgba(45,212,191,.08);border:1px solid rgba(45,212,191,.2);border-radius:14px;padding:24px 28px;margin-bottom:28px;text-align:left">
-      <p style="color:#fff;font-size:16px;font-weight:500;line-height:1.8;margin-bottom:16px">
-        Nous sommes spécialistes de la <strong style="color:#2dd4bf">traduction événementielle par IA</strong>.<br>
-        Pour un grand événement ou une réunion plus confidentielle,
-        nous vous apportons une <strong style="color:#2dd4bf">solution sur mesure, dans toutes les langues</strong>.<br>
-        Parlez à votre public, partout, sans barrière.
-        <strong style="color:#f0d48a">Budget maîtrisé.</strong>
-      </p>
-      <div style="display:flex;flex-wrap:wrap;gap:16px;justify-content:center">
-        <a href="tel:+33149260526" style="display:inline-flex;align-items:center;gap:8px;background:rgba(45,212,191,.15);border:1px solid rgba(45,212,191,.35);color:#2dd4bf;font-size:15px;font-weight:700;padding:10px 20px;border-radius:10px;text-decoration:none;transition:background .2s"
-          onmouseover="this.style.background='rgba(45,212,191,.25)'" onmouseout="this.style.background='rgba(45,212,191,.15)'">
-          📞 +33 1 49 26 05 26
-        </a>
-        <a href="mailto:dnb@sogedicom.com" style="display:inline-flex;align-items:center;gap:8px;background:rgba(45,212,191,.15);border:1px solid rgba(45,212,191,.35);color:#2dd4bf;font-size:15px;font-weight:700;padding:10px 20px;border-radius:10px;text-decoration:none;transition:background .2s"
-          onmouseover="this.style.background='rgba(45,212,191,.25)'" onmouseout="this.style.background='rgba(45,212,191,.15)'">
-          ✉️ dnb@sogedicom.com
-        </a>
-      </div>
-    </div>
-
-    <p style="color:rgba(255,255,255,.5);font-size:14px;margin-bottom:28px">
-      Ou remplissez le formulaire ci-dessous — nous vous répondons sous 24 heures.
+    <p style="color:rgba(255,255,255,.6);font-size:15px;line-height:1.7;margin-bottom:36px">
+      Need a tailored solution, technical advice, or support for a large-scale event?<br>
+      <strong style="color:#fff">Contact our sales team</strong> — we'll get back to you within 24 hours.
     </p>
  
     <form id="contactForm" onsubmit="sendContactForm(event)"
@@ -1092,7 +1284,7 @@ async function sendContactForm(e){
   var msg   = document.getElementById('c-msg').value.trim();
  
   try {
-    await emailjs.send('service_98a5sho', 'template_ofhz8y6', {
+    await emailjs.send('service_98a5sho', 'template_se7eiug', {
       to_email: 'dnb@sogedicom.com',
       from_name: name,
       from_org:  org || '—',
@@ -1127,7 +1319,7 @@ async function sendContactForm(e){
           <span data-fr="Qu'est-ce que TranslateTheWorld ?" data-en="What is TranslateTheWorld?">What is TranslateTheWorld?</span>
           <span class="faq-q-icon">+</span>
         </button>
-        <div class="faq-a"><span data-fr="TranslateTheWorld est une plateforme d'interprétation multilingue propulsée par l'IA, créée par SOGEDICOM, société parisienne fondée en 1990. Elle diffuse des sous-titres traduits en temps réel sur le smartphone des participants — dans jusqu'à <strong>70 langues</strong>, sans application à télécharger, sans matériel spécifique, sans interprète humain." data-en="TranslateTheWorld is a real-time AI-powered multilingual interpretation platform built by SOGEDICOM, a Paris-based interpretation company founded in 1990. It delivers live translated subtitles to attendees' smartphones in up to <strong>70 languages</strong> — no app to download, no special equipment, no human interpreters required.">TranslateTheWorld is a real-time AI-powered multilingual interpretation platform built by SOGEDICOM, a Paris-based interpretation company founded in 1990. It delivers live translated subtitles to attendees' smartphones in up to <strong>70 languages</strong> — no app to download, no special equipment, no human interpreters required.</span></div>
+        <div class="faq-a"><span data-fr="TranslateTheWorld est une plateforme d'interprétation multilingue propulsée par l'IA, créée par SV INTERACTIVE, société parisienne fondée en 1994. Elle diffuse des sous-titres traduits en temps réel sur le smartphone des participants — dans jusqu'à <strong>70 langues</strong>, sans application à télécharger, sans matériel spécifique, sans interprète humain." data-en="TranslateTheWorld is a real-time AI-powered multilingual interpretation platform built by SV INTERACTIVE, a Paris-based company founded in 1994. It delivers live translated subtitles to attendees' smartphones in up to <strong>70 languages</strong> — no app to download, no special equipment, no human interpreters required.">TranslateTheWorld is a real-time AI-powered multilingual interpretation platform built by SV INTERACTIVE, a Paris-based company founded in 1994. It delivers live translated subtitles to attendees' smartphones in up to <strong>70 languages</strong> — no app to download, no special equipment, no human interpreters required.</span></div>
       </div>
  
       <div class="faq-item">
@@ -1256,7 +1448,7 @@ async function sendContactForm(e){
           <span data-fr="Qui est derrière TranslateTheWorld ?" data-en="Who created TranslateTheWorld?">Who created TranslateTheWorld?</span>
           <span class="faq-q-icon">+</span>
         </button>
-        <div class="faq-a"><span data-fr="TranslateTheWorld est créé et exploité par <strong>SOGEDICOM</strong>, société professionnelle d'interprétation et de traduction fondée en 1990, basée au 102 avenue des Champs-Élysées, Paris. Avec plus de 30 ans d'expérience dans le secteur de l'interprétation, SOGEDICOM a développé TranslateTheWorld pour rendre l'interprétation professionnelle accessible à tous les budgets." data-en="TranslateTheWorld is created and operated by <strong>SOGEDICOM</strong>, a professional interpretation and translation company founded in 1990, based at 102 avenue des Champs-Élysées, Paris, France. With over 30 years of experience in the interpretation industry, SOGEDICOM developed TranslateTheWorld to make professional multilingual communication accessible to all budgets.">TranslateTheWorld is created and operated by <strong>SOGEDICOM</strong>, a professional interpretation and translation company founded in 1990, based at 102 avenue des Champs-Élysées, Paris, France. With over 30 years of experience in the interpretation industry, SOGEDICOM developed TranslateTheWorld to make professional multilingual communication accessible to all budgets.</span></div>
+        <div class="faq-a"><span data-fr="TranslateTheWorld est créé et exploité par <strong>SV INTERACTIVE</strong>, société de prestations linguistiques et audiovisuelles fondée en 1994, basée au 231 rue Saint-Honoré, 75001 Paris. Avec plus de 30 ans d'expérience, SV INTERACTIVE a développé TranslateTheWorld pour rendre l'interprétation professionnelle accessible à tous les budgets." data-en="TranslateTheWorld is created and operated by <strong>SV INTERACTIVE</strong>, a language and audiovisual services company founded in 1994, based at 231 rue Saint-Honoré, 75001 Paris, France. With over 30 years of experience, SV INTERACTIVE developed TranslateTheWorld to make professional multilingual communication accessible to all budgets.">TranslateTheWorld is created and operated by <strong>SV INTERACTIVE</strong>, a language and audiovisual services company founded in 1994, based at 231 rue Saint-Honoré, 75001 Paris, France. With over 30 years of experience, SV INTERACTIVE developed TranslateTheWorld to make professional multilingual communication accessible to all budgets.</span></div>
       </div>
  
       <div class="faq-item">
@@ -1287,14 +1479,16 @@ async function sendContactForm(e){
   <div id="shareOptions" style="display:none;flex-direction:column;gap:8px;align-items:flex-end">
     <button onclick="shareViaWA()" style="background:#25D366;color:#fff;border:none;border-radius:50px;padding:10px 18px;font-size:13px;font-weight:700;cursor:pointer;box-shadow:0 4px 14px rgba(0,0,0,.2);white-space:nowrap">💬 WhatsApp</button>
     <button onclick="shareViaSMS()" style="background:#007AFF;color:#fff;border:none;border-radius:50px;padding:10px 18px;font-size:13px;font-weight:700;cursor:pointer;box-shadow:0 4px 14px rgba(0,0,0,.2);white-space:nowrap">📱 SMS</button>
-    <button onclick="shareViaEmail()" style="background:#fff;color:#0d1f1a;border:none;border-radius:50px;padding:10px 18px;font-size:13px;font-weight:700;cursor:pointer;box-shadow:0 4px 14px rgba(0,0,0,.2);white-space:nowrap">✉️ Email</button>
+    <button onclick="shareViaGmail()" style="background:#ea4335;color:#fff;border:none;border-radius:50px;padding:10px 18px;font-size:13px;font-weight:700;cursor:pointer;box-shadow:0 4px 14px rgba(0,0,0,.2);white-space:nowrap">✉️ Gmail</button>
+    <button onclick="shareViaOutlook()" style="background:#0078d4;color:#fff;border:none;border-radius:50px;padding:10px 18px;font-size:13px;font-weight:700;cursor:pointer;box-shadow:0 4px 14px rgba(0,0,0,.2);white-space:nowrap">📨 Outlook</button>
+    <button onclick="shareViaMailApp()" style="background:#fff;color:#0d1f1a;border:none;border-radius:50px;padding:10px 18px;font-size:13px;font-weight:700;cursor:pointer;box-shadow:0 4px 14px rgba(0,0,0,.2);white-space:nowrap">📧 Mail app</button>
   </div>
  
   <!-- Bouton principal -->
   <button onclick="toggleShare()" id="shareMainBtn"
     style="background:#0d1f1a;color:#fff;border:2px solid #2dd4bf;border-radius:50px;padding:12px 20px;font-size:13px;font-weight:800;cursor:pointer;box-shadow:0 4px 20px rgba(0,0,0,.25);display:flex;align-items:center;gap:8px;white-space:nowrap">
     <span style="font-size:16px">📤</span>
-    <span id="shareBtnLabel">Envoyer à un ami</span>
+    <span id="shareBtnLabel">Send to a friend</span>
   </button>
 </div>
  
@@ -1328,7 +1522,7 @@ function toggleShare(){
   var opts = document.getElementById('shareOptions');
   var lbl  = document.getElementById('shareBtnLabel');
   opts.style.display = shareOpen ? 'flex' : 'none';
-  lbl.textContent    = shareOpen ? 'Fermer' : 'Envoyer à un ami';
+  lbl.textContent    = shareOpen ? 'Close' : 'Send to a friend';
 }
  
 function shareViaWA(){
@@ -1337,29 +1531,32 @@ function shareViaWA(){
 function shareViaSMS(){
   window.location.href = 'sms:?body=' + encodeURIComponent(getShareMsg());
 }
-function shareViaEmail(){
-  var sub = encodeURIComponent('Découvrez TranslateTheWorld — traduction en direct pour vos conférences');
-  window.location.href = 'mailto:?subject=' + sub + '&body=' + encodeURIComponent(getShareMsg());
+function shareViaGmail(){
+  var subject = 'Discover TranslateTheWorld — real-time translation for your conferences';
+  var enc = encodeURIComponent;
+  window.open('https://mail.google.com/mail/?view=cm&fs=1&su='+enc(subject)+'&body='+enc(getShareMsg()), '_blank');
+}
+function shareViaOutlook(){
+  var subject = 'Discover TranslateTheWorld — real-time translation for your conferences';
+  var enc = encodeURIComponent;
+  window.open('https://outlook.live.com/mail/deeplink/compose?subject='+enc(subject)+'&body='+enc(getShareMsg()), '_blank');
+}
+function shareViaMailApp(){
+  var subject = 'Discover TranslateTheWorld — real-time translation for your conferences';
+  var enc = encodeURIComponent;
+  window.location.href = 'mailto:?subject='+enc(subject)+'&body='+enc(getShareMsg());
 }
 </script>
  
 <footer>
-
-  <p><strong>TranslateTheWorld</strong> — <span data-fr="une solution" data-en="a solution by">une solution</span> SOGEDICOM</p>
-  <p style="margin-top:8px"><a href="tel:+33689735229">+33 6 89 73 52 29</a> &nbsp;·&nbsp; <a href="mailto:dnb@sogedicom.com">dnb@sogedicom.com</a></p>
-  <p style="margin-top:14px;font-size:11px;opacity:.55">© 2025 SOGEDICOM · Tous droits réservés</p>
-  <p style="margin-top:10px;font-size:13px">
-    <a href="/mentions-legales.html" style="color:rgba(255,255,255,.55);text-decoration:none;border-bottom:1px solid rgba(255,255,255,.25);padding-bottom:2px"
-      onmouseover="this.style.color='#2dd4bf';this.style.borderBottomColor='#2dd4bf'"
-      onmouseout="this.style.color='rgba(255,255,255,.55)';this.style.borderBottomColor='rgba(255,255,255,.25)'">
-      📄 Mentions légales · Legal Notice
-    </a>
-  </p>
+  <p><strong>TranslateTheWorld</strong> — <span data-fr="une solution" data-en="a solution by">une solution</span> SV INTERACTIVE</p>
+  <p style="margin-top:8px"><a href="tel:+33689735229">+33 6 89 73 52 29</a> &nbsp;·&nbsp; <a href="/cdn-cgi/l/email-protection#44272b2a3025273004372b2321202d272b296a2236"><span class="__cf_email__" data-cfemail="24474b4a5045475064574b4341404d474b490a4256">[email&#160;protected]</span></a></p>
+  <p style="margin-top:14px;font-size:11px;opacity:.55">© 2025 SV INTERACTIVE · Tous droits réservés</p>
   <p style="margin-top:20px;padding-top:16px;border-top:1px solid rgba(255,255,255,.08);font-size:10px;opacity:.28;line-height:1.8;max-width:700px;margin-left:auto;margin-right:auto">
     <strong style="opacity:.7">Mentions légales</strong> —
-    SOGEDICOM SARL · Capital 40 000 € · RCS 378 740 328 · N° TVA intracommunautaire FR50378740328 ·
-    Siège social : 102 avenue des Champs-Élysées, 75008 Paris ·
-    Tél. : <a href="tel:+33149260526" style="color:rgba(255,255,255,.35);text-decoration:none">+33 1 49 26 05 26</a> · <a href="mailto:dnb@sogedicom.com" style="color:rgba(255,255,255,.35);text-decoration:none">dnb@sogedicom.com</a> ·
+    SV INTERACTIVE SAS · Capital 8 000 € · RCS Paris 395 358 484 ·
+    Siège social : 231 rue Saint-Honoré, 75001 Paris ·
+    Tél. : <a href="tel:+33149260526" style="color:rgba(255,255,255,.35);text-decoration:none">+33 1 49 26 05 26</a> · <a href="mailto:contact@translatetheworld.com" style="color:rgba(255,255,255,.35);text-decoration:none">contact@translatetheworld.com</a> ·
     Directeur de la publication : David BARCHMANN
   </p>
 </footer>
@@ -1367,8 +1564,8 @@ function shareViaEmail(){
 <!-- MODAL -->
 <div class="modal-overlay" id="modal">
   <div class="modal-card" style="max-width:560px;padding:32px 28px;text-align:left">
-    <h2 style="text-align:center;margin-bottom:6px">📬 Vos liens sont prêts !</h2>
-    <p style="text-align:center;margin-bottom:20px">Envoyés par email à <strong id="modal-email" style="color:#f0d48a"></strong></p>
+    <h2 style="text-align:center;margin-bottom:6px">🚀 Votre conférence est prête !</h2>
+    <p id="modal-status-line" style="text-align:center;margin-bottom:20px"></p>
     <!-- Lien Hôte -->
     <div style="background:rgba(212,168,67,.1);border:1.5px solid rgba(212,168,67,.4);border-radius:12px;padding:16px;margin-bottom:14px">
       <div style="font-size:10px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:#f0d48a;margin-bottom:6px">🎙️ Lien Hôte — gardez-le pour vous</div>
@@ -1387,7 +1584,7 @@ function shareViaEmail(){
   </div>
 </div>
  
-<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
+<script>
 let currentLang='fr'; // declared early so populate() can use it
 const LANGS=[
   {code:'fr',flag:'🇫🇷',name:'Français / French'},
@@ -1567,17 +1764,27 @@ function updateFlag(id, sel){
   }
 }
  
-/* ── 8 langues disponibles ── */
+/* ── 19 langues disponibles (nom natif pour scripts latins ; natif + EN pour non-latins) ── */
 const MAIN_LANGS=[
-  {code:'fr', country:'fr', label:'Français',  labelEn:'French'},
-  {code:'en', country:'gb', label:'Anglais',   labelEn:'English'},
-  {code:'de', country:'de', label:'Allemand',  labelEn:'German'},
-  {code:'it', country:'it', label:'Italien',   labelEn:'Italian'},
-  {code:'es', country:'es', label:'Espagnol',  labelEn:'Spanish'},
-  {code:'ar', country:'lb', label:'Arabe',     labelEn:'Arabic'},
-  {code:'ru', country:'ru', label:'Russe',     labelEn:'Russian'},
-  {code:'zh', country:'cn', label:'Chinois',   labelEn:'Chinese'},
-  {code:'he', country:'il', label:'Hébreu',    labelEn:'Hebrew'},
+  {code:'fr',  country:'fr', label:'Français',                labelEn:'Français'},
+  {code:'en',  country:'gb', label:'English',                 labelEn:'English'},
+  {code:'de',  country:'de', label:'Deutsch',                 labelEn:'Deutsch'},
+  {code:'it',  country:'it', label:'Italiano',                labelEn:'Italiano'},
+  {code:'es',  country:'es', label:'Español',                 labelEn:'Español'},
+  {code:'pt',  country:'pt', label:'Português',               labelEn:'Português'},
+  {code:'nl',  country:'nl', label:'Nederlands',              labelEn:'Nederlands'},
+  {code:'pl',  country:'pl', label:'Polski',                  labelEn:'Polski'},
+  {code:'tr',  country:'tr', label:'Türkçe',                  labelEn:'Türkçe'},
+  {code:'da',  country:'dk', label:'Dansk',                   labelEn:'Dansk'},
+  {code:'el',  country:'gr', label:'Ελληνικά · Greek',         labelEn:'Ελληνικά · Greek'},
+  {code:'ar',  country:'lb', label:'العربية · Arabic',          labelEn:'العربية · Arabic'},
+  {code:'he',  country:'il', label:'עברית · Hebrew',            labelEn:'עברית · Hebrew'},
+  {code:'ru',  country:'ru', label:'Русский · Russian',         labelEn:'Русский · Russian'},
+  {code:'uk',  country:'ua', label:'Українська · Ukrainian',    labelEn:'Українська · Ukrainian'},
+  {code:'zh',  country:'cn', label:'中文 · Chinese',             labelEn:'中文 · Chinese'},
+  {code:'ja',  country:'jp', label:'日本語 · Japanese',           labelEn:'日本語 · Japanese'},
+  {code:'ko',  country:'kr', label:'한국어 · Korean',             labelEn:'한국어 · Korean'},
+  {code:'hi',  country:'in', label:'हिन्दी · Hindi',              labelEn:'हिन्दी · Hindi'},
 ];
  
 function populate(selId, withNone){
@@ -1630,7 +1837,7 @@ function calcBuildHours() {
   const g = document.getElementById('calcHoursGrid');
   if (!g) return;
   g.innerHTML = '';
-  for (let h = 1; h <= 8; h++) {
+  for (let h = 1; h <= 12; h++) {
     const btn = document.createElement('button');
     btn.type = 'button';
     btn.className = 'calc-plan-btn' + (h === calcHours ? ' active' : '');
@@ -1644,7 +1851,7 @@ function calcBuildExtraLangs() {
   const g = document.getElementById('calcExtraLangsGrid');
   if (!g) return;
   g.innerHTML = '';
-  for (let n = 0; n <= 3; n++) {
+  for (let n = 0; n <= 2; n++) {
     const btn = document.createElement('button');
     btn.type = 'button';
     btn.className = 'calc-plan-btn' + (n === calcExtraLangs ? ' active' : '');
@@ -1747,13 +1954,6 @@ function nameToRoom(name){
     .replace(/[^a-z0-9]/g,'')
     .slice(0,40);
 }
-function launchOrderFromCalc(){
-  // Détermine le plan selon les heures sélectionnées dans le simulateur
-  const h = typeof calcHours !== 'undefined' ? calcHours : 1;
-  const plan = h >= 10 ? '10H' : h >= 5 ? '5H' : '1H';
-  contactSales(plan);
-}
-
 function openFreeModal(){
   const ov=document.getElementById('freeTrialOverlay');
   ov.style.display='flex';
@@ -1775,14 +1975,100 @@ function sanitizeRoom(){
 }
  
 const usedRooms=new Set(['demo','test','example','free','sogedicom']);
+
+// ── MODE TEST INTERNE ──
+// Active avec ?test=sogedicom2025 dans l'URL.
+// Désactive la limite "1 essai gratuit par nom" pour permettre des tests intensifs.
+// Affiche aussi un bandeau jaune en haut pour rappel visuel.
+const TEST_MODE = (new URLSearchParams(window.location.search).get('test') === 'sogedicom2025');
+if(TEST_MODE){
+  console.log('🧪 Mode test activé : limite essai gratuit désactivée');
+  window.addEventListener('DOMContentLoaded', ()=>{
+    const banner = document.createElement('div');
+    banner.style.cssText = 'position:fixed;top:0;left:0;right:0;background:#fef3c7;border-bottom:2px solid #d4a843;color:#78350f;font-family:Arial,sans-serif;font-size:13px;font-weight:700;text-align:center;padding:8px 14px;z-index:99998;letter-spacing:.02em';
+    banner.textContent = '🧪 MODE TEST ACTIF — limite essai gratuit désactivée — Ne pas envoyer de liens à des clients depuis ce navigateur';
+    document.body.appendChild(banner);
+    // Pousser le contenu vers le bas pour ne pas masquer la nav
+    document.body.style.paddingTop = '36px';
+  });
+}
  
 const EJS_SERVICE  = 'service_98a5sho';
 const EJS_TEMPLATE = 'template_udijx31';
 const EJS_KEY      = 'nkdEOMlq3ycO1AsIc';
- 
-window.addEventListener('DOMContentLoaded', function(){
-  emailjs.init({ publicKey: EJS_KEY });
-});
+
+// Chargement à la volée de la lib QRCode : seulement quand un QR doit être généré
+// (économise ~5 Ko + parse au chargement initial de la page).
+let __qrcodeLoadPromise = null;
+function ensureQRCode(){
+  if (window.QRCode) return Promise.resolve();
+  if (__qrcodeLoadPromise) return __qrcodeLoadPromise;
+  __qrcodeLoadPromise = new Promise(function(resolve, reject){
+    var s = document.createElement('script');
+    s.src = 'https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js';
+    s.async = true;
+    s.onload = function(){ resolve(); };
+    s.onerror = function(){ __qrcodeLoadPromise = null; reject(new Error('QRCode load failed')); };
+    document.head.appendChild(s);
+  });
+  return __qrcodeLoadPromise;
+}
+
+// Correctif iPhone/Safari : EmailJS peut être chargé avec retard malgré "defer".
+// On initialise donc EmailJS seulement quand le SDK est réellement disponible,
+// et on prévoit un envoi REST de secours si le SDK ne répond pas sur mobile.
+let EJS_READY = false;
+function initEmailJsSafe(){
+  if(EJS_READY) return true;
+  if(window.emailjs && typeof emailjs.init === 'function'){
+    emailjs.init({ publicKey: EJS_KEY });
+    EJS_READY = true;
+    return true;
+  }
+  return false;
+}
+window.addEventListener('DOMContentLoaded', initEmailJsSafe);
+window.addEventListener('load', initEmailJsSafe);
+
+function waitForEmailJs(maxWaitMs){
+  const started = Date.now();
+  return new Promise(resolve => {
+    (function check(){
+      if(initEmailJsSafe()) return resolve(true);
+      if(Date.now() - started >= maxWaitMs) return resolve(false);
+      setTimeout(check, 120);
+    })();
+  });
+}
+
+async function sendEmailJsStable(serviceId, templateId, templateParams){
+  const sdkReady = await waitForEmailJs(2500);
+
+  if(sdkReady && window.emailjs && typeof emailjs.send === 'function'){
+    try{
+      return await emailjs.send(serviceId, templateId, templateParams);
+    }catch(sdkErr){
+      console.warn('EmailJS SDK failed, trying REST fallback:', sdkErr);
+    }
+  }
+
+  // Fallback compatible Safari/iPhone : appel REST officiel EmailJS.
+  const response = await fetch('https://api.emailjs.com/api/v1.0/email/send', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      service_id: serviceId,
+      template_id: templateId,
+      user_id: EJS_KEY,
+      template_params: templateParams
+    })
+  });
+
+  if(!response.ok){
+    throw new Error('EmailJS REST error ' + response.status + ': ' + await response.text());
+  }
+  return response;
+}
  
 function getLangLabel(code){
   const l=MAIN_LANGS.find(x=>x.code===code);
@@ -1790,6 +2076,41 @@ function getLangLabel(code){
 }
  
 async function handleSubmit(){
+  // ════════════════════════════════════════════════════════════
+  // PROTECTION DÉMO : on enveloppe TOUT le traitement dans un try/catch
+  // global. Si quelque chose plante, l'utilisateur voit une erreur claire
+  // et le bouton se réactive — JAMAIS de blocage silencieux.
+  // ════════════════════════════════════════════════════════════
+  // On cherche le bouton de soumission. On essaie plusieurs sélecteurs
+  // pour couvrir tous les cas (selon les évolutions du HTML).
+  const btn = document.querySelector('button[onclick="handleSubmit()"]')
+           || document.querySelector('.hfc-submit')
+           || document.querySelector('button.submit-btn');
+
+  // Helper pour afficher une erreur visible en haut du formulaire
+  function showFormError(msg){
+    let errEl = document.getElementById('form-global-error');
+    if(!errEl){
+      errEl = document.createElement('div');
+      errEl.id = 'form-global-error';
+      errEl.style.cssText = 'background:#fee;border:1.5px solid #f88;color:#c33;padding:10px 14px;border-radius:8px;margin-bottom:14px;font-size:13px;font-weight:600;text-align:center';
+      const formBox = document.querySelector('.form-box');
+      const fNameEl = document.getElementById('f-name');
+      const targetParent = formBox || (fNameEl ? fNameEl.parentElement : null);
+      if(targetParent && targetParent.firstChild) targetParent.insertBefore(errEl, targetParent.firstChild);
+    }
+    errEl.textContent = msg;
+    errEl.style.display = 'block';
+    errEl.scrollIntoView({behavior:'smooth', block:'center'});
+    if(btn){ btn.disabled = false; btn.textContent = '✉️ Recevoir mon lien & QR code gratuitement'; }
+  }
+  function clearFormError(){
+    const el = document.getElementById('form-global-error');
+    if(el) el.style.display = 'none';
+  }
+
+  try {
+
   const name  = document.getElementById('f-name').value.trim();
   const org   = document.getElementById('f-org').value.trim();
   const email = document.getElementById('f-email').value.trim();
@@ -1801,13 +2122,24 @@ async function handleSubmit(){
   const p2  = document.getElementById('f-lang-p2').value;
   const p3  = document.getElementById('f-lang-p3').value;
   const errEl = document.getElementById('room-error');
- 
-  if(!name||!email){alert(currentLang==='fr'?'Merci de remplir votre nom et email.':'Please fill in your name and email.');return;}
-  if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){alert(currentLang==='fr'?'Adresse email invalide.':'Invalid email address.');return;}
-  if(!p1){alert(currentLang==='fr'?'Choisissez au moins une langue participant.':'Please select at least one participant language.');return;}
-  if(usedRooms.has(room)){errEl.style.display='block';return;}
+
+  // Validations avec affichage VISIBLE (plus de alert() silencieux)
+  if(!name||!email){
+    showFormError(currentLang==='fr'?'⚠️ Merci de remplir votre nom et email.':'⚠️ Please fill in your name and email.');
+    return;
+  }
+  if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){
+    showFormError(currentLang==='fr'?'⚠️ Adresse email invalide.':'⚠️ Invalid email address.');
+    return;
+  }
+  if(!p1){
+    showFormError(currentLang==='fr'?'⚠️ Choisissez au moins une langue participant.':'⚠️ Please select at least one participant language.');
+    return;
+  }
+  if(usedRooms.has(room) && !TEST_MODE){errEl.style.display='block';return;}
   errEl.style.display='none';
-  usedRooms.add(room);
+  clearFormError();
+  if(!TEST_MODE) usedRooms.add(room);
  
   const targets=[p1,p2,p3].filter(Boolean).join(',');
   const exp=new Date();exp.setDate(exp.getDate()+3);
@@ -1817,11 +2149,20 @@ async function handleSubmit(){
   const participantLink=baseUrl+'/join.html?room='+room+'&exp='+expTs;
   const expDate=exp.toLocaleDateString('fr-FR',{day:'numeric',month:'long',year:'numeric'});
  
-  const btn=document.querySelector('.hfc-submit');
-  btn.textContent='⏳ Envoi en cours…';
-  btn.disabled=true;
+  // Le bouton est déjà capturé en début de fonction (variable btn).
+  // On le réutilise ici pour mettre à jour son état pendant l'envoi.
+  if(btn){ btn.textContent='⏳ Envoi en cours…'; btn.disabled=true; }
  
   const qr_url='https://quickchart.io/qr?size=300&text='+encodeURIComponent(participantLink);
+
+  // Texte de partage : contient nom de session + lien participant
+  const shareLabel = (org && org!=='—') ? org : 'TranslateTheWorld';
+  const shareText  = 'Join our multilingual session – '+shareLabel+': '+participantLink;
+  const shareEmailSubject = 'Join our multilingual session';
+  const share_whatsapp_url = 'https://api.whatsapp.com/send?text='+encodeURIComponent(shareText);
+  const share_sms_url      = 'sms:?&body='+encodeURIComponent(shareText);
+  const share_email_url    = 'mailto:?subject='+encodeURIComponent(shareEmailSubject)+'&body='+encodeURIComponent(shareText);
+
   const params={
     to_email:email, to_name:name, organisation:org||'—', phone:phone||'—',
     link:hostLink, host_link:hostLink, participant_link:participantLink,
@@ -1831,34 +2172,88 @@ async function handleSubmit(){
     lang_p2:p2?getLangLabel(p2):'—',
     lang_p3:p3?getLangLabel(p3):'—',
     exp_date:expDate, duration:'15 minutes',
-    qr_url:qr_url
+    qr_url:qr_url,
+    // Partage participant
+    share_whatsapp_url, share_sms_url, share_email_url,
+    // Label qui s'affichera sur les boutons quand l'org est vide
+    org_label: (org && org!=='—') ? org : 'Your Session'
   };
  
-  function showModal(emailOk){
-    document.getElementById('modal-email').textContent=email;
-    document.getElementById('modal-host-link').textContent=hostLink;
-    document.getElementById('modal-participant-link').textContent=participantLink;
-    const qEl=document.getElementById('modal-qr');qEl.innerHTML='';
-    new QRCode(qEl,{text:participantLink,width:140,height:140,colorDark:'#0a0a0a',colorLight:'#fff',correctLevel:QRCode.CorrectLevel.M});
-    document.getElementById('modal').classList.add('active');
-    if(!emailOk){
-      setTimeout(()=>{
-        const p=document.querySelector('.modal-card>p');
-        if(p) p.innerHTML='<span style="color:#ffb3b3;font-size:12px">⚠️ Email non envoyé. Copiez vos liens ci-dessous :</span>';
-      },80);
+  function showModal(emailStatus){
+    // emailStatus: 'pending' | 'success' | 'failed'
+    // On vérifie l'existence de chaque élément avant d'écrire dedans,
+    // pour éviter tout plantage si la structure HTML évolue.
+    var elEmail = document.getElementById('modal-email');
+    if(elEmail) elEmail.textContent = email;
+    var elHost = document.getElementById('modal-host-link');
+    if(elHost) elHost.textContent = hostLink;
+    var elPart = document.getElementById('modal-participant-link');
+    if(elPart) elPart.textContent = participantLink;
+    var qEl = document.getElementById('modal-qr');
+    if(qEl){
+      qEl.innerHTML = '';
+      ensureQRCode().then(function(){
+        try {
+          new QRCode(qEl,{text:participantLink,width:140,height:140,colorDark:'#0a0a0a',colorLight:'#fff',correctLevel:QRCode.CorrectLevel.M});
+        } catch(e){ /* QRCode lib pas chargée : on continue sans QR */ }
+      }).catch(function(){ /* échec chargement QRCode : on ignore, le lien texte reste affiché */ });
+    }
+    var modalEl = document.getElementById('modal');
+    if(modalEl) modalEl.classList.add('active');
+    updateModalEmailStatus(emailStatus);
+  }
+  function updateModalEmailStatus(status){
+    const p=document.getElementById('modal-status-line');
+    if(!p) return;
+    if(status==='pending'){
+      p.innerHTML='<span style="color:#f0d48a;font-size:12px">⏳ Envoi de l\'email à <strong>'+email+'</strong>… vous pouvez déjà copier vos liens ci-dessous</span>';
+    } else if(status==='success'){
+      p.innerHTML='✅ Email envoyé à <strong style="color:#f0d48a">'+email+'</strong>';
+    } else if(status==='failed'){
+      p.innerHTML='<span style="color:#ffb3b3;font-size:12px">⚠️ Email non envoyé — pas de problème, copiez vos liens ci-dessous (ils sont déjà actifs)</span>';
     }
   }
- 
+
+  // ═══ STRATÉGIE ANTI-PANIQUE EN DÉMO ═══
+  // On affiche la modale AVEC les liens IMMÉDIATEMENT (ils sont déjà calculés).
+  // L'email part en arrière-plan. Même si EmailJS plante, le client voit ses liens
+  // et peut les copier en un clic. La démo ne plante jamais.
+  showModal('pending');
+
+  // Mémorise les 2 liens 30 min dans le navigateur (utilisé par les pages d'aide).
   try{
-    await emailjs.send(EJS_SERVICE, EJS_TEMPLATE, params);
-    btn.textContent='✅ Email envoyé !';
-    setTimeout(()=>{btn.textContent='✉️ Recevoir mon lien & QR code gratuitement';btn.disabled=false;},3000);
-    showModal(true);
-  }catch(err){
-    console.error('EmailJS error:', err);
-    btn.textContent='✉️ Recevoir mon lien & QR code gratuitement';
-    btn.disabled=false;
-    showModal(false);
+    localStorage.setItem('ttw_recent_links', JSON.stringify({
+      host: hostLink,
+      participant: participantLink,
+      share_email: share_email_url,
+      share_whatsapp: share_whatsapp_url,
+      share_sms: share_sms_url,
+      saved_at: Date.now()
+    }));
+  }catch(e){/* navigation privée ou stockage plein : on ignore */}
+
+  // Envoi de l'email EN ARRIÈRE-PLAN. La modale est déjà affichée.
+  sendEmailJsStable(EJS_SERVICE, EJS_TEMPLATE, params)
+    .then(()=>{
+      btn.textContent='✅ Email envoyé !';
+      updateModalEmailStatus('success');
+      setTimeout(()=>{btn.textContent='✉️ Recevoir mon lien & QR code gratuitement';btn.disabled=false;},3000);
+    })
+    .catch(err=>{
+      console.error('EmailJS error:', err);
+      btn.textContent='✉️ Recevoir mon lien & QR code gratuitement';
+      btn.disabled=false;
+      updateModalEmailStatus('failed');
+    });
+
+  } catch(criticalError) {
+    // ⚠️ Filet de sécurité ULTIME : si quelque chose plante de manière
+    // imprévue, on affiche au moins une erreur claire au lieu d'un blocage.
+    console.error('[handleSubmit] Critical error:', criticalError);
+    showFormError(currentLang==='fr'
+      ? '⚠️ Erreur technique. Rafraîchissez la page (F5) et réessayez. Si le problème persiste, contactez-nous : contact@translatetheworld.com'
+      : '⚠️ Technical error. Please refresh (F5) and try again. If it persists, contact us: contact@translatetheworld.com'
+    );
   }
 }
 
@@ -1882,34 +2277,66 @@ function closeModal(){
   document.getElementById('result-box').style.display='block';
   const qc=document.getElementById('qrcode');
   qc.innerHTML='';
-  new QRCode(qc,{text:participantLink,width:130,height:130,colorDark:'#0a0a0a',colorLight:'#fff',correctLevel:QRCode.CorrectLevel.M});
+  ensureQRCode().then(function(){
+    new QRCode(qc,{text:participantLink,width:130,height:130,colorDark:'#0a0a0a',colorLight:'#fff',correctLevel:QRCode.CorrectLevel.M});
+  }).catch(function(){ /* échec chargement QRCode : lien texte déjà affiché, on ignore */ });
 }
  
-/* ── STRIPE CHECKOUT — SELF SERVICE ── */
-const STRIPE_PK   = 'pk_test_51H9DbmLWLP5OU54hWUTKnTThKbC3uky9XxZ32aUnbjF18IYbDzxm1HEnKso7jKja9sYOJrq2sSq99BSP2hVQzh0T00VnCgmuON';
-const PRICE_5H    = 'price_1TIWEcLWLP5OU54hUvXQ5OBb';
-const PRICE_10H   = 'price_1TIWGXLWLP5OU54hc0hhwBrG';
-
-// Tarifs TTC
-const PLAN_DEF = {
-  '1H': {label:'1 heure',  base:5999,  extraLang:4999, hours:1},
-  '5H': {label:'5 heures', base:23800, extraLang:19800, hours:5},
-  '10H':{label:'10 heures',base:45600, extraLang:37600, hours:10},
-};
-let purchasePlan = '1H';
+/* ── STRIPE CHECKOUT — MODÈLE LINÉAIRE ── */
+// Plus de plans figés. La calculatrice et la modale partagent ce barème :
+//   59,99 € TTC pour 1h × 2 langues (src + 1 cible)
+// + 49,99 € TTC par heure supplémentaire
+// + 49,99 € TTC par langue cible supplémentaire et par heure
+// Heures : 1 à 12. Langues cibles supplémentaires : 0 à 2 (max 4 langues totales).
+const PU_BASE_TTC       = 5999;  // centimes
+const PU_EXTRA_H_TTC    = 4999;
+const PU_EXTRA_LANG_TTC = 4999;
+const PU_MIN_HOURS = 1;
+const PU_MAX_HOURS = 12;
+let purchaseHours = 1;  // valeur courante choisie dans la modale
 
 const PU_LANGS = [
-  {code:'fr',country:'fr',label:'Français'},{code:'en',country:'gb',label:'Anglais'},
-  {code:'de',country:'de',label:'Allemand'},{code:'it',country:'it',label:'Italien'},
-  {code:'es',country:'es',label:'Espagnol'},{code:'pt',country:'pt',label:'Portugais'},
-  {code:'ar',country:'lb',label:'Arabe'},{code:'ru',country:'ru',label:'Russe'},
-  {code:'zh',country:'cn',label:'Chinois'},{code:'he',country:'il',label:'Hébreu'},
-  {code:'nl',country:'nl',label:'Néerlandais'},{code:'pl',country:'pl',label:'Polonais'},
-  {code:'uk',country:'ua',label:'Ukrainien'},{code:'tr',country:'tr',label:'Turc'},
-  {code:'ja',country:'jp',label:'Japonais'},{code:'ko',country:'kr',label:'Coréen'},
-  {code:'hi',country:'in',label:'Hindi'},{code:'el',country:'gr',label:'Grec'},
+  {code:'fr', country:'fr', label:'Français',                labelEn:'Français'},
+  {code:'en', country:'gb', label:'English',                 labelEn:'English'},
+  {code:'de', country:'de', label:'Deutsch',                 labelEn:'Deutsch'},
+  {code:'it', country:'it', label:'Italiano',                labelEn:'Italiano'},
+  {code:'es', country:'es', label:'Español',                 labelEn:'Español'},
+  {code:'pt', country:'pt', label:'Português',               labelEn:'Português'},
+  {code:'nl', country:'nl', label:'Nederlands',              labelEn:'Nederlands'},
+  {code:'pl', country:'pl', label:'Polski',                  labelEn:'Polski'},
+  {code:'tr', country:'tr', label:'Türkçe',                  labelEn:'Türkçe'},
+  {code:'da', country:'dk', label:'Dansk',                   labelEn:'Dansk'},
+  {code:'el', country:'gr', label:'Ελληνικά · Greek',         labelEn:'Ελληνικά · Greek'},
+  {code:'ar', country:'lb', label:'العربية · Arabic',          labelEn:'العربية · Arabic'},
+  {code:'he', country:'il', label:'עברית · Hebrew',            labelEn:'עברית · Hebrew'},
+  {code:'ru', country:'ru', label:'Русский · Russian',         labelEn:'Русский · Russian'},
+  {code:'uk', country:'ua', label:'Українська · Ukrainian',    labelEn:'Українська · Ukrainian'},
+  {code:'zh', country:'cn', label:'中文 · Chinese',             labelEn:'中文 · Chinese'},
+  {code:'ja', country:'jp', label:'日本語 · Japanese',           labelEn:'日本語 · Japanese'},
+  {code:'ko', country:'kr', label:'한국어 · Korean',             labelEn:'한국어 · Korean'},
+  {code:'hi', country:'in', label:'हिन्दी · Hindi',              labelEn:'हिन्दी · Hindi'},
 ];
 const PU_FLAGS = Object.fromEntries(PU_LANGS.map(l=>[l.code,l.country]));
+
+function puBuildHoursGrid(){
+  const g = document.getElementById('puHoursGrid');
+  if(!g) return;
+  g.innerHTML = '';
+  for(let h = PU_MIN_HOURS; h <= PU_MAX_HOURS; h++){
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'calc-plan-btn' + (h === purchaseHours ? ' active' : '');
+    btn.textContent = h + 'h';
+    btn.onclick = (function(hh){
+      return function(){
+        purchaseHours = hh;
+        puBuildHoursGrid();
+        puUpdateSummary();
+      };
+    })(h);
+    g.appendChild(btn);
+  }
+}
 
 function puPopulateSelects(){
   ['pu-lang-src','pu-lang-p1','pu-lang-p2','pu-lang-p3'].forEach((id,i)=>{
@@ -1923,7 +2350,7 @@ function puPopulateSelects(){
     }
     PU_LANGS.forEach(l=>{
       const o=document.createElement('option');
-      o.value=l.code; o.textContent=l.label;
+      o.value=l.code; o.textContent=currentLang==='fr'?l.label:l.labelEn;
       sel.appendChild(o);
     });
   });
@@ -1949,46 +2376,87 @@ function puUpdateFlagP(n){
   puUpdateSummary();
 }
 
-function puUpdateSummary(){
-  const plan=PLAN_DEF[purchasePlan]||PLAN_DEF['1H'];
-  const p1=document.getElementById('pu-lang-p1')?.value||'';
-  const p2=document.getElementById('pu-lang-p2')?.value||'';
-  const p3=document.getElementById('pu-lang-p3')?.value||'';
-  const extraCount=[p2,p3].filter(Boolean).length; // au-delà des 2 incluses (src + p1)
-
-  const baseEur=(plan.base/100).toFixed(2).replace('.',',');
-  const extraTotal=extraCount*(plan.extraLang/100);
-  const total=(plan.base/100 + extraTotal).toFixed(2).replace('.',',');
-
-  const isFr=currentLang==='fr';
-  document.getElementById('puSummaryPlan').textContent=
-    (isFr?'Forfait ':'Plan ')+plan.label+(isFr?' · 2 langues incluses':' · 2 languages included');
-  document.getElementById('puSummaryBase').textContent=baseEur+' €';
-
-  const extraRow=document.getElementById('puExtraRow');
-  if(extraCount>0){
-    extraRow.style.display='flex';
-    document.getElementById('puSummaryExtra').textContent=
-      extraCount+(isFr?' langue supp.':' extra lang.');
-    document.getElementById('puSummaryExtraPrice').textContent=
-      '+'+extraTotal.toFixed(2).replace('.',',')+' €';
-  } else {
-    extraRow.style.display='none';
-  }
-  document.getElementById('puSummaryTotal').textContent=total+' € TTC';
+// Calcul du prix (centimes) — DOIT correspondre exactement à create-checkout.js
+function puComputeCents(hours, extraLangs){
+  return PU_BASE_TTC + (hours - 1) * PU_EXTRA_H_TTC + extraLangs * hours * PU_EXTRA_LANG_TTC;
 }
 
-function contactSales(plan){
-  purchasePlan=plan;
-  const planDef=PLAN_DEF[plan]||PLAN_DEF['1H'];
-  const badge=document.getElementById('purchaseBadge');
-  badge.textContent=(currentLang==='fr'?'Forfait ':'Plan ')+planDef.label+' — '+(planDef.base/100).toFixed(2).replace('.',',')+' € TTC';
-  badge.style.background=plan==='10H'?'var(--ink)':'var(--teal)';
+function puUpdateSummary(){
+  const p2 = (document.getElementById('pu-lang-p2')||{}).value || '';
+  const p3 = (document.getElementById('pu-lang-p3')||{}).value || '';
+  const extraCount = [p2,p3].filter(Boolean).length; // au-delà des 2 incluses (src + p1)
+
+  const totalCents = puComputeCents(purchaseHours, extraCount);
+  const isFr = currentLang==='fr';
+  const fmt = function(c){ return (c/100).toFixed(2).replace('.', ',') + ' €'; };
+
+  // Ligne 1 : base
+  document.getElementById('puSummaryPlan').textContent =
+    (isFr?'Base · ':'Base · ') + purchaseHours + 'h · ' +
+    (isFr?'2 langues incluses':'2 languages included');
+  const baseLine = PU_BASE_TTC + (purchaseHours - 1) * PU_EXTRA_H_TTC;
+  document.getElementById('puSummaryBase').textContent = fmt(baseLine);
+
+  // Ligne 2 : langues supplémentaires (optionnelle)
+  const extraRow = document.getElementById('puExtraRow');
+  if(extraCount > 0){
+    extraRow.style.display = 'flex';
+    document.getElementById('puSummaryExtra').textContent =
+      extraCount + (isFr?' langue':' extra lang') + (extraCount>1?'s':'') +
+      ' × ' + purchaseHours + 'h × ' + fmt(PU_EXTRA_LANG_TTC);
+    const extraCents = extraCount * purchaseHours * PU_EXTRA_LANG_TTC;
+    document.getElementById('puSummaryExtraPrice').textContent = '+' + fmt(extraCents);
+  } else {
+    extraRow.style.display = 'none';
+  }
+
+  // Total et badge
+  document.getElementById('puSummaryTotal').textContent = fmt(totalCents) + ' TTC';
+  const badge = document.getElementById('purchaseBadge');
+  if(badge){
+    const langsTotal = 2 + extraCount;
+    badge.textContent =
+      purchaseHours + 'h · ' + langsTotal + (isFr?' langues — ':' languages — ') +
+      fmt(totalCents) + ' TTC';
+    badge.style.background = totalCents >= 100000 ? 'var(--ink)' : 'var(--teal)';
+  }
+}
+
+// Ouvre la modale. Optionnel : pré-remplir avec heures et langues
+// cibles supplémentaires venant de la calculatrice.
+function contactSales(planLegacy, prefHours, prefExtraLangs){
+  // Récupération des préférences (depuis la calculatrice si appel automatique)
+  if(typeof prefHours === 'undefined'){
+    prefHours = (typeof calcHours !== 'undefined') ? calcHours : 1;
+  }
+  if(typeof prefExtraLangs === 'undefined'){
+    prefExtraLangs = (typeof calcExtraLangs !== 'undefined') ? calcExtraLangs : 0;
+  }
+  purchaseHours = Math.max(PU_MIN_HOURS, Math.min(PU_MAX_HOURS, parseInt(prefHours,10) || 1));
+
+  puBuildHoursGrid();
+
   // Pré-remplir depuis le formulaire gratuit si rempli
   const n=document.getElementById('f-name'); const e=document.getElementById('f-email');
-  if(n?.value) document.getElementById('pu-name').value=n.value;
-  if(e?.value) document.getElementById('pu-email').value=e.value;
+  if(n && n.value) document.getElementById('pu-name').value=n.value;
+  if(e && e.value) document.getElementById('pu-email').value=e.value;
+
   puPopulateSelects();
+
+  // Synchroniser les langues cibles supplémentaires avec le choix de la calculatrice
+  // (par défaut p1=en, p2/p3 vides → on remplit p2/p3 si l'utilisateur a choisi des extras)
+  const extras = Math.max(0, Math.min(2, parseInt(prefExtraLangs,10) || 0));
+  if(extras >= 1){
+    const p2 = document.getElementById('pu-lang-p2');
+    // Choisir une langue par défaut non déjà utilisée (es par défaut)
+    if(p2 && !p2.value) p2.value = 'es';
+  }
+  if(extras >= 2){
+    const p3 = document.getElementById('pu-lang-p3');
+    if(p3 && !p3.value) p3.value = 'de';
+  }
+  puUpdateFlagP(2); puUpdateFlagP(3);
+
   document.getElementById('purchaseError').style.display='none';
   document.getElementById('purchaseOverlay').classList.add('active');
   document.body.style.overflow='hidden';
@@ -2014,32 +2482,36 @@ async function purchaseSubmit(){
   const p2   =document.getElementById('pu-lang-p2').value;
   const p3   =document.getElementById('pu-lang-p3').value;
   const errEl=document.getElementById('purchaseError');
+  const isFr = currentLang==='fr';
 
-  if(!name){errEl.textContent=currentLang==='fr'?'Merci d\'indiquer votre nom.':'Please enter your name.';errEl.style.display='block';return;}
-  if(!email||!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){errEl.textContent=currentLang==='fr'?'Email invalide.':'Invalid email.';errEl.style.display='block';return;}
-  if(!p1){errEl.textContent=currentLang==='fr'?'Choisissez au moins une langue participant.':'Select at least one participant language.';errEl.style.display='block';return;}
+  if(!name){errEl.textContent=isFr?'Merci d\'indiquer votre nom.':'Please enter your name.';errEl.style.display='block';return;}
+  if(!email||!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){errEl.textContent=isFr?'Email invalide.':'Invalid email.';errEl.style.display='block';return;}
+  if(!p1){errEl.textContent=isFr?'Choisissez au moins une langue participant.':'Select at least one participant language.';errEl.style.display='block';return;}
+  if(purchaseHours < PU_MIN_HOURS || purchaseHours > PU_MAX_HOURS){
+    errEl.textContent = isFr ? 'Durée invalide.' : 'Invalid duration.';
+    errEl.style.display='block';
+    return;
+  }
+  const cgvBox=document.getElementById('pu-cgv-accept');
+  if(cgvBox && !cgvBox.checked){errEl.textContent=isFr?'Veuillez lire et accepter les conditions générales de vente avant de procéder au paiement.':'Please read and accept the terms and conditions before proceeding to payment.';errEl.style.display='block';return;}
   errEl.style.display='none';
 
   const room=name.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9]/g,'').slice(0,40)+'_'+Date.now().toString(36);
   const targets=[p1,p2,p3].filter(Boolean).join(',');
   const allLangs=[src,...[p1,p2,p3].filter(Boolean)].join(',');
 
-  const plan=PLAN_DEF[purchasePlan]||PLAN_DEF['1H'];
-  const extraLangs=[p2,p3].filter(Boolean).length;
-  const totalCents=plan.base + extraLangs*plan.extraLang;
-
   const btn=document.getElementById('purchaseSubmitBtn');
-  btn.innerHTML='⏳ '+(currentLang==='fr'?'Redirection vers le paiement…':'Redirecting to payment…');
+  btn.innerHTML='⏳ '+(isFr?'Redirection vers le paiement…':'Redirecting to payment…');
   btn.disabled=true;
 
   try{
     const res=await fetch('/.netlify/functions/create-checkout',{
       method:'POST',headers:{'Content-Type':'application/json'},
       body:JSON.stringify({
-        plan:purchasePlan, room, customerEmail:email,
-        customerName:name, organisation:org,
+        room, customerEmail:email, customerName:name, organisation:org,
         langSrc:src, targets, languages:allLangs,
-        totalCents, hours:plan.hours
+        hours: purchaseHours,
+        locale: isFr ? 'fr' : 'en'
       })
     });
     const data=await res.json();
@@ -2047,13 +2519,13 @@ async function purchaseSubmit(){
     else{
       errEl.textContent='Erreur : '+(data.error||'Paiement impossible.');
       errEl.style.display='block';
-      btn.innerHTML='💳 '+(currentLang==='fr'?'Procéder au paiement':'Proceed to payment');
+      btn.innerHTML='💳 '+(isFr?'Procéder au paiement':'Proceed to payment');
       btn.disabled=false;
     }
   }catch(err){
-    errEl.textContent=currentLang==='fr'?'Erreur de connexion. Réessayez.':'Connection error. Try again.';
+    errEl.textContent=isFr?'Erreur de connexion. Réessayez.':'Connection error. Try again.';
     errEl.style.display='block';
-    btn.innerHTML='💳 '+(currentLang==='fr'?'Procéder au paiement':'Proceed to payment');
+    btn.innerHTML='💳 '+(isFr?'Procéder au paiement':'Proceed to payment');
     btn.disabled=false;
   }
 }
@@ -2088,7 +2560,7 @@ async function purchaseSubmit(){
       installBanner.style.cssText = 'position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:#0d1f1a;color:#fff;padding:14px 20px;border-radius:14px;box-shadow:0 4px 20px rgba(0,0,0,.3);display:flex;align-items:center;gap:12px;z-index:9999;max-width:340px;width:90%;border:1px solid #2dd4bf';
       installBanner.innerHTML =
         '<img src="/favicon-192.png" width="40" height="40" style="border-radius:8px">'+
-        '<div style="flex:1"><div style="font-weight:700;font-size:14px">TranslateTheWorld</div><div style="font-size:11px;color:#2dd4bf">Ajouter à l'écran d'accueil</div></div>'+
+        '<div style="flex:1"><div style="font-weight:700;font-size:14px">TranslateTheWorld</div><div style="font-size:11px;color:#2dd4bf">Ajouter à l\'écran d\'accueil</div></div>'+
         '<button onclick="doInstall()" style="background:#2dd4bf;color:#0d1f1a;border:none;border-radius:8px;padding:8px 14px;font-weight:700;cursor:pointer;font-size:13px">Installer</button>'+
         '<button onclick="dismissBanner()" style="background:none;border:none;color:#999;cursor:pointer;font-size:18px;padding:0 4px">✕</button>';
       document.body.appendChild(installBanner);
@@ -2118,8 +2590,51 @@ async function purchaseSubmit(){
     <div style="padding:24px 28px">
       <div id="bookStep1">
         <div id="bookSlotsGrid" style="display:flex;flex-direction:column;gap:16px"></div>
-        <div id="bookNoSlots" style="display:none;text-align:center;padding:40px 20px;color:#999;font-size:14px">
-          No availability for the next 7 days.<br>Contact us: <a href="mailto:dnb@sogedicom.com" style="color:#2dd4bf;font-weight:600">dnb@sogedicom.com</a>
+        <div id="bookNoSlots" style="display:none">
+          <!-- Message FALC en 4 langues -->
+          <div style="background:#fff8e6;border:1.5px solid #f0d68c;border-radius:10px;padding:14px 16px;margin-bottom:18px;font-size:13px;line-height:1.6;color:#5a4a1a">
+            <div style="font-weight:700;margin-bottom:8px;font-size:14px;color:#0d1f1a">📅 <span data-fallback-fr>Demandez votre démo personnalisée</span><span data-fallback-en style="display:none">Request your personalised demo</span><span data-fallback-es style="display:none">Solicite su demostración personalizada</span><span data-fallback-it style="display:none">Richiedi la tua demo personalizzata</span></div>
+            <div data-fallback-fr>Laissez-nous vos coordonnées. Nous vous rappelons vite pour fixer un rendez-vous.</div>
+            <div data-fallback-en style="display:none">Leave us your contact details. We will call you back fast to schedule a meeting.</div>
+            <div data-fallback-es style="display:none">Déjenos sus datos. Le llamamos pronto para concertar una cita.</div>
+            <div data-fallback-it style="display:none">Lasciaci i tuoi dati. Ti richiamiamo presto per fissare un appuntamento.</div>
+          </div>
+
+          <!-- Sélecteur de langue (drapeaux) -->
+          <div style="display:flex;justify-content:center;gap:6px;margin-bottom:16px">
+            <button type="button" onclick="setFallbackLang('fr')" id="fbLangFr" class="fb-lang-btn fb-active">🇫🇷 FR</button>
+            <button type="button" onclick="setFallbackLang('en')" id="fbLangEn" class="fb-lang-btn">🇬🇧 EN</button>
+            <button type="button" onclick="setFallbackLang('es')" id="fbLangEs" class="fb-lang-btn">🇪🇸 ES</button>
+            <button type="button" onclick="setFallbackLang('it')" id="fbLangIt" class="fb-lang-btn">🇮🇹 IT</button>
+          </div>
+
+          <!-- Formulaire -->
+          <div style="display:grid;gap:12px">
+            <div>
+              <label style="font-size:11px;font-weight:700;color:#999;letter-spacing:.08em;text-transform:uppercase;display:block;margin-bottom:6px"><span data-fb-label="name">Nom *</span></label>
+              <input id="fbName" type="text" style="width:100%;padding:11px 14px;border-radius:10px;border:1.5px solid #b8b8b8;font-size:14px;font-family:Arial,sans-serif;box-sizing:border-box;outline:none">
+            </div>
+            <div>
+              <label style="font-size:11px;font-weight:700;color:#999;letter-spacing:.08em;text-transform:uppercase;display:block;margin-bottom:6px"><span data-fb-label="phone">Téléphone *</span></label>
+              <input id="fbPhone" type="tel" style="width:100%;padding:11px 14px;border-radius:10px;border:1.5px solid #b8b8b8;font-size:14px;font-family:Arial,sans-serif;box-sizing:border-box;outline:none">
+            </div>
+            <div>
+              <label style="font-size:11px;font-weight:700;color:#999;letter-spacing:.08em;text-transform:uppercase;display:block;margin-bottom:6px"><span data-fb-label="email">Email *</span></label>
+              <input id="fbEmail" type="email" style="width:100%;padding:11px 14px;border-radius:10px;border:1.5px solid #b8b8b8;font-size:14px;font-family:Arial,sans-serif;box-sizing:border-box;outline:none">
+            </div>
+          </div>
+
+          <div id="fbError" style="display:none;color:#e53e3e;font-size:13px;margin-top:10px"></div>
+
+          <button type="button" onclick="submitFallbackForm()" id="fbSubmitBtn" style="width:100%;margin-top:16px;background:#2dd4bf;color:#0d1f1a;border:none;border-radius:10px;padding:14px;font-size:15px;font-weight:800;cursor:pointer;font-family:Arial,sans-serif">
+            <span data-fb-label="submit">📨 Envoyer ma demande</span>
+          </button>
+
+          <div id="fbSuccess" style="display:none;text-align:center;padding:20px 0;margin-top:14px;background:#d4f5e9;border:1px solid #2dd4bf;border-radius:10px">
+            <div style="font-size:36px;margin-bottom:8px">✅</div>
+            <div style="font-size:15px;font-weight:800;color:#085c3a"><span data-fb-label="success">Message envoyé !</span></div>
+            <div style="font-size:13px;color:#0d1f1a;margin-top:6px"><span data-fb-label="success_desc">Nous vous contactons très vite.</span></div>
+          </div>
         </div>
       </div>
       <div id="bookStep2" style="display:none">
@@ -2165,8 +2680,8 @@ function openBookingModal(){
   var o=document.getElementById('bookingOverlay'); o.style.display='flex';
   document.body.style.overflow='hidden';
   var isFr=(typeof currentLang!=='undefined'&&currentLang==='fr');
-  document.getElementById('book-label').textContent=isFr?'Reserver une demo':'Book a Demo';
-  document.getElementById('book-title').textContent=isFr?'Choisissez un creneau':'Choose a slot';
+  document.getElementById('book-label').textContent=isFr?'Demander une demo':'Request a demo';
+  document.getElementById('book-title').textContent=isFr?'Parlez-nous de votre evenement':'Tell us about your event';
   document.getElementById('bookStep1').style.display='block';
   document.getElementById('bookStep2').style.display='none';
   document.getElementById('bookStep3').style.display='none';
@@ -2175,48 +2690,13 @@ function openBookingModal(){
 function closeBookingModal(){document.getElementById('bookingOverlay').style.display='none';document.body.style.overflow='';}
 document.getElementById('bookingOverlay').addEventListener('click',function(e){if(e.target===this)closeBookingModal();});
 function loadBookingSlots(){
-  var grid=document.getElementById('bookSlotsGrid');
-  var noSlots=document.getElementById('bookNoSlots');
-  grid.innerHTML='<div style="text-align:center;padding:30px;color:#999;font-size:13px">Loading...</div>';
-  noSlots.style.display='none';
-  var db=initBookingFb();
-  if(!db){grid.innerHTML='';noSlots.style.display='block';return;}
-  var today=new Date();today.setHours(0,0,0,0);
-  var days=[];
-  for(var i=0;i<7;i++){var d=new Date(today);d.setDate(today.getDate()+i);days.push(d.toISOString().slice(0,10));}
-  db.ref('demo_availability').once('value',function(snap){
-    var avail=snap.val()||{};
-    db.ref('demo_bookings').once('value',function(bSnap){
-      var booked=bSnap.val()||{};
-      var bookedKeys=new Set(Object.keys(booked));
-      var hasSlots=false;
-      grid.innerHTML='';
-      days.forEach(function(date){
-        if(!avail[date]||!avail[date].slots) return;
-        var slots=avail[date].slots.filter(function(s){return !bookedKeys.has(date+'_'+s);});
-        if(!slots.length) return;
-        hasSlots=true;
-        var d=new Date(date+'T12:00:00');
-        var dayLabel=d.toLocaleDateString('en-GB',{weekday:'long',day:'numeric',month:'long'});
-        var dayDiv=document.createElement('div');
-        dayDiv.innerHTML='<div style="font-size:13px;font-weight:700;color:#0d1f1a;margin-bottom:10px;padding-bottom:8px;border-bottom:1px solid #f0f0f0">'+dayLabel+'</div>';
-        var row=document.createElement('div');
-        row.style.cssText='display:flex;flex-wrap:wrap;gap:8px';
-        slots.forEach(function(slot){
-          var btn=document.createElement('button');
-          btn.textContent=slot;
-          btn.style.cssText='background:#f0faf8;border:1.5px solid #2dd4bf;border-radius:8px;padding:8px 16px;font-size:13px;font-weight:700;color:#0d1f1a;cursor:pointer;transition:all .15s';
-          btn.onmouseover=function(){this.style.background='#2dd4bf';};
-          btn.onmouseout=function(){this.style.background='#f0faf8';};
-          (function(d2,s2,dl2){btn.onclick=function(){selectedBookingSlot={date:d2,time:s2,label:dl2+' at '+s2};showBookingStep2(dl2,s2);};})(date,slot,dayLabel);
-          row.appendChild(btn);
-        });
-        dayDiv.appendChild(row);
-        grid.appendChild(dayDiv);
-      });
-      if(!hasSlots){grid.innerHTML='';noSlots.style.display='block';}
-    });
-  });
+  // ── MODE CONTACT DIRECT ──
+  // Le calendrier est désactivé pour le moment. On affiche directement
+  // le formulaire de contact. Une fois que le client envoie sa demande,
+  // SV INTERACTIVE le rappelle pour planifier la démo manuellement.
+  document.getElementById('bookSlotsGrid').innerHTML='';
+  document.getElementById('bookNoSlots').style.display='block';
+  resetFallbackForm();
 }
 function showBookingStep2(dl,t){
   document.getElementById('bookStep1').style.display='none';
@@ -2227,6 +2707,118 @@ function bookingBackToStep1(){
   document.getElementById('bookStep2').style.display='none';
   document.getElementById('bookStep1').style.display='block';
 }
+// ════════════════════════════════════════════════════════════
+// FORMULAIRE DE CONTACT FALLBACK (si aucun créneau ne convient)
+// 4 langues : FR, EN, ES, IT
+// ════════════════════════════════════════════════════════════
+var fbCurrentLang = 'fr';
+var FB_LABELS = {
+  fr: { name:'Nom *',           phone:'Téléphone *', email:'Email *',           submit:'📨 Envoyer ma demande',     submit_loading:'⏳ Envoi en cours…', success:'Message envoyé !',  success_desc:'Nous vous contactons très vite.', err_required:'Merci de remplir tous les champs.', err_email:'Email invalide.', err_send:'Erreur d\'envoi. Réessayez.' },
+  en: { name:'Name *',           phone:'Phone *',     email:'Email *',           submit:'📨 Send my request',         submit_loading:'⏳ Sending…',         success:'Message sent!',     success_desc:'We will contact you very soon.',   err_required:'Please fill in all fields.',         err_email:'Invalid email.',  err_send:'Sending failed. Please retry.' },
+  es: { name:'Nombre *',         phone:'Teléfono *',  email:'Email *',           submit:'📨 Enviar mi solicitud',     submit_loading:'⏳ Enviando…',        success:'¡Mensaje enviado!', success_desc:'Le contactamos muy pronto.',       err_required:'Complete todos los campos.',         err_email:'Email no válido.',err_send:'Error de envío. Reintente.' },
+  it: { name:'Nome *',           phone:'Telefono *',  email:'Email *',           submit:'📨 Invia la mia richiesta',  submit_loading:'⏳ Invio…',           success:'Messaggio inviato!',success_desc:'Vi contattiamo molto presto.',     err_required:'Compila tutti i campi.',             err_email:'Email non valida.',err_send:'Errore di invio. Riprova.' }
+};
+
+function setFallbackLang(lang){
+  fbCurrentLang = lang;
+  // Mise à jour du visuel des onglets
+  ['fr','en','es','it'].forEach(function(l){
+    var btn = document.getElementById('fbLang' + l.charAt(0).toUpperCase() + l.slice(1));
+    if(btn) btn.classList.toggle('fb-active', l === lang);
+  });
+  // Affichage du bon texte d'introduction
+  ['fr','en','es','it'].forEach(function(l){
+    var els = document.querySelectorAll('[data-fallback-' + l + ']');
+    els.forEach(function(el){ el.style.display = (l === lang) ? '' : 'none'; });
+  });
+  // Mise à jour des labels du formulaire
+  var labels = FB_LABELS[lang];
+  document.querySelectorAll('[data-fb-label]').forEach(function(el){
+    var key = el.getAttribute('data-fb-label');
+    if(labels[key]) el.textContent = labels[key];
+  });
+}
+
+function submitFallbackForm(){
+  var name  = document.getElementById('fbName').value.trim();
+  var phone = document.getElementById('fbPhone').value.trim();
+  var email = document.getElementById('fbEmail').value.trim();
+  var errEl = document.getElementById('fbError');
+  var btn   = document.getElementById('fbSubmitBtn');
+  var labels = FB_LABELS[fbCurrentLang];
+
+  errEl.style.display = 'none';
+
+  // Validation
+  if(!name || !phone || !email){
+    errEl.textContent = labels.err_required;
+    errEl.style.display = 'block';
+    return;
+  }
+  if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){
+    errEl.textContent = labels.err_email;
+    errEl.style.display = 'block';
+    return;
+  }
+
+  btn.disabled = true;
+  btn.querySelector('[data-fb-label]').textContent = labels.submit_loading;
+
+  // Envoi via EmailJS (même service/template que les autres notifications admin)
+  var subject = '📭 DEMO REQUEST (no slot suitable) - ' + name;
+  var message = 'Demo request — no available slot suited the client.\n\n' +
+                'Name: ' + name + '\n' +
+                'Phone: ' + phone + '\n' +
+                'Email: ' + email + '\n' +
+                'Form language: ' + fbCurrentLang.toUpperCase() + '\n' +
+                'Date: ' + new Date().toLocaleString('fr-FR');
+
+  emailjs.send('service_98a5sho','template_se7eiug',{
+    to_email:  'dnb@sogedicom.com',
+    from_name: name,
+    from_org:  '-',
+    from_email: email,
+    message:   message,
+    reply_to:  email
+  }).then(function(){
+    // Sauvegarder aussi dans Firebase pour le suivi admin
+    if(db){
+      db.ref('demo_requests').push({
+        name: name, phone: phone, email: email,
+        lang: fbCurrentLang, ts: Date.now()
+      }).catch(function(){/* ignore si Firebase indispo */});
+    }
+    // Affichage succès
+    document.getElementById('fbSuccess').style.display = 'block';
+    btn.style.display = 'none';
+    // Cacher les champs
+    ['fbName','fbPhone','fbEmail'].forEach(function(id){
+      var el = document.getElementById(id);
+      if(el && el.parentElement) el.parentElement.style.display = 'none';
+    });
+  }).catch(function(err){
+    console.error('EmailJS error:', err);
+    errEl.textContent = labels.err_send;
+    errEl.style.display = 'block';
+    btn.disabled = false;
+    btn.querySelector('[data-fb-label]').textContent = labels.submit;
+  });
+}
+
+// Réinitialise le formulaire à chaque ouverture du modal
+function resetFallbackForm(){
+  ['fbName','fbPhone','fbEmail'].forEach(function(id){
+    var el = document.getElementById(id);
+    if(el){ el.value = ''; if(el.parentElement) el.parentElement.style.display = ''; }
+  });
+  var err = document.getElementById('fbError');     if(err) err.style.display = 'none';
+  var ok  = document.getElementById('fbSuccess');   if(ok)  ok.style.display = 'none';
+  var btn = document.getElementById('fbSubmitBtn'); if(btn){ btn.style.display = ''; btn.disabled = false; }
+  // Détecte la langue du site et applique
+  var lang = (typeof currentLang !== 'undefined' && ['fr','en','es','it'].indexOf(currentLang) !== -1) ? currentLang : 'fr';
+  setFallbackLang(lang);
+}
+
 async function confirmBooking(){
   var name=document.getElementById('bookName').value.trim();
   var email=document.getElementById('bookEmail').value.trim();
@@ -2242,7 +2834,7 @@ async function confirmBooking(){
     var db=initBookingFb();
     await db.ref('demo_bookings/'+slotKey).set({slot:slotKey,date:selectedBookingSlot.date,time:selectedBookingSlot.time,name:name,email:email,org:org||'-',bookedAt:Date.now()});
     try{
-      await emailjs.send('service_98a5sho','template_ofhz8y6',{to_email:'dnb@sogedicom.com',from_name:name,from_org:org||'-',from_email:email,message:'DEMO BOOKING - '+selectedBookingSlot.label+' | Name: '+name+' | Email: '+email+' | Org: '+(org||'-'),reply_to:email});
+      await emailjs.send('service_98a5sho','template_se7eiug',{to_email:'dnb@sogedicom.com',from_name:name,from_org:org||'-',from_email:email,message:'DEMO BOOKING - '+selectedBookingSlot.label+' | Name: '+name+' | Email: '+email+' | Org: '+(org||'-'),reply_to:email});
     }catch(e2){console.warn('email',e2);}
     document.getElementById('bookStep2').style.display='none';
     document.getElementById('bookStep3').style.display='block';
@@ -2257,4 +2849,3 @@ async function confirmBooking(){
 </body>
 </html>
  
-

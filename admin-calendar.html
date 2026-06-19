@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex,nofollow">
+<title>TTW Admin — Calendrier démos</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;font-family:'DM Sans',Arial,sans-serif;background:#f5f7f6;color:#0d1f1a;padding:20px}
+.container{max-width:900px;margin:0 auto}
+.header{background:#0d1f1a;color:#fff;padding:24px 28px;border-radius:14px 14px 0 0;display:flex;justify-content:space-between;align-items:center}
+.header h1{margin:0;font-size:20px;font-weight:800}
+.header .sub{color:#2dd4bf;font-size:12px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;margin-bottom:4px}
+.btn-logout{background:rgba(255,255,255,.1);border:none;color:#fff;padding:8px 14px;border-radius:8px;cursor:pointer;font-size:13px;font-weight:700}
+.body{background:#fff;border-radius:0 0 14px 14px;padding:28px;box-shadow:0 4px 14px rgba(0,0,0,.05);margin-bottom:30px}
+.section{margin-bottom:30px}
+.section h2{font-size:16px;font-weight:800;margin:0 0 14px;color:#0d1f1a;display:flex;align-items:center;gap:8px}
+.add-slot{display:flex;flex-wrap:wrap;gap:10px;align-items:flex-end;background:#f0faf8;border:1.5px solid #2dd4bf;border-radius:12px;padding:16px}
+.add-slot label{font-size:11px;font-weight:700;color:#666;letter-spacing:.06em;text-transform:uppercase;display:block;margin-bottom:5px}
+.add-slot input{width:100%;padding:10px 12px;border-radius:8px;border:1.5px solid #ccc;font-size:14px;font-family:inherit;outline:none}
+.add-slot input:focus{border-color:#2dd4bf}
+.add-slot .col{flex:1;min-width:130px}
+.btn-primary{background:#2dd4bf;color:#0d1f1a;border:none;padding:12px 22px;border-radius:8px;font-size:14px;font-weight:800;cursor:pointer;font-family:inherit;white-space:nowrap}
+.btn-primary:hover{background:#26b8a6}
+.btn-primary:disabled{opacity:.5;cursor:not-allowed}
+.btn-danger{background:#fee;color:#c33;border:1px solid #fcc;padding:6px 10px;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit}
+.btn-danger:hover{background:#fcc}
+.day{background:#fafafa;border:1px solid #e5e5e5;border-radius:10px;padding:14px 16px;margin-bottom:10px}
+.day-header{font-size:14px;font-weight:800;color:#0d1f1a;margin-bottom:10px;padding-bottom:8px;border-bottom:1px solid #eee}
+.slots-row{display:flex;flex-wrap:wrap;gap:8px}
+.slot-chip{background:#fff;border:1.5px solid #2dd4bf;border-radius:8px;padding:8px 12px;font-size:13px;font-weight:700;display:flex;align-items:center;gap:8px}
+.slot-chip.booked{background:#fff5e0;border-color:#f0c060;color:#a07000}
+.empty{text-align:center;padding:40px 20px;color:#999;font-size:14px}
+.message{padding:12px 16px;border-radius:8px;margin-bottom:14px;font-size:13px;font-weight:600}
+.message.success{background:#d4f5e9;color:#085c3a;border:1px solid #2dd4bf}
+.message.error{background:#fee;color:#c33;border:1px solid #fcc}
+.bookings-list{display:flex;flex-direction:column;gap:10px}
+.booking-item{background:#fff;border:1px solid #e5e5e5;border-radius:10px;padding:12px 16px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px}
+.booking-info{flex:1;min-width:200px}
+.booking-name{font-weight:800;font-size:14px;color:#0d1f1a}
+.booking-meta{font-size:12px;color:#666;margin-top:3px}
+.booking-slot{background:#f0faf8;border:1px solid #2dd4bf;border-radius:6px;padding:5px 10px;font-size:12px;font-weight:700;color:#0d1f1a}
+@media(max-width:600px){.add-slot{flex-direction:column;align-items:stretch}.add-slot .col{min-width:0}}
+
+/* Login */
+.login-screen{position:fixed;inset:0;background:linear-gradient(180deg,#0d1f1a 0%,#1a3530 100%);display:flex;align-items:center;justify-content:center;padding:20px;z-index:9999}
+.login-box{background:#fff;border-radius:16px;padding:30px 28px;max-width:380px;width:100%;text-align:center;box-shadow:0 10px 40px rgba(0,0,0,.3)}
+.login-box h2{margin:0 0 8px;font-size:20px;color:#0d1f1a}
+.login-box p{margin:0 0 20px;color:#666;font-size:13px}
+.login-box input{width:100%;padding:12px 14px;border-radius:8px;border:1.5px solid #ccc;font-size:15px;font-family:inherit;outline:none;margin-bottom:14px}
+.login-box input:focus{border-color:#2dd4bf}
+.login-error{color:#c33;font-size:13px;margin-top:8px;display:none}
+</style>
+</head>
+<body>
+
+<!-- Écran de connexion -->
+<div id="loginScreen" class="login-screen">
+  <div class="login-box">
+    <h2>🔐 Admin Calendar</h2>
+    <p>TranslateTheWorld — Gestion des créneaux démos</p>
+    <input type="password" id="pwd" placeholder="Mot de passe" autofocus onkeydown="if(event.key==='Enter')checkPwd()">
+    <button class="btn-primary" onclick="checkPwd()" style="width:100%">Se connecter</button>
+    <div class="login-error" id="loginError">Mot de passe incorrect</div>
+  </div>
+</div>
+
+<!-- Interface admin -->
+<div class="container" id="adminApp" style="display:none">
+  <div class="header">
+    <div>
+      <div class="sub">TranslateTheWorld Admin</div>
+      <h1>📅 Gestion des créneaux démos</h1>
+    </div>
+    <button class="btn-logout" onclick="logout()">Déconnexion</button>
+  </div>
+
+  <div class="body">
+    <!-- Ajouter un créneau -->
+    <div class="section">
+      <h2>➕ Ajouter un créneau disponible</h2>
+      <div class="add-slot">
+        <div class="col">
+          <label>Date</label>
+          <input type="date" id="newDate">
+        </div>
+        <div class="col">
+          <label>Heure (24h)</label>
+          <input type="time" id="newTime" step="900">
+        </div>
+        <button class="btn-primary" id="addBtn" onclick="addSlot()">Ajouter</button>
+      </div>
+      <div id="addMsg"></div>
+    </div>
+
+    <!-- Créneaux existants -->
+    <div class="section">
+      <h2>🗓️ Créneaux disponibles (14 prochains jours)</h2>
+      <div id="slotsContainer"></div>
+    </div>
+
+    <!-- Réservations confirmées -->
+    <div class="section">
+      <h2>✅ Démos réservées</h2>
+      <div id="bookingsContainer"></div>
+    </div>
+  </div>
+</div>
+
+<!-- Firebase -->
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+
+<script>
+// ── CONFIGURATION ──
+const ADMIN_PWD = 'sogedicom2025ttw';
+const FIREBASE_CONFIG = {
+  databaseURL: 'https://sogevoxreunion-default-rtdb.europe-west1.firebasedatabase.app'
+};
+
+// ── LOGIN ──
+function checkPwd(){
+  const pwd = document.getElementById('pwd').value;
+  if(pwd === ADMIN_PWD){
+    document.getElementById('loginScreen').style.display = 'none';
+    document.getElementById('adminApp').style.display = 'block';
+    sessionStorage.setItem('ttw_admin_ok','1');
+    initAdmin();
+  } else {
+    document.getElementById('loginError').style.display = 'block';
+  }
+}
+function logout(){
+  sessionStorage.removeItem('ttw_admin_ok');
+  location.reload();
+}
+// Auto-login si déjà connecté dans cette session
+if(sessionStorage.getItem('ttw_admin_ok') === '1'){
+  document.getElementById('loginScreen').style.display = 'none';
+  document.getElementById('adminApp').style.display = 'block';
+  setTimeout(initAdmin, 100);
+}
+
+// ── INITIALISATION ──
+let db = null;
+function initAdmin(){
+  if(!firebase.apps.length){
+    firebase.initializeApp(FIREBASE_CONFIG);
+  }
+  db = firebase.database();
+  // Date par défaut = demain
+  const tomorrow = new Date();
+  tomorrow.setDate(tomorrow.getDate() + 1);
+  document.getElementById('newDate').value = tomorrow.toISOString().slice(0,10);
+  document.getElementById('newTime').value = '14:00';
+  refreshSlots();
+  refreshBookings();
+}
+
+// ── AJOUTER UN CRÉNEAU ──
+function addSlot(){
+  const date = document.getElementById('newDate').value;
+  const time = document.getElementById('newTime').value;
+  const msg  = document.getElementById('addMsg');
+  const btn  = document.getElementById('addBtn');
+
+  msg.innerHTML = '';
+
+  if(!date || !time){
+    msg.innerHTML = '<div class="message error">Merci de remplir la date ET l\'heure.</div>';
+    return;
+  }
+
+  btn.disabled = true;
+  btn.textContent = 'Ajout…';
+
+  // Lire les créneaux existants pour ce jour, puis ajouter le nouveau
+  db.ref('demo_availability/' + date).once('value').then(snap => {
+    const data = snap.val() || {};
+    const slots = data.slots || [];
+    if(slots.includes(time)){
+      msg.innerHTML = '<div class="message error">Ce créneau existe déjà pour cette date.</div>';
+      btn.disabled = false;
+      btn.textContent = 'Ajouter';
+      return;
+    }
+    slots.push(time);
+    slots.sort(); // ordre chronologique
+    return db.ref('demo_availability/' + date).set({slots: slots});
+  }).then(() => {
+    msg.innerHTML = '<div class="message success">✅ Créneau ajouté avec succès !</div>';
+    btn.disabled = false;
+    btn.textContent = 'Ajouter';
+    setTimeout(()=>{msg.innerHTML=''}, 4000);
+    refreshSlots();
+  }).catch(err => {
+    msg.innerHTML = '<div class="message error">Erreur : ' + err.message + '</div>';
+    btn.disabled = false;
+    btn.textContent = 'Ajouter';
+  });
+}
+
+// ── SUPPRIMER UN CRÉNEAU ──
+function deleteSlot(date, time){
+  if(!confirm('Supprimer le créneau du ' + date + ' à ' + time + ' ?')) return;
+  db.ref('demo_availability/' + date).once('value').then(snap => {
+    const data = snap.val() || {};
+    const slots = (data.slots || []).filter(s => s !== time);
+    if(slots.length === 0){
+      return db.ref('demo_availability/' + date).remove();
+    } else {
+      return db.ref('demo_availability/' + date).set({slots: slots});
+    }
+  }).then(() => refreshSlots())
+    .catch(err => alert('Erreur : ' + err.message));
+}
+
+// ── AFFICHER LES CRÉNEAUX ──
+function refreshSlots(){
+  const container = document.getElementById('slotsContainer');
+  container.innerHTML = '<div class="empty">Chargement…</div>';
+
+  // Calculer les 14 prochains jours
+  const today = new Date();
+  today.setHours(0,0,0,0);
+  const days = [];
+  for(let i = 0; i < 14; i++){
+    const d = new Date(today);
+    d.setDate(today.getDate() + i);
+    days.push(d.toISOString().slice(0,10));
+  }
+
+  db.ref('demo_availability').once('value').then(snapAvail => {
+    const avail = snapAvail.val() || {};
+    return db.ref('demo_bookings').once('value').then(snapBook => {
+      const booked = snapBook.val() || {};
+      const bookedKeys = new Set(Object.keys(booked));
+
+      let html = '';
+      let hasAny = false;
+
+      days.forEach(date => {
+        if(!avail[date] || !avail[date].slots || avail[date].slots.length === 0) return;
+        hasAny = true;
+        const d = new Date(date + 'T12:00:00');
+        const dayLabel = d.toLocaleDateString('fr-FR', {weekday:'long', day:'numeric', month:'long'});
+        html += '<div class="day">';
+        html += '<div class="day-header">' + dayLabel + '</div>';
+        html += '<div class="slots-row">';
+        avail[date].slots.forEach(slot => {
+          const slotKey = date + '_' + slot;
+          const isBooked = bookedKeys.has(slotKey);
+          const cls = isBooked ? 'slot-chip booked' : 'slot-chip';
+          const icon = isBooked ? '🔒' : '🟢';
+          html += '<div class="' + cls + '">';
+          html += icon + ' ' + slot;
+          if(isBooked){
+            html += ' <span style="font-size:11px;font-weight:600;color:#a07000">(réservé)</span>';
+          } else {
+            html += ' <button class="btn-danger" onclick="deleteSlot(\'' + date + '\',\'' + slot + '\')">Supprimer</button>';
+          }
+          html += '</div>';
+        });
+        html += '</div></div>';
+      });
+
+      if(!hasAny){
+        html = '<div class="empty">Aucun créneau pour les 14 prochains jours.<br>Ajoutez votre premier créneau ci-dessus.</div>';
+      }
+
+      container.innerHTML = html;
+    });
+  }).catch(err => {
+    container.innerHTML = '<div class="message error">Erreur : ' + err.message + '</div>';
+  });
+}
+
+// ── AFFICHER LES RÉSERVATIONS ──
+function refreshBookings(){
+  const container = document.getElementById('bookingsContainer');
+  container.innerHTML = '<div class="empty">Chargement…</div>';
+
+  db.ref('demo_bookings').once('value').then(snap => {
+    const data = snap.val() || {};
+    const keys = Object.keys(data);
+
+    if(keys.length === 0){
+      container.innerHTML = '<div class="empty">Aucune démo réservée pour le moment.</div>';
+      return;
+    }
+
+    // Tri par date croissante
+    keys.sort((a, b) => {
+      return (data[a].date + '_' + data[a].time).localeCompare(data[b].date + '_' + data[b].time);
+    });
+
+    let html = '<div class="bookings-list">';
+    keys.forEach(k => {
+      const b = data[k];
+      const d = new Date(b.date + 'T12:00:00');
+      const dayLabel = d.toLocaleDateString('fr-FR', {weekday:'short', day:'numeric', month:'short'});
+      html += '<div class="booking-item">';
+      html += '<div class="booking-info">';
+      html += '<div class="booking-name">' + escHtml(b.name) + '</div>';
+      html += '<div class="booking-meta">';
+      html += '📧 <a href="mailto:' + encodeURIComponent(b.email) + '">' + escHtml(b.email) + '</a>';
+      if(b.org && b.org !== '-'){ html += ' · 🏢 ' + escHtml(b.org); }
+      html += '</div></div>';
+      html += '<div class="booking-slot">' + dayLabel + ' à ' + b.time + '</div>';
+      html += '</div>';
+    });
+    html += '</div>';
+    container.innerHTML = html;
+  }).catch(err => {
+    container.innerHTML = '<div class="message error">Erreur : ' + err.message + '</div>';
+  });
+}
+
+// Sécurité texte
+function escHtml(s){
+  if(!s) return '';
+  return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+</script>
+</body>
+</html>

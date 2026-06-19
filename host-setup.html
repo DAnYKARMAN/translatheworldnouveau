@@ -1,0 +1,925 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>TranslateTheWorld — Start your session</title>
+<link rel="icon" type="image/svg+xml" href="/favicon.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;700;800&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#0b1512;
+  --surface:#121e19;
+  --card:#1a2b24;
+  --border:rgba(45,212,191,.18);
+  --teal:#2dd4bf;
+  --teal-dim:rgba(45,212,191,.12);
+  --gold:#f0d48a;
+  --ink:#0a0a0a;
+  --white:#f0f0ec;
+  --mid:#8a9e97;
+  --font:'DM Sans',sans-serif;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{
+  font-family:var(--font);
+  background:var(--bg);
+  min-height:100vh;
+  display:flex;align-items:center;justify-content:center;
+  padding:24px;
+  position:relative;overflow-x:hidden;
+}
+/* Subtle background glow */
+body::before{
+  content:'';position:fixed;inset:0;
+  background:radial-gradient(ellipse 60% 50% at 50% 0%,rgba(45,212,191,.08) 0%,transparent 70%);
+  pointer-events:none;
+}
+.wrap{width:100%;max-width:480px;position:relative;z-index:1}
+
+/* Language switcher (top-right) */
+.lang-switcher{
+  position:fixed;top:18px;right:18px;z-index:50;
+  display:flex;gap:4px;
+  background:rgba(0,0,0,.35);
+  border:1px solid rgba(255,255,255,.08);
+  border-radius:999px;
+  padding:4px;
+  backdrop-filter:blur(8px);
+}
+.lang-btn{
+  border:none;background:transparent;
+  color:rgba(255,255,255,.5);
+  font-family:var(--font);font-size:12px;font-weight:700;
+  padding:6px 12px;border-radius:999px;cursor:pointer;
+  display:flex;align-items:center;gap:6px;
+  transition:all .15s;
+}
+.lang-btn:hover{color:rgba(255,255,255,.85)}
+.lang-btn.active{
+  background:var(--teal-dim);
+  color:var(--teal);
+}
+.lang-btn .flag{
+  width:16px;height:12px;border-radius:2px;overflow:hidden;display:inline-block;
+}
+.lang-btn .flag img{width:100%;height:100%;object-fit:cover;display:block}
+
+/* Logo */
+.logo{
+  display:flex;align-items:center;justify-content:center;gap:10px;
+  margin-bottom:32px;text-decoration:none;
+  margin-top:36px;
+}
+.logo-text{font-size:16px;font-weight:800;color:var(--white);letter-spacing:-.02em}
+.logo-text span{
+  background:linear-gradient(110deg,#e8690a,#f5c842,#2dd4bf);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+}
+.logo-pill{
+  background:var(--teal-dim);border:1px solid var(--border);
+  color:var(--teal);font-size:10px;font-weight:700;letter-spacing:.1em;
+  text-transform:uppercase;padding:3px 10px;border-radius:999px;
+}
+
+/* Card */
+.card{
+  background:var(--card);
+  border:1px solid var(--border);
+  border-radius:20px;
+  padding:32px 28px 28px;
+  box-shadow:0 24px 64px rgba(0,0,0,.4);
+}
+.card-header{margin-bottom:24px}
+.card-badge{
+  display:inline-flex;align-items:center;gap:6px;
+  background:var(--teal-dim);border:1px solid var(--border);
+  color:var(--teal);font-size:10px;font-weight:700;
+  letter-spacing:.12em;text-transform:uppercase;
+  padding:5px 12px;border-radius:999px;margin-bottom:14px;
+}
+.card-title{font-size:22px;font-weight:800;color:var(--white);line-height:1.2;margin-bottom:6px}
+.card-sub{font-size:13px;color:var(--mid);line-height:1.6}
+
+/* Session info chips */
+.session-chips{
+  display:flex;flex-wrap:wrap;gap:8px;
+  padding:14px;background:rgba(0,0,0,.25);
+  border:1px solid rgba(255,255,255,.06);
+  border-radius:12px;margin-bottom:22px;
+}
+.chip{
+  display:inline-flex;align-items:center;gap:5px;
+  background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.09);
+  border-radius:8px;padding:5px 10px;
+  font-size:11.5px;font-weight:600;color:rgba(255,255,255,.7);
+  font-family:'DM Mono',monospace;
+}
+.chip.hl{border-color:rgba(45,212,191,.3);color:var(--teal);background:rgba(45,212,191,.07)}
+
+/* Clickable chip (languages button) */
+.chip.clickable{
+  cursor:pointer;
+  border-color:rgba(45,212,191,.35);
+  color:var(--teal);
+  background:rgba(45,212,191,.07);
+  transition:all .15s;
+  font-family:var(--font);
+  font-weight:700;
+}
+.chip.clickable:hover{
+  background:rgba(45,212,191,.15);
+  border-color:var(--teal);
+  transform:translateY(-1px);
+}
+.chip.clickable .edit-icon{
+  font-size:10px;opacity:.8;margin-left:2px;
+}
+
+/* Form fields */
+.field{margin-bottom:16px}
+.field label{
+  display:block;font-size:11px;font-weight:700;
+  color:var(--mid);letter-spacing:.1em;text-transform:uppercase;
+  margin-bottom:7px;
+}
+.field input,.field select{
+  width:100%;padding:13px 14px;
+  background:rgba(0,0,0,.3);
+  border:1.5px solid rgba(255,255,255,.1);
+  border-radius:10px;
+  color:var(--white);font-size:14px;font-weight:500;
+  font-family:var(--font);outline:none;
+  transition:border-color .18s,background .18s;
+}
+.field input:focus,.field select:focus{
+  border-color:var(--teal);background:rgba(0,0,0,.4);
+}
+.field input::placeholder{color:rgba(255,255,255,.2)}
+.field select option{background:#1a2b24;color:var(--white)}
+
+/* Flag+select wrapper */
+.sel-row{display:flex;align-items:center;gap:10px}
+.flag-box{width:36px;height:26px;border-radius:4px;overflow:hidden;flex-shrink:0;box-shadow:0 2px 8px rgba(0,0,0,.3)}
+.flag-box img{width:100%;height:100%;object-fit:cover;display:block}
+.sel-row select{flex:1}
+
+/* Audience languages field (clickable) */
+.audience-box{
+  width:100%;padding:13px 14px;
+  background:rgba(0,0,0,.3);
+  border:1.5px solid rgba(255,255,255,.1);
+  border-radius:10px;
+  color:var(--white);font-size:14px;font-weight:500;
+  font-family:var(--font);outline:none;cursor:pointer;
+  display:flex;align-items:center;justify-content:space-between;gap:10px;
+  min-height:48px;
+  transition:all .15s;
+}
+.audience-box:hover{
+  border-color:var(--teal);
+  background:rgba(0,0,0,.4);
+}
+.audience-box.empty{color:rgba(255,255,255,.3)}
+.audience-flags{display:flex;flex-wrap:wrap;gap:6px;align-items:center;flex:1}
+.audience-mini{
+  display:inline-flex;align-items:center;gap:5px;
+  background:rgba(45,212,191,.12);
+  border:1px solid rgba(45,212,191,.3);
+  border-radius:6px;padding:3px 8px;
+  font-size:12px;color:var(--teal);font-weight:600;
+}
+.audience-mini img{width:14px;height:10px;border-radius:2px;object-fit:cover}
+.audience-chevron{
+  color:var(--teal);font-size:16px;flex-shrink:0;opacity:.7;
+}
+
+/* Mode toggle */
+.mode-toggle{
+  background:rgba(0,0,0,.25);border:1px solid rgba(255,255,255,.07);
+  border-radius:12px;padding:14px 16px;margin-bottom:12px;
+}
+.mode-toggle-label{
+  display:flex;align-items:flex-start;gap:12px;cursor:pointer;
+}
+.toggle-switch{
+  position:relative;flex-shrink:0;margin-top:2px;
+}
+.toggle-switch input{opacity:0;width:0;height:0;position:absolute}
+.toggle-slider{
+  display:block;width:40px;height:22px;
+  background:rgba(255,255,255,.12);border-radius:999px;
+  transition:background .2s;cursor:pointer;position:relative;
+}
+.toggle-slider::after{
+  content:'';position:absolute;left:3px;top:3px;
+  width:16px;height:16px;border-radius:50%;
+  background:#fff;transition:transform .2s;
+}
+.toggle-switch input:checked+.toggle-slider{background:var(--teal)}
+.toggle-switch input:checked+.toggle-slider::after{transform:translateX(18px)}
+.toggle-text-block{flex:1}
+.toggle-title{font-size:13px;font-weight:700;color:var(--white);margin-bottom:4px;display:block}
+.toggle-recommended{
+  display:block;font-size:11.5px;font-weight:700;color:var(--teal);
+  margin-bottom:4px;font-style:italic;
+}
+.toggle-desc{font-size:11.5px;color:var(--mid);line-height:1.5;display:block}
+
+/* Auto mode control warning (host loses control) */
+.auto-control-warning{
+  background:rgba(240,212,138,.08);
+  border:1px solid rgba(240,212,138,.25);
+  border-radius:10px;
+  padding:11px 14px;margin-bottom:16px;
+  font-size:11.5px;color:var(--gold);line-height:1.5;
+}
+.auto-control-warning strong{color:#f0d48a;font-weight:800}
+
+/* Lang proximity warning */
+.lang-warning{
+  display:none;
+  background:rgba(239,68,68,.08);border:1px solid rgba(239,68,68,.25);
+  border-radius:8px;padding:10px 14px;margin-bottom:16px;
+  font-size:12px;color:#f87171;line-height:1.5;
+}
+
+/* Start button */
+.btn-start{
+  width:100%;padding:16px;border-radius:12px;border:none;
+  background:linear-gradient(135deg,#157a6e 0%,#2dd4bf 100%);
+  color:#fff;font-size:15px;font-weight:800;
+  font-family:var(--font);cursor:pointer;letter-spacing:.01em;
+  transition:opacity .18s,transform .18s;
+  box-shadow:0 6px 24px rgba(45,212,191,.25);
+}
+.btn-start:hover{opacity:.88;transform:translateY(-1px)}
+.btn-start:disabled{opacity:.4;cursor:not-allowed;transform:none;box-shadow:none}
+
+/* Error */
+.err{
+  display:none;background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.3);
+  border-radius:8px;padding:9px 13px;margin-bottom:14px;
+  font-size:12px;color:#f87171;line-height:1.4;
+}
+.expired-msg{
+  background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.3);
+  border-radius:12px;padding:18px;text-align:center;
+  color:#f87171;font-size:13px;line-height:1.6;
+  margin-bottom:20px;
+}
+.expired-msg a{color:var(--teal);font-weight:700;text-decoration:none}
+
+/* Footer note */
+.footer-note{
+  text-align:center;font-size:11px;color:rgba(255,255,255,.2);
+  margin-top:18px;line-height:1.6;
+}
+
+/* ==================================================
+   MODAL — Language picker
+   ================================================== */
+.modal-overlay{
+  display:none;
+  position:fixed;inset:0;z-index:200;
+  background:rgba(0,0,0,.7);
+  backdrop-filter:blur(8px);
+  align-items:center;justify-content:center;
+  padding:20px;
+}
+.modal-overlay.open{display:flex}
+.modal{
+  background:var(--card);
+  border:1px solid var(--border);
+  border-radius:20px;
+  width:100%;max-width:440px;
+  max-height:85vh;
+  overflow:hidden;
+  display:flex;flex-direction:column;
+  box-shadow:0 32px 80px rgba(0,0,0,.6);
+  animation:modalIn .22s ease-out;
+}
+@keyframes modalIn{
+  from{opacity:0;transform:translateY(20px) scale(.96)}
+  to{opacity:1;transform:translateY(0) scale(1)}
+}
+.modal-header{
+  padding:22px 24px 16px;
+  border-bottom:1px solid rgba(255,255,255,.06);
+}
+.modal-title{font-size:18px;font-weight:800;color:var(--white);margin-bottom:4px}
+.modal-sub{font-size:12.5px;color:var(--mid);line-height:1.5}
+.modal-body{
+  padding:16px 14px;
+  overflow-y:auto;
+  flex:1;
+}
+.modal-max-banner{
+  background:rgba(240,212,138,.1);
+  border:1px solid rgba(240,212,138,.3);
+  border-radius:8px;
+  padding:9px 12px;
+  margin:0 2px 10px;
+  font-size:11.5px;color:var(--gold);
+  line-height:1.4;font-weight:600;
+  text-align:center;
+}
+.lang-list{display:flex;flex-direction:column;gap:3px}
+.lang-item{
+  display:flex;align-items:center;gap:12px;
+  padding:10px 12px;border-radius:10px;
+  cursor:pointer;
+  transition:background .12s;
+  user-select:none;
+}
+.lang-item:hover{background:rgba(255,255,255,.04)}
+.lang-item.checked{background:rgba(45,212,191,.1)}
+.lang-item.disabled{opacity:.35;cursor:not-allowed}
+.lang-item.disabled:hover{background:transparent}
+.lang-item .chk{
+  width:20px;height:20px;border-radius:6px;
+  border:1.5px solid rgba(255,255,255,.2);
+  flex-shrink:0;display:flex;align-items:center;justify-content:center;
+  transition:all .15s;
+}
+.lang-item.checked .chk{
+  background:var(--teal);border-color:var(--teal);
+}
+.lang-item.checked .chk::after{
+  content:'✓';color:#0a0a0a;font-size:13px;font-weight:800;
+}
+.lang-item .flag-mini{
+  width:24px;height:18px;border-radius:3px;overflow:hidden;flex-shrink:0;
+  box-shadow:0 1px 4px rgba(0,0,0,.3);
+}
+.lang-item .flag-mini img{width:100%;height:100%;object-fit:cover;display:block}
+.lang-item .lang-label{
+  flex:1;font-size:14px;color:var(--white);font-weight:500;
+}
+.lang-item .lang-code{
+  font-size:11px;color:var(--mid);font-family:'DM Mono',monospace;
+  text-transform:uppercase;
+}
+.lang-item .badge-host{
+  font-size:9.5px;font-weight:700;
+  background:rgba(255,255,255,.08);
+  color:var(--mid);
+  padding:2px 7px;border-radius:999px;
+  letter-spacing:.05em;text-transform:uppercase;
+}
+
+.modal-footer{
+  padding:14px 20px 18px;
+  border-top:1px solid rgba(255,255,255,.06);
+  display:flex;gap:10px;
+  background:rgba(0,0,0,.15);
+}
+.modal-count{
+  flex:1;display:flex;align-items:center;
+  font-size:12px;color:var(--mid);font-weight:600;
+}
+.modal-count strong{color:var(--teal);font-weight:800;margin-right:3px}
+.modal-btn{
+  padding:11px 18px;border-radius:10px;border:none;cursor:pointer;
+  font-family:var(--font);font-size:13px;font-weight:700;
+  transition:opacity .15s,transform .15s;
+}
+.modal-btn.cancel{
+  background:rgba(255,255,255,.06);color:var(--white);
+}
+.modal-btn.cancel:hover{background:rgba(255,255,255,.1)}
+.modal-btn.confirm{
+  background:linear-gradient(135deg,#157a6e 0%,#2dd4bf 100%);
+  color:#fff;box-shadow:0 4px 14px rgba(45,212,191,.25);
+}
+.modal-btn.confirm:hover{opacity:.88;transform:translateY(-1px)}
+
+@media(max-width:480px){
+  .card{padding:24px 18px 20px}
+  .card-title{font-size:19px}
+  .lang-switcher{top:12px;right:12px}
+  .logo{margin-top:28px}
+}
+</style>
+</head>
+<body>
+
+<!-- Language switcher -->
+<div class="lang-switcher">
+  <button class="lang-btn" id="btnLangFr" onclick="setUiLang('fr')">
+    <span class="flag"><img src="https://flagcdn.com/w40/fr.png" alt=""></span>
+    FR
+  </button>
+  <button class="lang-btn active" id="btnLangEn" onclick="setUiLang('en')">
+    <span class="flag"><img src="https://flagcdn.com/w40/gb.png" alt=""></span>
+    EN
+  </button>
+</div>
+
+<div class="wrap">
+
+  <a href="/" class="logo">
+    <span class="logo-text">Translate<span>TheWorld</span></span>
+    <span class="logo-pill" id="logoPill">🎙️ Hôte</span>
+  </a>
+
+  <div class="card">
+    <div class="card-header">
+      <div class="card-badge" id="cardBadge">🟢 Page de démarrage — Réservée à l'hôte</div>
+      <div class="card-title" id="cardTitle">Configurez votre session</div>
+      <div class="card-sub" id="cardSub">Renseignez vos informations, choisissez votre langue et démarrez.</div>
+    </div>
+
+    <!-- Session info chips (populated from URL) -->
+    <div class="session-chips" id="sessionChips" style="display:none"></div>
+
+    <!-- Expired warning -->
+    <div class="expired-msg" id="expiredMsg" style="display:none">
+      <span id="expiredText">⏰ Ce lien a expiré.</span><br>
+      <a href="/" id="expiredLink">Créez une nouvelle session sur TranslateTheWorld.com →</a>
+    </div>
+
+    <div id="formArea">
+      <!-- Nom -->
+      <div class="field">
+        <label id="lblName">Votre nom ou pseudonyme *</label>
+        <input type="text" id="hostName" placeholder="ex : Marie Dupont" autocomplete="name">
+      </div>
+
+      <!-- Organisation -->
+      <div class="field">
+        <label id="lblOrg">Organisme / Organisation</label>
+        <input type="text" id="hostOrg" placeholder="ex : ACME Conférence" autocomplete="organization">
+      </div>
+
+      <!-- Langue de l'hôte -->
+      <div class="field">
+        <label id="lblMyLang">Ma langue *</label>
+        <div class="sel-row">
+          <div class="flag-box"><img id="hostFlagImg" src="https://flagcdn.com/w40/fr.png" alt=""></div>
+          <select id="hostLang" onchange="onHostLangChange()">
+            <!-- populated by JS -->
+          </select>
+        </div>
+      </div>
+
+      <!-- Langues du public (cliquable) -->
+      <div class="field">
+        <label id="lblAudience">Langues du public</label>
+        <div class="audience-box" id="audienceBox" onclick="openLangModal()">
+          <div class="audience-flags" id="audienceFlags"></div>
+          <span class="audience-chevron">▸</span>
+        </div>
+      </div>
+
+      <div class="err" id="formErr"></div>
+
+      <button class="btn-start" id="btnStart" onclick="startSession()">
+        <span id="btnStartText">🚀 Démarrer la session</span>
+      </button>
+    </div>
+  </div>
+
+  <p class="footer-note" id="footerNote">
+    🔒 Ce lien est réservé à l'hôte — ne le partagez pas avec vos participants.<br>
+    Utilisez le <strong>Lien Participants</strong> reçu par email pour les inviter.
+  </p>
+
+</div>
+
+<!-- ==================================================
+     MODAL — Audience languages picker
+     ================================================== -->
+<div class="modal-overlay" id="langModal" onclick="if(event.target===this)closeLangModal()">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title" id="modalTitle">Langues du public</div>
+      <div class="modal-sub" id="modalSub">Sélectionnez les langues dans lesquelles vos participants recevront la traduction.</div>
+    </div>
+    <div class="modal-body">
+      <div class="modal-max-banner" id="modalMaxBanner" style="display:none"></div>
+      <div class="lang-list" id="modalLangList"></div>
+    </div>
+    <div class="modal-footer">
+      <div class="modal-count">
+        <span><strong id="modalCount">0</strong> <span id="modalCountLabel">sélectionnée(s)</span></span>
+      </div>
+      <button class="modal-btn cancel" onclick="closeLangModal()" id="btnCancel">Annuler</button>
+      <button class="modal-btn confirm" onclick="confirmLangModal()" id="btnConfirm">Valider</button>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ============================================================
+   TRADUCTIONS INTERFACE (FR / EN)
+   ============================================================ */
+const I18N = {
+  fr: {
+    page_title:       'TranslateTheWorld — Démarrer la session',
+    logo_pill:        '🎙️ Hôte',
+    card_badge:       '🟢 Page de démarrage — Réservée à l\'hôte',
+    card_title:       'Configurez votre session',
+    card_sub:         'Renseignez vos informations, choisissez votre langue et démarrez.',
+    lbl_name:         'Votre nom ou pseudonyme *',
+    ph_name:          'ex : Marie Dupont',
+    lbl_org:          'Organisme / Organisation',
+    ph_org:           'ex : ACME Conférence',
+    lbl_my_lang:      'Ma langue *',
+    lbl_audience:     'Langues du public',
+    audience_empty:   'Cliquez pour choisir les langues',
+    auto_title:       '🤖 Mode multilinguisme automatique',
+    auto_recommended: 'Recommandé pour réunions restreintes de 2 à 3 personnes.',
+    auto_desc:        'Chaque participant parle sa propre langue. Le système détecte automatiquement qui parle quelle langue et traduit vers les autres.',
+    auto_control:     'dans ce mode, l\'hôte n\'a plus la maîtrise des débats. Chaque participant peut prendre la parole librement. Pour une conférence avec un orateur unique, laissez ce mode désactivé.',
+    auto_control_pfx: '⚠️ <strong>Attention :</strong> ',
+    lang_warn:        '⚠️ Le mode automatique fonctionne au mieux avec des langues phonétiquement distinctes. Si deux langues proches sont présentes (ex. espagnol + portugais), des confusions légères sont possibles.',
+    btn_start:        '🚀 Démarrer la session',
+    footer_note:      '🔒 Ce lien est réservé à l\'hôte — ne le partagez pas avec vos participants.<br>Utilisez le <strong>Lien Participants</strong> reçu par email pour les inviter.',
+    expired:          '⏰ Ce lien a expiré.',
+    expired_link:     'Créez une nouvelle session sur TranslateTheWorld.com →',
+    err_name:         '⚠️ Votre nom est requis pour démarrer.',
+    err_room:         '⚠️ Paramètre de salle manquant. Vérifiez votre lien.',
+    err_audience:     '⚠️ Choisissez au moins une langue pour le public.',
+    chip_duration:    ' min',
+    chip_langs:       ' langue(s) public',
+    chip_langs_edit:  '✏️ Modifier',
+    modal_title:      'Langues du public',
+    modal_sub:        'Sélectionnez jusqu\'à 3 langues dans lesquelles vos participants recevront la traduction.',
+    modal_count_lbl:  'sur 3 sélectionnée(s)',
+    modal_cancel:     'Annuler',
+    modal_confirm:    'Valider',
+    modal_max_reached:'Limite de 3 langues atteinte. Désélectionnez-en une pour en ajouter une autre.',
+    badge_host:       'Votre langue',
+    err_max_langs:    '⚠️ Maximum 3 langues autorisées pour le public.',
+  },
+  en: {
+    page_title:       'TranslateTheWorld — Start your session',
+    logo_pill:        '🎙️ Host',
+    card_badge:       '🟢 Start page — Host only',
+    card_title:       'Set up your session',
+    card_sub:         'Fill in your details, choose your language and start.',
+    lbl_name:         'Your name or nickname *',
+    ph_name:          'e.g. Marie Dupont',
+    lbl_org:          'Organization',
+    ph_org:           'e.g. ACME Conference',
+    lbl_my_lang:      'My language *',
+    lbl_audience:     'Audience languages',
+    audience_empty:   'Click to choose the languages',
+    auto_title:       '🤖 Auto-detect multilingual mode',
+    auto_recommended: 'Recommended for small meetings of 2 to 3 people.',
+    auto_desc:        'Each participant speaks their own language. The system automatically detects who speaks which language and translates to the others.',
+    auto_control:     'in this mode, the host no longer controls the floor. Any participant can speak freely. For a conference with a single speaker, leave this mode off.',
+    auto_control_pfx: '⚠️ <strong>Warning:</strong> ',
+    lang_warn:        '⚠️ Auto mode works best with phonetically distinct languages. If two close languages are present (e.g. Spanish + Portuguese), minor confusions are possible.',
+    btn_start:        '🚀 Start session',
+    footer_note:      '🔒 This link is for the host only — do not share it with your participants.<br>Use the <strong>Participant Link</strong> received by email to invite them.',
+    expired:          '⏰ This link has expired.',
+    expired_link:     'Create a new session on TranslateTheWorld.com →',
+    err_name:         '⚠️ Your name is required to start.',
+    err_room:         '⚠️ Missing room parameter. Check your link.',
+    err_audience:     '⚠️ Please choose at least one audience language.',
+    chip_duration:    ' min',
+    chip_langs:       ' audience language(s)',
+    chip_langs_edit:  '✏️ Edit',
+    modal_title:      'Audience languages',
+    modal_sub:        'Select up to 3 languages in which your participants will receive the translation.',
+    modal_count_lbl:  'of 3 selected',
+    modal_cancel:     'Cancel',
+    modal_confirm:    'Confirm',
+    modal_max_reached:'Limit of 3 languages reached. Deselect one to add another.',
+    badge_host:       'Your language',
+    err_max_langs:    '⚠️ Maximum 3 audience languages allowed.',
+  }
+};
+
+let uiLang = 'en';  // Default: English (user can switch to FR via toggle)
+
+function setUiLang(l){
+  uiLang = l;
+  document.documentElement.lang = l;
+  document.getElementById('btnLangFr').classList.toggle('active', l==='fr');
+  document.getElementById('btnLangEn').classList.toggle('active', l==='en');
+  applyTranslations();
+}
+
+function applyTranslations(){
+  const t = I18N[uiLang];
+  document.title = t.page_title;
+  document.getElementById('logoPill').textContent = t.logo_pill;
+  document.getElementById('cardBadge').textContent = t.card_badge;
+  document.getElementById('cardTitle').textContent = t.card_title;
+  document.getElementById('cardSub').textContent = t.card_sub;
+  document.getElementById('lblName').textContent = t.lbl_name;
+  document.getElementById('hostName').placeholder = t.ph_name;
+  document.getElementById('lblOrg').textContent = t.lbl_org;
+  document.getElementById('hostOrg').placeholder = t.ph_org;
+  document.getElementById('lblMyLang').textContent = t.lbl_my_lang;
+  document.getElementById('lblAudience').textContent = t.lbl_audience;
+  // Mode auto-detect retiré : on saute silencieusement les éléments absents.
+  const _safeSet = (id, val, html=false)=>{
+    const el = document.getElementById(id);
+    if(!el) return;
+    if(html) el.innerHTML = val; else el.textContent = val;
+  };
+  _safeSet('autoTitle', t.auto_title);
+  _safeSet('autoRecommended', t.auto_recommended);
+  _safeSet('autoDesc', t.auto_desc);
+  _safeSet('autoControlWarning', t.auto_control_pfx + t.auto_control, true);
+  _safeSet('langWarningText', t.lang_warn);
+  document.getElementById('btnStartText').textContent = t.btn_start;
+  document.getElementById('footerNote').innerHTML = t.footer_note;
+  document.getElementById('expiredText').textContent = t.expired;
+  document.getElementById('expiredLink').textContent = t.expired_link;
+  document.getElementById('modalTitle').textContent = t.modal_title;
+  document.getElementById('modalSub').textContent = t.modal_sub;
+  document.getElementById('modalCountLabel').textContent = t.modal_count_lbl;
+  document.getElementById('btnCancel').textContent = t.modal_cancel;
+  document.getElementById('btnConfirm').textContent = t.modal_confirm;
+  renderSessionChips();
+  renderAudienceBox();
+}
+
+/* ============================================================
+   LANGUES DISPONIBLES
+   ============================================================ */
+const MAX_AUDIENCE_LANGS = 3;
+
+const LANGS = [
+  {code:'fr',country:'fr',label:'Français',az:'fr-FR'},
+  {code:'en',country:'gb',label:'English',az:'en-US'},
+  {code:'de',country:'de',label:'Deutsch',az:'de-DE'},
+  {code:'it',country:'it',label:'Italiano',az:'it-IT'},
+  {code:'es',country:'es',label:'Español',az:'es-ES'},
+  {code:'pt',country:'pt',label:'Português',az:'pt-PT'},
+  {code:'ar',country:'lb',label:'العربية · Arabic',az:'ar-SA'},
+  {code:'ru',country:'ru',label:'Русский · Russian',az:'ru-RU'},
+  {code:'zh',country:'cn',label:'中文 · Chinese',az:'zh-CN'},
+  {code:'he',country:'il',label:'עברית · Hebrew',az:'he-IL'},
+  {code:'nl',country:'nl',label:'Nederlands',az:'nl-NL'},
+  {code:'pl',country:'pl',label:'Polski',az:'pl-PL'},
+  {code:'uk',country:'ua',label:'Українська · Ukrainian',az:'uk-UA'},
+  {code:'tr',country:'tr',label:'Türkçe',az:'tr-TR'},
+  {code:'ja',country:'jp',label:'日本語 · Japanese',az:'ja-JP'},
+  {code:'ko',country:'kr',label:'한국어 · Korean',az:'ko-KR'},
+  {code:'el',country:'gr',label:'Ελληνικά / Greek',az:'el-GR'},
+  {code:'da',country:'dk',label:'Dansk',az:'da-DK'},
+  {code:'hi',country:'in',label:'हिन्दी · Hindi',az:'hi-IN'},
+];
+
+function getP(n){return new URLSearchParams(window.location.search).get(n)||'';}
+
+const room   = getP('room');
+let   toList = (getP('to')||'').split(',').filter(Boolean);
+// Enforce maximum at init (URL could contain more)
+if(toList.length > MAX_AUDIENCE_LANGS) toList = toList.slice(0, MAX_AUDIENCE_LANGS);
+const dur    = getP('dur')||'15';
+const exp    = parseInt(getP('exp'))||0;
+
+// Peupler le select de langue hôte
+const sel = document.getElementById('hostLang');
+LANGS.forEach(l=>{
+  const o=document.createElement('option');
+  o.value=l.code;
+  o.textContent=l.label;
+  sel.appendChild(o);
+});
+// Pré-sélectionner depuis URL
+const urlLang = getP('lang');
+if(urlLang) sel.value=urlLang; else sel.value='fr';
+updateHostFlag();
+
+function updateHostFlag(){
+  const l=LANGS.find(x=>x.code===sel.value)||LANGS[0];
+  document.getElementById('hostFlagImg').src='https://flagcdn.com/w40/'+l.country+'.png';
+}
+
+function onHostLangChange(){
+  updateHostFlag();
+  // Si la nouvelle langue hôte est dans toList, on la retire
+  toList = toList.filter(c => c !== sel.value);
+  renderAudienceBox();
+  renderSessionChips();
+  onAutoDetectChange();
+}
+
+// ── HELPERS validité (fin de jour locale) ──
+// La session est considérée valable jusqu'à 23:59:59 du dernier jour, en heure
+// locale du navigateur (fuseau horaire du PC/téléphone de l'hôte).
+function endOfDayTimestamp(unixSec){
+  const d = new Date(unixSec * 1000);
+  d.setHours(23, 59, 59, 999);
+  return Math.floor(d.getTime() / 1000);
+}
+function formatValidityDate(unixSec, lang){
+  const d = new Date(unixSec * 1000);
+  const locale = (lang === 'fr') ? 'fr-FR' : 'en-GB';
+  // Ex: "lundi 22 mai 2026" ou "Monday 22 May 2026"
+  const datePart = d.toLocaleDateString(locale, {
+    weekday: 'long', day: 'numeric', month: 'long', year: 'numeric'
+  });
+  const atWord = (lang === 'fr') ? ' à ' : ' at ';
+  return datePart + atWord + '23:59';
+}
+
+// Vérification expiration (utilise la fin de jour, pas l'heure exacte de exp)
+const expEndOfDay = (exp > 0) ? endOfDayTimestamp(exp) : 0;
+const now=Math.floor(Date.now()/1000);
+if(expEndOfDay>0&&now>expEndOfDay){
+  document.getElementById('expiredMsg').style.display='block';
+  document.getElementById('formArea').style.opacity='.4';
+  document.getElementById('btnStart').disabled=true;
+}
+
+/* ============================================================
+   SESSION CHIPS (room, duration, languages count)
+   ============================================================ */
+function renderSessionChips(){
+  const chips=document.getElementById('sessionChips');
+  if(!room){chips.style.display='none';return;}
+  chips.style.display='flex';
+  const t = I18N[uiLang];
+  // Chip "Valable jusqu'au …" (en heure locale du navigateur)
+  let validityChip = '';
+  if(exp > 0){
+    validityChip = '<div class="chip">📅 '+t.chip_validity+' '+formatValidityDate(exp, uiLang)+'</div>';
+  }
+  chips.innerHTML =
+    '<div class="chip hl">🔑 '+room+'</div>'+
+    '<div class="chip">⏱ '+dur+t.chip_duration+'</div>'+
+    '<div class="chip clickable" onclick="openLangModal()">👥 '+toList.length+t.chip_langs+' <span class="edit-icon">✏️</span></div>'+
+    validityChip;
+}
+
+/* ============================================================
+   AUDIENCE LANGUAGES BOX (visible language pills)
+   ============================================================ */
+function renderAudienceBox(){
+  const box = document.getElementById('audienceFlags');
+  const t = I18N[uiLang];
+  const parent = document.getElementById('audienceBox');
+
+  if(!toList.length){
+    parent.classList.add('empty');
+    box.innerHTML = '<span>'+t.audience_empty+'</span>';
+    return;
+  }
+  parent.classList.remove('empty');
+  box.innerHTML = toList.map(code=>{
+    const l = LANGS.find(x=>x.code===code);
+    if(!l) return '';
+    return '<span class="audience-mini">'+
+      '<img src="https://flagcdn.com/w40/'+l.country+'.png" alt="">'+
+      l.label+'</span>';
+  }).join('');
+}
+
+/* ============================================================
+   MODAL — Audience language picker
+   ============================================================ */
+let modalSelection = [];
+
+function openLangModal(){
+  modalSelection = [...toList];
+  renderModalList();
+  updateModalCount();
+  document.getElementById('langModal').classList.add('open');
+}
+
+function closeLangModal(){
+  document.getElementById('langModal').classList.remove('open');
+}
+
+function renderModalList(){
+  const list = document.getElementById('modalLangList');
+  const hostCode = sel.value;
+  const t = I18N[uiLang];
+  const maxReached = modalSelection.length >= MAX_AUDIENCE_LANGS;
+
+  list.innerHTML = LANGS.map(l=>{
+    const isHost    = l.code === hostCode;
+    const isChecked = modalSelection.includes(l.code);
+    // Disable if: it's the host language OR max reached and not already checked
+    const isDisabled = isHost || (maxReached && !isChecked);
+    const handler = (isHost || (maxReached && !isChecked))
+      ? ''
+      : 'onclick="toggleLangInModal(\''+l.code+'\')"';
+    return '<div class="lang-item '+
+      (isChecked?'checked ':'')+
+      (isDisabled?'disabled ':'')+
+      '" data-code="'+l.code+'" '+
+      handler+
+      '>'+
+      '<div class="chk"></div>'+
+      '<div class="flag-mini"><img src="https://flagcdn.com/w40/'+l.country+'.png" alt=""></div>'+
+      '<div class="lang-label">'+l.label+'</div>'+
+      (isHost
+        ? '<span class="badge-host">'+t.badge_host+'</span>'
+        : '<span class="lang-code">'+l.code+'</span>')+
+      '</div>';
+  }).join('');
+
+  // Show/hide max-reached banner
+  const banner = document.getElementById('modalMaxBanner');
+  if(banner){
+    banner.style.display = maxReached ? 'block' : 'none';
+    banner.textContent = t.modal_max_reached;
+  }
+}
+
+function toggleLangInModal(code){
+  const idx = modalSelection.indexOf(code);
+  if(idx >= 0){
+    modalSelection.splice(idx,1);
+  } else {
+    if(modalSelection.length >= MAX_AUDIENCE_LANGS) return; // block at 3
+    modalSelection.push(code);
+  }
+  renderModalList();
+  updateModalCount();
+}
+
+function updateModalCount(){
+  document.getElementById('modalCount').textContent = modalSelection.length;
+}
+
+function confirmLangModal(){
+  toList = [...modalSelection];
+  renderAudienceBox();
+  renderSessionChips();
+  onAutoDetectChange();
+  closeLangModal();
+}
+
+/* ============================================================
+   AUTO-DETECT MODE — désactivé : un seul mode (hôte maîtrise les micros)
+   ============================================================ */
+function onAutoDetectChange(){
+  // Mode auto-detect retiré de l'interface. Fonction conservée vide
+  // par sécurité au cas où un appelant orphelin subsisterait.
+}
+
+/* ============================================================
+   START SESSION
+   ============================================================ */
+function startSession(){
+  const name=document.getElementById('hostName').value.trim();
+  const org=document.getElementById('hostOrg').value.trim();
+  const lang=document.getElementById('hostLang').value;
+  // Mode auto-detect retiré : toujours forcé à 0 (hôte maîtrise les micros).
+  const auto=false;
+  const errEl=document.getElementById('formErr');
+  const t = I18N[uiLang];
+
+  if(!name){
+    errEl.textContent=t.err_name;
+    errEl.style.display='block';
+    document.getElementById('hostName').focus();
+    return;
+  }
+  if(!room){
+    errEl.textContent=t.err_room;
+    errEl.style.display='block';
+    return;
+  }
+  if(!toList.length){
+    errEl.textContent=t.err_audience;
+    errEl.style.display='block';
+    openLangModal();
+    return;
+  }
+  errEl.style.display='none';
+
+  const params=new URLSearchParams({
+    room, lang,
+    to:   toList.join(','),
+    dur, exp,
+    host: name,
+    org:  org||'',
+    auto: auto?'1':'0',
+    ui:   uiLang,
+    role: 'host'
+  });
+  window.location.href='/host-session.html?'+params.toString();
+}
+
+document.addEventListener('keydown',e=>{
+  if(e.key==='Enter' && !document.getElementById('langModal').classList.contains('open')) startSession();
+  if(e.key==='Escape') closeLangModal();
+});
+
+/* ============================================================
+   INIT
+   ============================================================ */
+// If host language is in toList, remove it (can't speak to yourself)
+toList = toList.filter(c => c !== sel.value);
+
+// Interface starts in English by default. Users can switch to FR via the toggle.
+setUiLang('en');
+
+renderAudienceBox();
+</script>
+</body>
+</html>

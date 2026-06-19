@@ -1,0 +1,840 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TranslateTheWorld — User Guide</title>
+
+<!-- Open Graph (WhatsApp, LinkedIn, Facebook, iMessage…) -->
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://translatetheworld.com/guide/index-en.html">
+<meta property="og:title" content="TranslateTheWorld — Visual User Guide">
+<meta property="og:description" content="How to use TTW for live multilingual subtitles in 15+ languages. 9-step visual guide.">
+<meta property="og:image" content="https://static.wixstatic.com/media/8e0c90_67ab058e45204a00b19d4e4eeb7ee0c1~mv2.png/v1/fill/w_1200,h_630,al_c,q_90,enc_avif,quality_auto/og-preview.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:locale" content="en_US">
+<meta property="og:site_name" content="TranslateTheWorld">
+
+<!-- Twitter Card -->
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="TranslateTheWorld — Visual User Guide">
+<meta name="twitter:description" content="How to use TTW for live multilingual subtitles in 15+ languages.">
+<meta name="twitter:image" content="https://static.wixstatic.com/media/8e0c90_67ab058e45204a00b19d4e4eeb7ee0c1~mv2.png/v1/fill/w_1200,h_630,al_c,q_90,enc_avif,quality_auto/og-preview.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bangers&family=Bowlby+One&family=Patrick+Hand&family=Caveat:wght@700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --paper: #fdf6e3;
+    --ink: #1a1a1a;
+    --red: #e63946;
+    --yellow: #ffd60a;
+    --blue: #0077b6;
+    --green: #06d6a0;
+    --pink: #ff5d8f;
+    --orange: #ff9f1c;
+    --purple: #8338ec;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Patrick Hand', cursive;
+    background: var(--paper);
+    background-image:
+      radial-gradient(circle at 1px 1px, rgba(0,0,0,0.12) 1px, transparent 0);
+    background-size: 14px 14px;
+    color: var(--ink);
+    min-height: 100vh;
+    padding: 40px 20px 80px;
+    overflow-x: hidden;
+  }
+
+  body::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='200' height='200'><filter id='n'><feTurbulence baseFrequency='0.9' numOctaves='2'/></filter><rect width='100%25' height='100%25' filter='url(%23n)' opacity='0.08'/></svg>");
+    pointer-events: none;
+    z-index: 1;
+  }
+
+  .container {
+    max-width: 1200px;
+    margin: 0 auto;
+    position: relative;
+    z-index: 2;
+  }
+
+  /* ============ LANGUAGE SWITCHER ============ */
+  .lang-switch {
+    position: absolute;
+    top: 0;
+    right: 0;
+    display: flex;
+    gap: 8px;
+    z-index: 20;
+  }
+
+  .lang-switch a {
+    display: inline-block;
+    padding: 6px 14px;
+    font-family: 'Bangers', cursive;
+    font-size: 1.1rem;
+    letter-spacing: 2px;
+    text-decoration: none;
+    color: var(--ink);
+    background: white;
+    border: 3px solid var(--ink);
+    border-radius: 4px;
+    box-shadow: 3px 3px 0 var(--ink);
+    transition: transform 0.15s;
+  }
+
+  .lang-switch a:hover { transform: translate(-2px, -2px); box-shadow: 5px 5px 0 var(--ink); }
+  .lang-switch a.active { background: var(--yellow); }
+
+  /* ============ HEADER ============ */
+  .header {
+    text-align: center;
+    margin-bottom: 60px;
+    position: relative;
+    padding-top: 20px;
+  }
+
+  .header-banner {
+    display: inline-block;
+    background: var(--ink);
+    color: var(--yellow);
+    padding: 6px 24px;
+    font-family: 'Bangers', cursive;
+    font-size: 1.4rem;
+    letter-spacing: 3px;
+    transform: rotate(-2deg);
+    margin-bottom: 18px;
+    box-shadow: 6px 6px 0 var(--red);
+  }
+
+  .header h1 {
+    font-family: 'Bowlby One', cursive;
+    font-size: clamp(2.5rem, 7vw, 5.5rem);
+    line-height: 0.95;
+    color: var(--ink);
+    text-shadow:
+      4px 4px 0 var(--yellow),
+      8px 8px 0 var(--red);
+    letter-spacing: -1px;
+  }
+
+  .header h1 .accent { color: var(--red); }
+  .header h1 .accent2 { color: var(--blue); }
+
+  .subtitle {
+    font-family: 'Caveat', cursive;
+    font-size: 1.8rem;
+    margin-top: 30px;
+    color: var(--ink);
+    transform: rotate(-1deg);
+    display: inline-block;
+  }
+
+  .stars {
+    position: absolute;
+    font-family: 'Bangers', cursive;
+    color: var(--red);
+    font-size: 3rem;
+  }
+  .star1 { top: -10px; left: 10%; transform: rotate(-15deg); color: var(--yellow); }
+  .star2 { top: 30%; right: 8%; transform: rotate(20deg); color: var(--pink); }
+
+  /* ============ COMIC GRID ============ */
+  .comic-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 40px;
+    margin-bottom: 60px;
+  }
+
+  @media (max-width: 768px) {
+    .comic-grid { grid-template-columns: 1fr; gap: 50px; }
+  }
+
+  /* ============ PANEL ============ */
+  .panel {
+    background: white;
+    border: 4px solid var(--ink);
+    border-radius: 4px;
+    padding: 24px;
+    position: relative;
+    box-shadow: 8px 8px 0 var(--ink);
+    transition: transform 0.3s ease;
+    animation: popIn 0.5s ease-out backwards;
+  }
+
+  .panel:hover { transform: translateY(-6px); }
+
+  .panel:nth-child(odd) { transform: rotate(-0.8deg); }
+  .panel:nth-child(even) { transform: rotate(0.8deg); }
+  .panel:nth-child(odd):hover { transform: rotate(-0.8deg) translateY(-6px); }
+  .panel:nth-child(even):hover { transform: rotate(0.8deg) translateY(-6px); }
+
+  .panel-number {
+    position: absolute;
+    top: -22px;
+    left: -22px;
+    width: 60px;
+    height: 60px;
+    background: var(--yellow);
+    color: var(--ink);
+    border: 4px solid var(--ink);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Bowlby One', cursive;
+    font-size: 1.8rem;
+    z-index: 5;
+    box-shadow: 3px 3px 0 var(--ink);
+  }
+
+  .panel-title {
+    font-family: 'Bangers', cursive;
+    font-size: 1.8rem;
+    letter-spacing: 2px;
+    color: var(--ink);
+    margin-bottom: 14px;
+    padding: 8px 14px;
+    background: var(--yellow);
+    display: inline-block;
+    border: 3px solid var(--ink);
+    box-shadow: 4px 4px 0 var(--ink);
+    transform: rotate(-1deg);
+  }
+
+  .panel-image {
+    background: #f0f0f0;
+    border: 3px solid var(--ink);
+    border-radius: 2px;
+    overflow: hidden;
+    margin: 18px 0;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 180px;
+  }
+
+  .panel-image img {
+    width: 100%;
+    height: auto;
+    display: block;
+  }
+
+  .panel-text {
+    font-family: 'Patrick Hand', cursive;
+    font-size: 1.25rem;
+    line-height: 1.4;
+    color: var(--ink);
+    margin-top: 14px;
+  }
+
+  .panel-text strong {
+    background: var(--yellow);
+    padding: 0 4px;
+    font-weight: bold;
+  }
+
+  .speech-bubble {
+    background: white;
+    border: 3px solid var(--ink);
+    border-radius: 20px;
+    padding: 12px 18px;
+    position: relative;
+    margin-top: 16px;
+    font-family: 'Caveat', cursive;
+    font-size: 1.4rem;
+    box-shadow: 4px 4px 0 var(--ink);
+  }
+  .speech-bubble::before {
+    content: "";
+    position: absolute;
+    bottom: -16px;
+    left: 30px;
+    width: 0; height: 0;
+    border: 12px solid transparent;
+    border-top-color: var(--ink);
+    border-bottom: 0;
+  }
+  .speech-bubble::after {
+    content: "";
+    position: absolute;
+    bottom: -10px;
+    left: 33px;
+    width: 0; height: 0;
+    border: 9px solid transparent;
+    border-top-color: white;
+    border-bottom: 0;
+  }
+
+  .sfx {
+    position: absolute;
+    font-family: 'Bowlby One', cursive;
+    color: var(--ink);
+    z-index: 10;
+    pointer-events: none;
+  }
+
+  .sfx-burst {
+    background: var(--red);
+    color: white;
+    padding: 12px 20px;
+    border: 4px solid var(--ink);
+    border-radius: 50% 30% 50% 30%;
+    transform: rotate(-12deg);
+    box-shadow: 4px 4px 0 var(--ink);
+    font-size: 1.6rem;
+    letter-spacing: 2px;
+  }
+
+  .sfx-yellow { background: var(--yellow); color: var(--ink); }
+  .sfx-blue { background: var(--blue); color: white; }
+  .sfx-green { background: var(--green); color: var(--ink); }
+  .sfx-pink { background: var(--pink); color: white; }
+  .sfx-purple { background: var(--purple); color: white; }
+
+  .sfx-tr { top: -20px; right: -15px; }
+  .sfx-tl { top: -20px; left: -15px; }
+
+  /* ============ SPOTLIGHT PANEL ============ */
+  .panel-spotlight {
+    grid-column: 1 / -1;
+    background: linear-gradient(135deg, var(--yellow) 0%, var(--orange) 100%);
+    border: 6px solid var(--ink);
+    padding: 36px 40px;
+    position: relative;
+    box-shadow: 12px 12px 0 var(--ink);
+    transform: rotate(0deg) !important;
+    overflow: hidden;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 36px;
+    align-items: center;
+  }
+
+  .panel-spotlight:hover { transform: translateY(-6px) !important; }
+
+  @media (max-width: 768px) {
+    .panel-spotlight {
+      grid-template-columns: 1fr;
+      padding: 28px 24px;
+    }
+  }
+
+  .panel-spotlight::before {
+    content: "";
+    position: absolute;
+    top: 50%; left: 50%;
+    width: 200%; height: 200%;
+    background: repeating-conic-gradient(
+      from 0deg,
+      rgba(255,255,255,0.18) 0deg 10deg,
+      transparent 10deg 25deg
+    );
+    transform: translate(-50%, -50%);
+    z-index: 0;
+    animation: spin 60s linear infinite;
+  }
+
+  @keyframes spin {
+    to { transform: translate(-50%, -50%) rotate(360deg); }
+  }
+
+  .panel-spotlight > * { position: relative; z-index: 2; }
+
+  .spotlight-image {
+    background: white;
+    border: 5px solid var(--ink);
+    border-radius: 6px;
+    padding: 24px;
+    box-shadow: 8px 8px 0 var(--ink);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 220px;
+    transform: rotate(-2deg);
+  }
+
+  .spotlight-image img {
+    max-width: 100%;
+    max-height: 280px;
+    height: auto;
+    display: block;
+  }
+
+  .spotlight-image.dark-bg {
+    background: linear-gradient(135deg, #1a1a1a 0%, #2a2a2a 100%);
+  }
+
+  .spotlight-content { text-align: left; }
+
+  .spotlight-label {
+    display: inline-block;
+    background: var(--red);
+    color: white;
+    padding: 6px 16px;
+    font-family: 'Bangers', cursive;
+    font-size: 1.2rem;
+    letter-spacing: 3px;
+    border: 3px solid var(--ink);
+    box-shadow: 4px 4px 0 var(--ink);
+    transform: rotate(-3deg);
+    margin-bottom: 18px;
+  }
+
+  .spotlight-title {
+    font-family: 'Bowlby One', cursive;
+    font-size: clamp(2rem, 4vw, 3rem);
+    line-height: 1;
+    color: var(--ink);
+    margin-bottom: 18px;
+    text-shadow: 3px 3px 0 white;
+  }
+
+  .spotlight-text {
+    font-family: 'Patrick Hand', cursive;
+    font-size: 1.4rem;
+    line-height: 1.4;
+    color: var(--ink);
+  }
+
+  .spotlight-text strong {
+    background: var(--ink);
+    color: var(--yellow);
+    padding: 2px 6px;
+  }
+
+  .panel-spotlight .panel-number {
+    background: var(--red);
+    color: white;
+    width: 72px;
+    height: 72px;
+    font-size: 2.2rem;
+    top: -28px;
+    left: -28px;
+  }
+
+  /* ============ WARNING PANEL (quiet environment) ============ */
+  .panel-warning {
+    grid-column: 1 / -1;
+    background: repeating-linear-gradient(
+      45deg,
+      #ffd60a,
+      #ffd60a 30px,
+      #1a1a1a 30px,
+      #1a1a1a 60px
+    );
+    padding: 8px;
+    border: 4px solid var(--ink);
+    box-shadow: 10px 10px 0 var(--ink);
+    position: relative;
+    transform: rotate(0deg) !important;
+  }
+
+  .panel-warning:hover { transform: translateY(-6px) !important; }
+
+  .panel-warning-inner {
+    background: white;
+    border: 3px solid var(--ink);
+    padding: 30px 36px;
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 28px;
+    align-items: center;
+  }
+
+  @media (max-width: 768px) {
+    .panel-warning-inner {
+      grid-template-columns: 1fr;
+      text-align: center;
+      padding: 24px 20px;
+    }
+  }
+
+  .warning-icon {
+    font-size: 5rem;
+    line-height: 1;
+    animation: shake 2s ease-in-out infinite;
+  }
+
+  @keyframes shake {
+    0%, 100% { transform: rotate(0); }
+    25% { transform: rotate(-10deg); }
+    75% { transform: rotate(10deg); }
+  }
+
+  .warning-label {
+    display: inline-block;
+    background: var(--red);
+    color: white;
+    padding: 6px 16px;
+    font-family: 'Bangers', cursive;
+    font-size: 1.2rem;
+    letter-spacing: 3px;
+    border: 3px solid var(--ink);
+    box-shadow: 3px 3px 0 var(--ink);
+    margin-bottom: 12px;
+  }
+
+  .warning-title {
+    font-family: 'Bowlby One', cursive;
+    font-size: clamp(1.6rem, 3vw, 2.4rem);
+    line-height: 1.05;
+    color: var(--ink);
+    margin-bottom: 12px;
+  }
+
+  .warning-text {
+    font-family: 'Patrick Hand', cursive;
+    font-size: 1.3rem;
+    line-height: 1.4;
+    color: var(--ink);
+  }
+
+  .warning-text strong {
+    background: var(--yellow);
+    padding: 1px 5px;
+    font-weight: bold;
+  }
+
+  .warning-bad-good {
+    margin-top: 14px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+  }
+
+  @media (max-width: 768px) {
+    .warning-bad-good { grid-template-columns: 1fr; }
+  }
+
+  .warning-item {
+    padding: 10px 12px;
+    border: 3px solid var(--ink);
+    border-radius: 6px;
+    font-family: 'Patrick Hand', cursive;
+    font-size: 1.1rem;
+    line-height: 1.3;
+  }
+
+  .warning-bad {
+    background: #ffe5e5;
+    border-color: var(--red);
+  }
+
+  .warning-good {
+    background: #d8f5e9;
+    border-color: var(--green);
+  }
+
+  /* ============ FINAL CARD ============ */
+  .final-card {
+    background: var(--ink);
+    color: var(--paper);
+    border: 4px solid var(--ink);
+    padding: 36px;
+    text-align: center;
+    box-shadow: 10px 10px 0 var(--red);
+    margin-top: 40px;
+    position: relative;
+  }
+
+  .final-card::before {
+    content: "★";
+    position: absolute;
+    top: -25px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: var(--yellow);
+    color: var(--ink);
+    width: 50px; height: 50px;
+    border: 4px solid var(--ink);
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1.8rem;
+  }
+
+  .final-card h2 {
+    font-family: 'Bangers', cursive;
+    font-size: 2.4rem;
+    letter-spacing: 3px;
+    color: var(--yellow);
+    margin-bottom: 16px;
+  }
+
+  .final-card p {
+    font-family: 'Patrick Hand', cursive;
+    font-size: 1.4rem;
+    line-height: 1.5;
+    max-width: 700px;
+    margin: 0 auto;
+  }
+
+  .final-card .ttw-logo {
+    font-family: 'Bowlby One', cursive;
+    font-size: 1.6rem;
+    margin-top: 18px;
+    color: white;
+  }
+  .final-card .ttw-logo .green-part { color: var(--green); }
+  .final-card .ttw-logo .yellow-part { color: var(--yellow); }
+
+  .footer-note {
+    text-align: center;
+    margin-top: 30px;
+    font-family: 'Caveat', cursive;
+    font-size: 1.3rem;
+    color: var(--ink);
+    opacity: 0.7;
+  }
+
+  @keyframes popIn {
+    from { opacity: 0; transform: scale(0.8); }
+    to { opacity: 1; }
+  }
+
+  .panel:nth-child(1) { animation-delay: 0.05s; }
+  .panel:nth-child(2) { animation-delay: 0.15s; }
+  .panel:nth-child(3) { animation-delay: 0.25s; }
+  .panel:nth-child(4) { animation-delay: 0.35s; }
+  .panel:nth-child(5) { animation-delay: 0.45s; }
+  .panel:nth-child(6) { animation-delay: 0.55s; }
+  .panel:nth-child(7) { animation-delay: 0.65s; }
+  .panel:nth-child(8) { animation-delay: 0.75s; }
+</style>
+</head>
+<body>
+
+<div class="container">
+
+  <!-- Language switcher -->
+  <div class="lang-switch">
+    <a href="index.html">FR</a>
+    <a href="index-en.html" class="active">EN</a>
+  </div>
+
+  <!-- ============ HEADER ============ -->
+  <header class="header">
+    <span class="stars star1">★</span>
+    <span class="stars star2">✦</span>
+    <div class="header-banner">★ USER GUIDE ★</div>
+    <h1>
+      Translate<span class="accent">The</span><span class="accent2">World</span>
+    </h1>
+    <div class="subtitle">Your first session adventure… in 9 steps!</div>
+  </header>
+
+  <!-- ============ COMIC GRID ============ -->
+  <div class="comic-grid">
+
+    <!-- PANEL 1: EMAIL -->
+    <div class="panel">
+      <div class="panel-number">1</div>
+      <div class="sfx sfx-burst sfx-yellow sfx-tr">DING!</div>
+      <div class="panel-title">You get your email!</div>
+      <div class="panel-image">
+        <img src="https://static.wixstatic.com/media/8e0c90_d4458f40924f4adf99e3dbb4b0dedd5c~mv2.png/v1/crop/x_0,y_85,w_602,h_389/fill/w_642,h_467,al_c,lg_1,q_85,enc_avif,quality_auto/1%20Lien%20Start%20the%20session.png" alt="TranslateTheWorld email with Start the session link">
+      </div>
+      <div class="panel-text">
+        After you sign up, TTW sends you an <strong>email</strong> with
+        <strong>2 links</strong>:<br>
+        🔑 your <strong>HOST link</strong> (keep this one private!)<br>
+        👥 your <strong>PARTICIPANT link</strong> (for your guests).
+      </div>
+      <div class="speech-bubble">
+        Click "Start the session" to begin 🚀
+      </div>
+    </div>
+
+    <!-- PANEL 2: SETUP -->
+    <div class="panel">
+      <div class="panel-number">2</div>
+      <div class="sfx sfx-burst sfx-blue sfx-tr">SETUP!</div>
+      <div class="panel-title">Set up your session</div>
+      <div class="panel-image">
+        <img src="https://static.wixstatic.com/media/8e0c90_dd34f28e6db64b799569f461d742b299~mv2.png/v1/crop/x_178,y_85,w_486,h_763/fill/w_436,h_684,al_c,q_85,usm_0.66_1.00_0.01,enc_avif,quality_auto/8e0c90_dd34f28e6db64b799569f461d742b299~mv2.png" alt="Set up your session page">
+      </div>
+      <div class="panel-text">
+        On the <strong>"Set up your session"</strong> page, fill in:<br>
+        • Your <strong>name or nickname</strong><br>
+        • Your <strong>organization</strong> (optional)<br>
+        • Your <strong>language</strong> (the one you'll speak)<br>
+        • The <strong>audience languages</strong> (subtitles your guests will see).
+      </div>
+      <div class="speech-bubble">
+        Then click "Start session" 🚀
+      </div>
+    </div>
+
+    <!-- PANEL 3: DASHBOARD -->
+    <div class="panel">
+      <div class="panel-number">3</div>
+      <div class="sfx sfx-burst sfx-green sfx-tr">TADAAA!</div>
+      <div class="panel-title">Your control interface</div>
+      <div class="panel-image">
+        <img src="https://static.wixstatic.com/media/8e0c90_8f3955eae1874639a2746f64785cf5b7~mv2.png/v1/fill/w_1200,h_2600,al_c,q_95,usm_0.66_1.00_0.01,enc_avif,quality_auto/intrface%20orateur.png" alt="Speaker interface to run the conference">
+      </div>
+      <div class="panel-text">
+        This is the <strong>interface</strong> where you'll
+        <strong>speak and run</strong> your conference:
+        <strong>start</strong> it, <strong>allow</strong>
+        (or decline) participants to speak,
+        and <strong>end</strong> it.<br>
+        You also see the <strong>room code</strong>,
+        the <strong>countdown timer</strong>, and your
+        <strong>connected guests</strong> in real time.
+      </div>
+      <div class="speech-bubble">
+        Now it's time to invite your participants!
+      </div>
+    </div>
+
+    <!-- ============ SPOTLIGHT 4: INVITE ============ -->
+    <div class="panel panel-spotlight">
+      <div class="panel-number">4</div>
+      <div class="spotlight-image">
+        <img src="https://static.wixstatic.com/media/8e0c90_31a19ed9e98f4faa9000469c5e300d1c~mv2.png/v1/fill/w_202,h_185,al_c,lg_1,q_85,enc_avif,quality_auto/8e0c90_31a19ed9e98f4faa9000469c5e300d1c~mv2.png" alt="Close-up of the Invite button">
+      </div>
+      <div class="spotlight-content">
+        <div class="spotlight-label">⚡ DON'T MISS THIS ⚡</div>
+        <div class="spotlight-title">CLICK ON<br>"INVITE"!</div>
+        <div class="spotlight-text">
+          Top right of your dashboard, the <strong>big turquoise button</strong>.
+          <strong>THIS</strong> is what opens the menu to invite your participants
+          (QR code, link, email, WhatsApp…).
+        </div>
+      </div>
+    </div>
+
+    <!-- PANEL 5: RAISE HAND -->
+    <div class="panel">
+      <div class="panel-number">5</div>
+      <div class="sfx sfx-burst sfx-purple sfx-tr">✋ HAND!</div>
+      <div class="panel-title">A participant raises a hand</div>
+      <div class="panel-image">
+        <img src="https://static.wixstatic.com/media/8e0c90_9ac6b04605bd4de38d38769d7e2b870b~mv2.png/v1/crop/x_21,y_0,w_127,h_97/fill/w_178,h_136,al_c,lg_1,q_85,enc_avif,quality_auto/8%20Raise%20hand%20en%20gros%20plan.png" alt="Raise hand button">
+      </div>
+      <div class="panel-text">
+        A participant wants to <strong>speak up</strong>?<br>
+        They click the <strong>"Raise hand"</strong> ✋ button
+        from their screen.<br>
+        You (the host) get a <strong>notification</strong>.
+      </div>
+      <div class="speech-bubble">
+        Your call: accept or decline!
+      </div>
+    </div>
+
+    <!-- PANEL 6: HOST AUTHORIZATION -->
+    <div class="panel">
+      <div class="panel-number">6</div>
+      <div class="sfx sfx-burst sfx-pink sfx-tr">CHOOSE!</div>
+      <div class="panel-title">You allow… or not</div>
+      <div class="panel-image">
+        <img src="https://static.wixstatic.com/media/8e0c90_84bf574cddb34a2d98f52be509fd6d06~mv2.png/v1/fill/w_1438,h_146,al_c,q_85,usm_0.66_1.00_0.01,enc_avif,quality_auto/8e0c90_84bf574cddb34a2d98f52be509fd6d06~mv2.png" alt="Host authorization bar">
+      </div>
+      <div class="panel-text">
+        A <strong>notification bar</strong> appears on your host screen.<br>
+        ✅ <strong>Allow</strong>: the participant can speak,
+        their voice will be translated for everyone.<br>
+        ❌ <strong>Decline</strong>: they'll have to wait their turn.
+      </div>
+      <div class="speech-bubble">
+        You stay in full control of the session 🎯
+      </div>
+    </div>
+
+    <!-- ============ WARNING PANEL: SILENCE ============ -->
+    <div class="panel panel-warning">
+      <div class="panel-warning-inner">
+        <div class="warning-icon">🤫</div>
+        <div>
+          <div class="warning-label">⚠️ IMPORTANT ⚠️</div>
+          <div class="warning-title">The AI needs a <u>QUIET</u> environment</div>
+          <div class="warning-text">
+            Translation works by <strong>capturing your voice</strong>.
+            If the mic also picks up background conversations, clinking cutlery,
+            music or a fan… the <strong>quality drops dramatically</strong>
+            (poor transcription, poor translation).
+          </div>
+          <div class="warning-bad-good">
+            <div class="warning-item warning-bad">
+              ❌ <strong>Avoid:</strong> noisy restaurants, busy cafés, open-plan offices, moving cars, crowded terraces.
+            </div>
+            <div class="warning-item warning-good">
+              ✅ <strong>Ideal:</strong> closed meeting room, quiet office, headset mic placed close to your mouth.
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============ SPOTLIGHT 7: MIC ============ -->
+    <div class="panel panel-spotlight">
+      <div class="panel-number">7</div>
+      <div class="spotlight-image dark-bg">
+        <img src="https://static.wixstatic.com/media/8e0c90_ba30d47172d447279c504af07a809005~mv2.png/v1/crop/x_8,y_45,w_94,h_64/fill/w_131,h_90,al_c,lg_1,q_85,enc_avif,quality_auto/8e0c90_ba30d47172d447279c504af07a809005~mv2.png" alt="Close-up of the Speaker (mic) button">
+      </div>
+      <div class="spotlight-content">
+        <div class="spotlight-label">🎤 THE MOST IMPORTANT 🎤</div>
+        <div class="spotlight-title">CLICK ON<br>THE MIC!</div>
+        <div class="spotlight-text">
+          This is <strong>THE</strong> button that starts everything.<br>
+          Without this click, <strong>no sound is captured</strong> and
+          no translation appears for your participants.<br>
+          👉 Click <strong>"Speaker"</strong> and just speak normally.
+        </div>
+      </div>
+    </div>
+
+    <!-- PANEL 8: PARTICIPANT VIEW -->
+    <div class="panel">
+      <div class="panel-number">8</div>
+      <div class="sfx sfx-burst sfx-green sfx-tr">MAGIC! ✨</div>
+      <div class="panel-title">And there you go!</div>
+      <div class="panel-image">
+        <img src="https://static.wixstatic.com/media/8e0c90_a8a80bec92da40fb805c1534b9ccad8c~mv2.jpg/v1/crop/x_0,y_133,w_428,h_438/fill/w_513,h_526,al_c,lg_1,q_80,enc_avif,quality_auto/SOUSTITRAGE%20IPHONE_edited.jpg" alt="Participant view: live translated subtitles on a phone screen">
+      </div>
+      <div class="panel-text">
+        Here's how <strong>your participants</strong> follow your conference:
+        the <strong>live translated subtitles</strong> appear right on their
+        <strong>phone screen</strong>, big and clear, in their own language. 🌍
+      </div>
+      <div class="speech-bubble">
+        Well done! You're now a TTW pro 🏆
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ============ FINAL CARD ============ -->
+  <div class="final-card">
+    <h2>★ AND THERE YOU GO — YOU'RE READY ★</h2>
+    <p>
+      8 simple steps + 1 golden rule, one multilingual conference translated live.<br>
+      No human interpreter needed, no software to install.<br>
+      Just a web browser, a mic, and the magic of AI. 🪄
+    </p>
+    <div class="ttw-logo">
+      Translate<span class="green-part">The</span><span class="yellow-part">World</span>
+    </div>
+  </div>
+
+  <div class="footer-note">
+    User Guide — SOGEDICOM SAS · translatetheworld.com
+  </div>
+
+</div>
+
+</body>
+</html>

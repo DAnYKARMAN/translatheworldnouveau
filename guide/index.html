@@ -1,0 +1,846 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TranslateTheWorld — Mode d'emploi BD</title>
+
+<!-- Open Graph (WhatsApp, LinkedIn, Facebook, iMessage…) -->
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://translatetheworld.com/guide/">
+<meta property="og:title" content="TranslateTheWorld — Mode d'emploi visuel">
+<meta property="og:description" content="Comment utiliser TTW pour faire traduire votre conférence en direct dans 15+ langues. Guide visuel en 9 étapes.">
+<meta property="og:image" content="https://static.wixstatic.com/media/8e0c90_67ab058e45204a00b19d4e4eeb7ee0c1~mv2.png/v1/fill/w_1200,h_630,al_c,q_90,enc_avif,quality_auto/og-preview.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:locale" content="fr_FR">
+<meta property="og:site_name" content="TranslateTheWorld">
+
+<!-- Twitter Card -->
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="TranslateTheWorld — Mode d'emploi visuel">
+<meta name="twitter:description" content="Comment utiliser TTW pour faire traduire votre conférence en direct dans 15+ langues.">
+<meta name="twitter:image" content="https://static.wixstatic.com/media/8e0c90_67ab058e45204a00b19d4e4eeb7ee0c1~mv2.png/v1/fill/w_1200,h_630,al_c,q_90,enc_avif,quality_auto/og-preview.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bangers&family=Bowlby+One&family=Patrick+Hand&family=Caveat:wght@700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --paper: #fdf6e3;
+    --ink: #1a1a1a;
+    --red: #e63946;
+    --yellow: #ffd60a;
+    --blue: #0077b6;
+    --green: #06d6a0;
+    --pink: #ff5d8f;
+    --orange: #ff9f1c;
+    --purple: #8338ec;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Patrick Hand', cursive;
+    background: var(--paper);
+    background-image:
+      radial-gradient(circle at 1px 1px, rgba(0,0,0,0.12) 1px, transparent 0);
+    background-size: 14px 14px;
+    color: var(--ink);
+    min-height: 100vh;
+    padding: 40px 20px 80px;
+    overflow-x: hidden;
+  }
+
+  body::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='200' height='200'><filter id='n'><feTurbulence baseFrequency='0.9' numOctaves='2'/></filter><rect width='100%25' height='100%25' filter='url(%23n)' opacity='0.08'/></svg>");
+    pointer-events: none;
+    z-index: 1;
+  }
+
+  .container {
+    max-width: 1200px;
+    margin: 0 auto;
+    position: relative;
+    z-index: 2;
+  }
+
+  /* ============ LANGUAGE SWITCHER ============ */
+  .lang-switch {
+    position: absolute;
+    top: 0;
+    right: 0;
+    display: flex;
+    gap: 8px;
+    z-index: 20;
+  }
+
+  .lang-switch a {
+    display: inline-block;
+    padding: 6px 14px;
+    font-family: 'Bangers', cursive;
+    font-size: 1.1rem;
+    letter-spacing: 2px;
+    text-decoration: none;
+    color: var(--ink);
+    background: white;
+    border: 3px solid var(--ink);
+    border-radius: 4px;
+    box-shadow: 3px 3px 0 var(--ink);
+    transition: transform 0.15s;
+  }
+
+  .lang-switch a:hover { transform: translate(-2px, -2px); box-shadow: 5px 5px 0 var(--ink); }
+  .lang-switch a.active { background: var(--yellow); }
+
+  /* ============ EN-TÊTE ============ */
+  .header {
+    text-align: center;
+    margin-bottom: 60px;
+    position: relative;
+    padding-top: 20px;
+  }
+
+  .header-banner {
+    display: inline-block;
+    background: var(--ink);
+    color: var(--yellow);
+    padding: 6px 24px;
+    font-family: 'Bangers', cursive;
+    font-size: 1.4rem;
+    letter-spacing: 3px;
+    transform: rotate(-2deg);
+    margin-bottom: 18px;
+    box-shadow: 6px 6px 0 var(--red);
+  }
+
+  .header h1 {
+    font-family: 'Bowlby One', cursive;
+    font-size: clamp(2.5rem, 7vw, 5.5rem);
+    line-height: 0.95;
+    color: var(--ink);
+    text-shadow:
+      4px 4px 0 var(--yellow),
+      8px 8px 0 var(--red);
+    letter-spacing: -1px;
+  }
+
+  .header h1 .accent { color: var(--red); }
+  .header h1 .accent2 { color: var(--blue); }
+
+  .subtitle {
+    font-family: 'Caveat', cursive;
+    font-size: 1.8rem;
+    margin-top: 30px;
+    color: var(--ink);
+    transform: rotate(-1deg);
+    display: inline-block;
+  }
+
+  .stars {
+    position: absolute;
+    font-family: 'Bangers', cursive;
+    color: var(--red);
+    font-size: 3rem;
+  }
+  .star1 { top: -10px; left: 10%; transform: rotate(-15deg); color: var(--yellow); }
+  .star2 { top: 30%; right: 8%; transform: rotate(20deg); color: var(--pink); }
+
+  /* ============ GRILLE BD ============ */
+  .comic-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 40px;
+    margin-bottom: 60px;
+  }
+
+  @media (max-width: 768px) {
+    .comic-grid { grid-template-columns: 1fr; gap: 50px; }
+  }
+
+  /* ============ CASE BD ============ */
+  .panel {
+    background: white;
+    border: 4px solid var(--ink);
+    border-radius: 4px;
+    padding: 24px;
+    position: relative;
+    box-shadow: 8px 8px 0 var(--ink);
+    transition: transform 0.3s ease;
+    animation: popIn 0.5s ease-out backwards;
+  }
+
+  .panel:hover { transform: translateY(-6px); }
+
+  .panel:nth-child(odd) { transform: rotate(-0.8deg); }
+  .panel:nth-child(even) { transform: rotate(0.8deg); }
+  .panel:nth-child(odd):hover { transform: rotate(-0.8deg) translateY(-6px); }
+  .panel:nth-child(even):hover { transform: rotate(0.8deg) translateY(-6px); }
+
+  /* Numéro de case */
+  .panel-number {
+    position: absolute;
+    top: -22px;
+    left: -22px;
+    width: 60px;
+    height: 60px;
+    background: var(--yellow);
+    color: var(--ink);
+    border: 4px solid var(--ink);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Bowlby One', cursive;
+    font-size: 1.8rem;
+    z-index: 5;
+    box-shadow: 3px 3px 0 var(--ink);
+  }
+
+  .panel-title {
+    font-family: 'Bangers', cursive;
+    font-size: 1.8rem;
+    letter-spacing: 2px;
+    color: var(--ink);
+    margin-bottom: 14px;
+    padding: 8px 14px;
+    background: var(--yellow);
+    display: inline-block;
+    border: 3px solid var(--ink);
+    box-shadow: 4px 4px 0 var(--ink);
+    transform: rotate(-1deg);
+  }
+
+  .panel-image {
+    background: #f0f0f0;
+    border: 3px solid var(--ink);
+    border-radius: 2px;
+    overflow: hidden;
+    margin: 18px 0;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 180px;
+  }
+
+  .panel-image img {
+    width: 100%;
+    height: auto;
+    display: block;
+  }
+
+  .panel-text {
+    font-family: 'Patrick Hand', cursive;
+    font-size: 1.25rem;
+    line-height: 1.4;
+    color: var(--ink);
+    margin-top: 14px;
+  }
+
+  .panel-text strong {
+    background: var(--yellow);
+    padding: 0 4px;
+    font-weight: bold;
+  }
+
+  /* Bulle de dialogue */
+  .speech-bubble {
+    background: white;
+    border: 3px solid var(--ink);
+    border-radius: 20px;
+    padding: 12px 18px;
+    position: relative;
+    margin-top: 16px;
+    font-family: 'Caveat', cursive;
+    font-size: 1.4rem;
+    box-shadow: 4px 4px 0 var(--ink);
+  }
+  .speech-bubble::before {
+    content: "";
+    position: absolute;
+    bottom: -16px;
+    left: 30px;
+    width: 0; height: 0;
+    border: 12px solid transparent;
+    border-top-color: var(--ink);
+    border-bottom: 0;
+  }
+  .speech-bubble::after {
+    content: "";
+    position: absolute;
+    bottom: -10px;
+    left: 33px;
+    width: 0; height: 0;
+    border: 9px solid transparent;
+    border-top-color: white;
+    border-bottom: 0;
+  }
+
+  /* Effets sonores */
+  .sfx {
+    position: absolute;
+    font-family: 'Bowlby One', cursive;
+    color: var(--ink);
+    z-index: 10;
+    pointer-events: none;
+  }
+
+  .sfx-burst {
+    background: var(--red);
+    color: white;
+    padding: 12px 20px;
+    border: 4px solid var(--ink);
+    border-radius: 50% 30% 50% 30%;
+    transform: rotate(-12deg);
+    box-shadow: 4px 4px 0 var(--ink);
+    font-size: 1.6rem;
+    letter-spacing: 2px;
+  }
+
+  .sfx-yellow { background: var(--yellow); color: var(--ink); }
+  .sfx-blue { background: var(--blue); color: white; }
+  .sfx-green { background: var(--green); color: var(--ink); }
+  .sfx-pink { background: var(--pink); color: white; }
+  .sfx-purple { background: var(--purple); color: white; }
+
+  .sfx-tr { top: -20px; right: -15px; }
+  .sfx-tl { top: -20px; left: -15px; }
+
+  /* ============ CASE SPOTLIGHT (gros plans à mettre en avant) ============ */
+  .panel-spotlight {
+    grid-column: 1 / -1;
+    background: linear-gradient(135deg, var(--yellow) 0%, var(--orange) 100%);
+    border: 6px solid var(--ink);
+    padding: 36px 40px;
+    position: relative;
+    box-shadow: 12px 12px 0 var(--ink);
+    transform: rotate(0deg) !important;
+    overflow: hidden;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 36px;
+    align-items: center;
+  }
+
+  .panel-spotlight:hover { transform: translateY(-6px) !important; }
+
+  @media (max-width: 768px) {
+    .panel-spotlight {
+      grid-template-columns: 1fr;
+      padding: 28px 24px;
+    }
+  }
+
+  /* Rayons de lumière en arrière-plan */
+  .panel-spotlight::before {
+    content: "";
+    position: absolute;
+    top: 50%; left: 50%;
+    width: 200%; height: 200%;
+    background: repeating-conic-gradient(
+      from 0deg,
+      rgba(255,255,255,0.18) 0deg 10deg,
+      transparent 10deg 25deg
+    );
+    transform: translate(-50%, -50%);
+    z-index: 0;
+    animation: spin 60s linear infinite;
+  }
+
+  @keyframes spin {
+    to { transform: translate(-50%, -50%) rotate(360deg); }
+  }
+
+  .panel-spotlight > * { position: relative; z-index: 2; }
+
+  .spotlight-image {
+    background: white;
+    border: 5px solid var(--ink);
+    border-radius: 6px;
+    padding: 24px;
+    box-shadow: 8px 8px 0 var(--ink);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 220px;
+    transform: rotate(-2deg);
+  }
+
+  .spotlight-image img {
+    max-width: 100%;
+    max-height: 280px;
+    height: auto;
+    display: block;
+  }
+
+  .spotlight-image.dark-bg {
+    background: linear-gradient(135deg, #1a1a1a 0%, #2a2a2a 100%);
+  }
+
+  .spotlight-content { text-align: left; }
+
+  .spotlight-label {
+    display: inline-block;
+    background: var(--red);
+    color: white;
+    padding: 6px 16px;
+    font-family: 'Bangers', cursive;
+    font-size: 1.2rem;
+    letter-spacing: 3px;
+    border: 3px solid var(--ink);
+    box-shadow: 4px 4px 0 var(--ink);
+    transform: rotate(-3deg);
+    margin-bottom: 18px;
+  }
+
+  .spotlight-title {
+    font-family: 'Bowlby One', cursive;
+    font-size: clamp(2rem, 4vw, 3rem);
+    line-height: 1;
+    color: var(--ink);
+    margin-bottom: 18px;
+    text-shadow: 3px 3px 0 white;
+  }
+
+  .spotlight-text {
+    font-family: 'Patrick Hand', cursive;
+    font-size: 1.4rem;
+    line-height: 1.4;
+    color: var(--ink);
+  }
+
+  .spotlight-text strong {
+    background: var(--ink);
+    color: var(--yellow);
+    padding: 2px 6px;
+  }
+
+  /* Numéro spotlight */
+  .panel-spotlight .panel-number {
+    background: var(--red);
+    color: white;
+    width: 72px;
+    height: 72px;
+    font-size: 2.2rem;
+    top: -28px;
+    left: -28px;
+  }
+
+  /* ============ CASE WARNING (environnement silencieux) ============ */
+  .panel-warning {
+    grid-column: 1 / -1;
+    background: repeating-linear-gradient(
+      45deg,
+      #ffd60a,
+      #ffd60a 30px,
+      #1a1a1a 30px,
+      #1a1a1a 60px
+    );
+    padding: 8px;
+    border: 4px solid var(--ink);
+    box-shadow: 10px 10px 0 var(--ink);
+    position: relative;
+    transform: rotate(0deg) !important;
+  }
+
+  .panel-warning:hover { transform: translateY(-6px) !important; }
+
+  .panel-warning-inner {
+    background: white;
+    border: 3px solid var(--ink);
+    padding: 30px 36px;
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 28px;
+    align-items: center;
+  }
+
+  @media (max-width: 768px) {
+    .panel-warning-inner {
+      grid-template-columns: 1fr;
+      text-align: center;
+      padding: 24px 20px;
+    }
+  }
+
+  .warning-icon {
+    font-size: 5rem;
+    line-height: 1;
+    animation: shake 2s ease-in-out infinite;
+  }
+
+  @keyframes shake {
+    0%, 100% { transform: rotate(0); }
+    25% { transform: rotate(-10deg); }
+    75% { transform: rotate(10deg); }
+  }
+
+  .warning-label {
+    display: inline-block;
+    background: var(--red);
+    color: white;
+    padding: 6px 16px;
+    font-family: 'Bangers', cursive;
+    font-size: 1.2rem;
+    letter-spacing: 3px;
+    border: 3px solid var(--ink);
+    box-shadow: 3px 3px 0 var(--ink);
+    margin-bottom: 12px;
+  }
+
+  .warning-title {
+    font-family: 'Bowlby One', cursive;
+    font-size: clamp(1.6rem, 3vw, 2.4rem);
+    line-height: 1.05;
+    color: var(--ink);
+    margin-bottom: 12px;
+  }
+
+  .warning-text {
+    font-family: 'Patrick Hand', cursive;
+    font-size: 1.3rem;
+    line-height: 1.4;
+    color: var(--ink);
+  }
+
+  .warning-text strong {
+    background: var(--yellow);
+    padding: 1px 5px;
+    font-weight: bold;
+  }
+
+  .warning-bad-good {
+    margin-top: 14px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+  }
+
+  @media (max-width: 768px) {
+    .warning-bad-good { grid-template-columns: 1fr; }
+  }
+
+  .warning-item {
+    padding: 10px 12px;
+    border: 3px solid var(--ink);
+    border-radius: 6px;
+    font-family: 'Patrick Hand', cursive;
+    font-size: 1.1rem;
+    line-height: 1.3;
+  }
+
+  .warning-bad {
+    background: #ffe5e5;
+    border-color: var(--red);
+  }
+
+  .warning-good {
+    background: #d8f5e9;
+    border-color: var(--green);
+  }
+
+  /* ============ ENCADRÉ FINAL ============ */
+  .final-card {
+    background: var(--ink);
+    color: var(--paper);
+    border: 4px solid var(--ink);
+    padding: 36px;
+    text-align: center;
+    box-shadow: 10px 10px 0 var(--red);
+    margin-top: 40px;
+    position: relative;
+  }
+
+  .final-card::before {
+    content: "★";
+    position: absolute;
+    top: -25px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: var(--yellow);
+    color: var(--ink);
+    width: 50px; height: 50px;
+    border: 4px solid var(--ink);
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1.8rem;
+  }
+
+  .final-card h2 {
+    font-family: 'Bangers', cursive;
+    font-size: 2.4rem;
+    letter-spacing: 3px;
+    color: var(--yellow);
+    margin-bottom: 16px;
+  }
+
+  .final-card p {
+    font-family: 'Patrick Hand', cursive;
+    font-size: 1.4rem;
+    line-height: 1.5;
+    max-width: 700px;
+    margin: 0 auto;
+  }
+
+  .final-card .ttw-logo {
+    font-family: 'Bowlby One', cursive;
+    font-size: 1.6rem;
+    margin-top: 18px;
+    color: white;
+  }
+  .final-card .ttw-logo .green-part { color: var(--green); }
+  .final-card .ttw-logo .yellow-part { color: var(--yellow); }
+
+  .footer-note {
+    text-align: center;
+    margin-top: 30px;
+    font-family: 'Caveat', cursive;
+    font-size: 1.3rem;
+    color: var(--ink);
+    opacity: 0.7;
+  }
+
+  @keyframes popIn {
+    from { opacity: 0; transform: scale(0.8); }
+    to { opacity: 1; }
+  }
+
+  .panel:nth-child(1) { animation-delay: 0.05s; }
+  .panel:nth-child(2) { animation-delay: 0.15s; }
+  .panel:nth-child(3) { animation-delay: 0.25s; }
+  .panel:nth-child(4) { animation-delay: 0.35s; }
+  .panel:nth-child(5) { animation-delay: 0.45s; }
+  .panel:nth-child(6) { animation-delay: 0.55s; }
+  .panel:nth-child(7) { animation-delay: 0.65s; }
+  .panel:nth-child(8) { animation-delay: 0.75s; }
+</style>
+</head>
+<body>
+
+<div class="container">
+
+  <!-- Language switcher -->
+  <div class="lang-switch">
+    <a href="index.html" class="active">FR</a>
+    <a href="index-en.html">EN</a>
+  </div>
+
+  <!-- ============ EN-TÊTE ============ -->
+  <header class="header">
+    <span class="stars star1">★</span>
+    <span class="stars star2">✦</span>
+    <div class="header-banner">★ MODE D'EMPLOI ★</div>
+    <h1>
+      Translate<span class="accent">The</span><span class="accent2">World</span>
+    </h1>
+    <div class="subtitle">L'aventure de ta première session… en 9 étapes !</div>
+  </header>
+
+  <!-- ============ GRILLE BD ============ -->
+  <div class="comic-grid">
+
+    <!-- CASE 1 : EMAIL -->
+    <div class="panel">
+      <div class="panel-number">1</div>
+      <div class="sfx sfx-burst sfx-yellow sfx-tr">DING !</div>
+      <div class="panel-title">Tu reçois ton email !</div>
+      <div class="panel-image">
+        <img src="https://static.wixstatic.com/media/8e0c90_d4458f40924f4adf99e3dbb4b0dedd5c~mv2.png/v1/crop/x_0,y_85,w_602,h_389/fill/w_642,h_467,al_c,lg_1,q_85,enc_avif,quality_auto/1%20Lien%20Start%20the%20session.png" alt="Email TranslateTheWorld avec le lien Start the session">
+      </div>
+      <div class="panel-text">
+        Après ton inscription, TTW t'envoie un <strong>email</strong> avec
+        <strong>2 liens</strong> :<br>
+        🔑 ton <strong>lien HÔTE</strong> (pour toi tout seul !)<br>
+        👥 ton <strong>lien PARTICIPANTS</strong> (pour tes invités).
+      </div>
+      <div class="speech-bubble">
+        Clique sur "Lancer la session" pour démarrer 🚀
+      </div>
+    </div>
+
+    <!-- CASE 2 : CONFIGURATION -->
+    <div class="panel">
+      <div class="panel-number">2</div>
+      <div class="sfx sfx-burst sfx-blue sfx-tr">SETUP !</div>
+      <div class="panel-title">Tu configures ta session</div>
+      <div class="panel-image">
+        <img src="https://static.wixstatic.com/media/8e0c90_dd34f28e6db64b799569f461d742b299~mv2.png/v1/crop/x_178,y_85,w_486,h_763/fill/w_436,h_684,al_c,q_85,usm_0.66_1.00_0.01,enc_avif,quality_auto/8e0c90_dd34f28e6db64b799569f461d742b299~mv2.png" alt="Page Set up your session">
+      </div>
+      <div class="panel-text">
+        Sur la page <strong>"Set up your session"</strong>, tu remplis :<br>
+        • Ton <strong>nom ou pseudo</strong><br>
+        • Ton <strong>organisation</strong> (facultatif)<br>
+        • Ta <strong>langue à toi</strong> (ce que tu vas parler)<br>
+        • Les <strong>langues du public</strong> (la traduction qu'ils verront).
+      </div>
+      <div class="speech-bubble">
+        Puis tu cliques sur "Start session" 🚀
+      </div>
+    </div>
+
+    <!-- CASE 3 : HOST DASHBOARD -->
+    <div class="panel">
+      <div class="panel-number">3</div>
+      <div class="sfx sfx-burst sfx-green sfx-tr">TADAAA !</div>
+      <div class="panel-title">Ton interface de pilotage</div>
+      <div class="panel-image">
+        <img src="https://static.wixstatic.com/media/8e0c90_8f3955eae1874639a2746f64785cf5b7~mv2.png/v1/fill/w_1200,h_2600,al_c,q_95,usm_0.66_1.00_0.01,enc_avif,quality_auto/intrface%20orateur.png" alt="Interface de l'orateur pour piloter la conférence">
+      </div>
+      <div class="panel-text">
+        C'est sur cette <strong>interface</strong> que tu vas
+        <strong>parler et diriger</strong> ta conférence :
+        la <strong>démarrer</strong>, <strong>autoriser</strong>
+        (ou non) les participants à intervenir,
+        et la <strong>clôturer</strong>.<br>
+        Tu y vois aussi le <strong>code de la salle</strong>,
+        le <strong>compte à rebours</strong> et tes
+        <strong>invités connectés</strong> en temps réel.
+      </div>
+      <div class="speech-bubble">
+        Maintenant, il faut inviter tes participants !
+      </div>
+    </div>
+
+    <!-- ============ CASE SPOTLIGHT 4 : INVITE ============ -->
+    <div class="panel panel-spotlight">
+      <div class="panel-number">4</div>
+      <div class="spotlight-image">
+        <img src="https://static.wixstatic.com/media/8e0c90_31a19ed9e98f4faa9000469c5e300d1c~mv2.png/v1/fill/w_202,h_185,al_c,lg_1,q_85,enc_avif,quality_auto/8e0c90_31a19ed9e98f4faa9000469c5e300d1c~mv2.png" alt="Gros plan sur le bouton Invite">
+      </div>
+      <div class="spotlight-content">
+        <div class="spotlight-label">⚡ À NE PAS LOUPER ⚡</div>
+        <div class="spotlight-title">CLIQUE SUR<br>"INVITE" !</div>
+        <div class="spotlight-text">
+          En haut à droite de ton tableau de bord, le <strong>gros bouton turquoise</strong>.
+          C'est <strong>LUI</strong> qui ouvre le menu pour inviter tes participants
+          (QR code, lien, email, WhatsApp…).
+        </div>
+      </div>
+    </div>
+
+    <!-- CASE 5 : RAISE HAND -->
+    <div class="panel">
+      <div class="panel-number">5</div>
+      <div class="sfx sfx-burst sfx-purple sfx-tr">✋ HAND !</div>
+      <div class="panel-title">Un participant lève la main</div>
+      <div class="panel-image">
+        <img src="https://static.wixstatic.com/media/8e0c90_9ac6b04605bd4de38d38769d7e2b870b~mv2.png/v1/crop/x_21,y_0,w_127,h_97/fill/w_178,h_136,al_c,lg_1,q_85,enc_avif,quality_auto/8%20Raise%20hand%20en%20gros%20plan.png" alt="Bouton Raise hand">
+      </div>
+      <div class="panel-text">
+        Un participant veut <strong>prendre la parole</strong> ?<br>
+        Il clique sur le bouton <strong>"Raise hand"</strong> ✋
+        depuis son écran.<br>
+        Toi (l'hôte), tu reçois une <strong>notification</strong>.
+      </div>
+      <div class="speech-bubble">
+        À toi de décider : tu acceptes ou tu refuses !
+      </div>
+    </div>
+
+    <!-- CASE 6 : AUTORISATION HÔTE -->
+    <div class="panel">
+      <div class="panel-number">6</div>
+      <div class="sfx sfx-burst sfx-pink sfx-tr">CHOIX !</div>
+      <div class="panel-title">Tu autorises… ou pas</div>
+      <div class="panel-image">
+        <img src="https://static.wixstatic.com/media/8e0c90_84bf574cddb34a2d98f52be509fd6d06~mv2.png/v1/fill/w_1438,h_146,al_c,q_85,usm_0.66_1.00_0.01,enc_avif,quality_auto/8e0c90_84bf574cddb34a2d98f52be509fd6d06~mv2.png" alt="Barre d'autorisation hôte">
+      </div>
+      <div class="panel-text">
+        Une <strong>barre apparaît</strong> sur ton écran d'hôte.<br>
+        ✅ <strong>Autoriser</strong> : le participant peut parler,
+        sa voix sera traduite pour tout le monde.<br>
+        ❌ <strong>Refuser</strong> : il devra attendre son tour.
+      </div>
+      <div class="speech-bubble">
+        Tu gardes le contrôle total de la session 🎯
+      </div>
+    </div>
+
+    <!-- ============ CASE WARNING : SILENCE ============ -->
+    <div class="panel panel-warning">
+      <div class="panel-warning-inner">
+        <div class="warning-icon">🤫</div>
+        <div>
+          <div class="warning-label">⚠️ ATTENTION ⚠️</div>
+          <div class="warning-title">L'IA a besoin d'un environnement <u>SILENCIEUX</u></div>
+          <div class="warning-text">
+            La traduction fonctionne en <strong>captant ta voix</strong>.
+            Si le micro entend aussi des conversations à côté, le bruit des couverts,
+            de la musique ou un ventilateur… la <strong>qualité chute fortement</strong>
+            (mauvaise transcription, mauvaise traduction).
+          </div>
+          <div class="warning-bad-good">
+            <div class="warning-item warning-bad">
+              ❌ <strong>À éviter :</strong> restaurant bruyant, brasserie, terrasse animée, bureau open-space, voiture en marche.
+            </div>
+            <div class="warning-item warning-good">
+              ✅ <strong>Idéal :</strong> salle de réunion fermée, bureau calme, casque-micro proche de la bouche.
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============ CASE SPOTLIGHT 7 : MICRO ============ -->
+    <div class="panel panel-spotlight">
+      <div class="panel-number">7</div>
+      <div class="spotlight-image dark-bg">
+        <img src="https://static.wixstatic.com/media/8e0c90_ba30d47172d447279c504af07a809005~mv2.png/v1/crop/x_8,y_45,w_94,h_64/fill/w_131,h_90,al_c,lg_1,q_85,enc_avif,quality_auto/8e0c90_ba30d47172d447279c504af07a809005~mv2.png" alt="Gros plan sur le bouton Speaker (micro)">
+      </div>
+      <div class="spotlight-content">
+        <div class="spotlight-label">🎤 LE PLUS IMPORTANT 🎤</div>
+        <div class="spotlight-title">CLIQUE SUR<br>LE MICRO !</div>
+        <div class="spotlight-text">
+          C'est <strong>LE</strong> bouton qui démarre tout.<br>
+          Sans ce clic, <strong>aucun son n'est capté</strong> et
+          aucune traduction ne s'affiche pour tes participants.<br>
+          👉 Clique sur <strong>"Speaker"</strong> et parle normalement.
+        </div>
+      </div>
+    </div>
+
+    <!-- CASE 8 : VUE PARTICIPANT -->
+    <div class="panel">
+      <div class="panel-number">8</div>
+      <div class="sfx sfx-burst sfx-green sfx-tr">MAGIE ! ✨</div>
+      <div class="panel-title">Et voilà !</div>
+      <div class="panel-image">
+        <img src="https://static.wixstatic.com/media/8e0c90_a8a80bec92da40fb805c1534b9ccad8c~mv2.jpg/v1/crop/x_0,y_133,w_428,h_438/fill/w_513,h_526,al_c,lg_1,q_80,enc_avif,quality_auto/SOUSTITRAGE%20IPHONE_edited.jpg" alt="Vue participant : sous-titres traduits en direct sur le téléphone">
+      </div>
+      <div class="panel-text">
+        Voilà comment <strong>tes participants</strong> peuvent suivre
+        ta conférence : les <strong>sous-titres traduits en temps réel</strong>
+        s'affichent directement sur leur <strong>téléphone</strong>,
+        en gros et en clair, dans leur propre langue. 🌍
+      </div>
+      <div class="speech-bubble">
+        Bravo ! Tu es maintenant un pro de TTW 🏆
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ============ ENCADRÉ FINAL ============ -->
+  <div class="final-card">
+    <h2>★ ET VOILÀ ! TU ES PRÊT ★</h2>
+    <p>
+      8 étapes simples + 1 règle d'or, une conférence multilingue traduite en direct.<br>
+      Pas besoin d'interprète humain, pas besoin d'installer quoi que ce soit.<br>
+      Juste un navigateur web, un micro, et la magie de l'IA. 🪄
+    </p>
+    <div class="ttw-logo">
+      Translate<span class="green-part">The</span><span class="yellow-part">World</span>
+    </div>
+  </div>
+
+  <div class="footer-note">
+    Mode d'emploi BD — SOGEDICOM SAS · translatetheworld.com
+  </div>
+
+</div>
+
+</body>
+</html>

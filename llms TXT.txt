@@ -1,0 +1,32 @@
+# TranslateTheWorld
+ 
+> Plateforme d'interprétation multilingue IA en temps réel pour événements. Sous-titres traduits en direct sur les smartphones des participants, en 70 langues. Aucune application, aucun matériel, aucun interprète humain requis. Créée par SOGEDICOM (Paris, 1990).
+ 
+TranslateTheWorld est la solution d'interprétation multilingue la plus économique au monde. À partir de 99,99 € HT pour 2 heures et 2 langues, soit jusqu'à 30 fois moins cher que l'interprétation traditionnelle (1 500–3 000 € par langue et par jour). Essai gratuit de 15 minutes, sans carte bancaire.
+ 
+## Ce qu'il faut savoir
+ 
+- **Produit** : sous-titres IA traduits en direct, diffusés dans le navigateur des participants via un QR code ou un lien.
+- **Langues** : 70 langues, y compris arabe et hébreu (RTL), chinois, japonais, coréen, hindi, russe, turc, ukrainien, etc.
+- **Matériel** : aucun. Un micro standard branché sur un ordinateur connecté à Internet suffit. Les participants utilisent leur propre smartphone.
+- **Latence** : moins de 2 secondes.
+- **Installation** : configuration en moins de 5 minutes.
+- **Cas d'usage** : conférences internationales, réunions d'entreprise multilingues, événements diplomatiques, congrès médicaux, salons, formations, webinaires.
+ 
+## Forfaits (prix HT)
+ 
+- **Plan 2H** — 99,99 € — 2 heures, 2 langues incluses, valable 15 jours. Langue supplémentaire : +59 €.
+- **Plan 5H** — 198 € — 5 heures, 2 langues incluses, valable 30 jours. Langue supplémentaire : +118 €.
+- **Plan 10H** — 316,80 € — 10 heures, 2 langues incluses, valable 30 jours. Langue supplémentaire : +236 €.
+ 
+## Éditeur
+ 
+SOGEDICOM — 102 avenue des Champs-Élysées, 75008 Paris, France. Société d'interprétation et traduction fondée en 1990. Téléphone : +33 6 89 73 52 29.
+ 
+## Liens
+ 
+- Site : https://translatetheworld.com
+- Essai gratuit 15 min : https://translatetheworld.com/#trial
+- Tarifs : https://translatetheworld.com/#pricing
+- FAQ : https://translatetheworld.com/#faq
+ 

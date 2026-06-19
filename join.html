@@ -1,0 +1,544 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>TranslateTheWorld — Join Session</title>
+<link rel="icon" type="image/svg+xml" href="/favicon.svg">
+<meta name="theme-color" content="#0b1512">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;700;800&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<!-- Firebase -->
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+<style>
+:root{
+  --bg:#0b1512;--surface:#121e19;--card:#1a2b24;--card2:#243632;
+  --border:rgba(45,212,191,.22);--border2:rgba(255,255,255,.08);
+  --teal:#2dd4bf;--teal-dim:rgba(45,212,191,.1);--teal-glow:rgba(45,212,191,.25);
+  --gold:#e5c569;--red:#f87171;--red-dim:rgba(248,113,113,.12);
+  --ink:#e8edeb;--mid:#8a9e97;--dim:#6a7a72;
+  --font:'DM Sans',sans-serif;--mono:'DM Mono',monospace;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html,body{min-height:100%}
+body{
+  font-family:var(--font);
+  background:
+    radial-gradient(1200px 600px at 70% -10%,rgba(45,212,191,.10),transparent 60%),
+    radial-gradient(900px 500px at -10% 110%,rgba(232,105,10,.08),transparent 60%),
+    var(--bg);
+  color:var(--ink);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  padding:24px 16px;min-height:100vh;
+}
+
+/* Logo */
+.logo{
+  font-size:18px;font-weight:800;letter-spacing:-.02em;
+  text-decoration:none;color:var(--ink);margin-bottom:24px;
+}
+.logo span{
+  background:linear-gradient(110deg,#e8690a,#f5c842,#2dd4bf);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+}
+
+/* Card */
+.card{
+  background:var(--surface);
+  border:1px solid var(--border2);
+  border-radius:18px;
+  padding:28px 24px;
+  width:100%;max-width:440px;
+  box-shadow:0 20px 60px rgba(0,0,0,.4);
+}
+
+/* Lang switch top right */
+.lang-switch{
+  position:fixed;top:16px;right:16px;
+  display:flex;gap:2px;
+  background:var(--card2);
+  border:1px solid var(--border2);
+  border-radius:999px;padding:3px;
+  z-index:10;
+}
+.lang-switch button{
+  border:none;background:transparent;
+  color:var(--mid);
+  font-family:var(--font);font-size:11px;font-weight:700;
+  padding:5px 11px;border-radius:999px;cursor:pointer;
+  display:flex;align-items:center;gap:5px;
+}
+.lang-switch button.active{background:var(--teal-dim);color:var(--teal)}
+.lang-switch img{width:14px;height:10px;border-radius:2px;display:block}
+
+/* Loading */
+.loading{
+  display:flex;flex-direction:column;align-items:center;gap:14px;
+  padding:30px 10px;color:var(--mid);font-size:14px;text-align:center;
+}
+.spinner{
+  width:36px;height:36px;border-radius:50%;
+  border:3px solid var(--border2);border-top-color:var(--teal);
+  animation:spin .8s linear infinite;
+}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* Title */
+.title{font-size:22px;font-weight:800;margin-bottom:4px;letter-spacing:-.01em}
+.subtitle{font-size:13px;color:var(--mid);margin-bottom:22px;line-height:1.5}
+
+/* Session info */
+.session-info{
+  background:var(--card);
+  border:1px solid var(--border);
+  border-radius:12px;
+  padding:14px 16px;margin-bottom:20px;
+  display:flex;align-items:center;gap:12px;
+}
+.session-info-icon{
+  width:38px;height:38px;border-radius:10px;
+  background:var(--teal-dim);
+  display:flex;align-items:center;justify-content:center;
+  font-size:18px;flex-shrink:0;
+}
+.session-info-text{flex:1;min-width:0}
+.session-info-host{font-size:14px;font-weight:700;color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.session-info-room{font-size:11px;color:var(--mid);font-family:var(--mono);margin-top:2px}
+
+/* Form */
+.field{margin-bottom:16px}
+.field label{
+  display:block;font-size:12px;font-weight:700;color:var(--mid);
+  letter-spacing:.04em;text-transform:uppercase;margin-bottom:6px;
+}
+.field input,.field select{
+  width:100%;padding:13px 14px;
+  background:var(--card);
+  border:1.5px solid var(--border2);
+  border-radius:10px;
+  font-family:var(--font);font-size:15px;font-weight:500;
+  color:var(--ink);
+  transition:border-color .15s,background .15s;
+  -webkit-appearance:none;-moz-appearance:none;appearance:none;
+}
+.field input:focus,.field select:focus{
+  outline:none;border-color:var(--teal);background:var(--card2);
+}
+.field input::placeholder{color:var(--dim)}
+
+/* Custom select arrow */
+.select-wrap{position:relative}
+.select-wrap::after{
+  content:'';position:absolute;right:14px;top:50%;
+  width:8px;height:8px;
+  border-right:2px solid var(--mid);border-bottom:2px solid var(--mid);
+  transform:translateY(-70%) rotate(45deg);pointer-events:none;
+}
+.select-wrap select{padding-right:36px;cursor:pointer}
+
+/* Submit button */
+.btn-primary{
+  width:100%;padding:15px;
+  background:var(--teal);color:#0b1512;
+  border:none;border-radius:12px;
+  font-family:var(--font);font-size:16px;font-weight:800;
+  cursor:pointer;
+  box-shadow:0 6px 20px rgba(45,212,191,.3);
+  transition:transform .1s,box-shadow .15s,opacity .15s;
+}
+.btn-primary:hover:not(:disabled){box-shadow:0 8px 26px rgba(45,212,191,.45)}
+.btn-primary:active:not(:disabled){transform:translateY(1px)}
+.btn-primary:disabled{opacity:.45;cursor:not-allowed;box-shadow:none}
+
+/* Error / info messages */
+.error-box{
+  background:var(--red-dim);
+  border:1px solid rgba(248,113,113,.3);
+  border-radius:12px;padding:18px;
+  color:var(--red);font-size:14px;line-height:1.55;
+  text-align:center;
+}
+.error-box .icon{font-size:28px;display:block;margin-bottom:8px}
+.error-box strong{color:#fca5a5;display:block;margin-bottom:4px;font-weight:800}
+.error-box a{color:var(--teal);text-decoration:underline}
+
+/* Hint under form */
+.hint{
+  font-size:11px;color:var(--dim);text-align:center;
+  margin-top:14px;line-height:1.5;
+}
+
+/* Footer */
+.footer{
+  margin-top:24px;font-size:11px;color:var(--dim);text-align:center;
+}
+.footer a{color:var(--mid);text-decoration:none}
+</style>
+</head>
+<body>
+
+<!-- Language switch -->
+<div class="lang-switch">
+  <button id="btnLangFr" onclick="setUiLang('fr')"><img src="https://flagcdn.com/w40/fr.png" alt="">FR</button>
+  <button id="btnLangEn" onclick="setUiLang('en')" class="active"><img src="https://flagcdn.com/w40/gb.png" alt="">EN</button>
+</div>
+
+<a href="/" class="logo"><span>TRANSLATETHEWORLD</span></a>
+
+<div class="card">
+
+  <!-- Loading state (default) -->
+  <div id="loadingView" class="loading">
+    <div class="spinner"></div>
+    <div id="loadingText">Loading session…</div>
+  </div>
+
+  <!-- Error state -->
+  <div id="errorView" style="display:none">
+    <div class="error-box">
+      <span class="icon" id="errorIcon">⚠️</span>
+      <strong id="errorTitle">Session unavailable</strong>
+      <span id="errorMessage">This invitation link is no longer valid.</span>
+    </div>
+    <div class="hint" style="margin-top:16px">
+      <a href="/" id="errorBackLink" style="color:var(--teal);text-decoration:none;font-weight:600">← Back to home</a>
+    </div>
+  </div>
+
+  <!-- Form state -->
+  <div id="formView" style="display:none">
+    <div class="title" id="formTitle">Join the session</div>
+    <div class="subtitle" id="formSubtitle">Choose your language and enter your name to receive live subtitles.</div>
+
+    <div class="session-info">
+      <div class="session-info-icon">🎙️</div>
+      <div class="session-info-text">
+        <div class="session-info-host" id="hostNameLabel">—</div>
+        <div class="session-info-room" id="roomLabel">—</div>
+      </div>
+    </div>
+
+    <div class="field">
+      <label for="nameInput" id="lblName">Your name</label>
+      <input type="text" id="nameInput" placeholder="e.g. Marie Dupont" autocomplete="given-name" maxlength="40">
+    </div>
+
+    <div class="field">
+      <label for="langSelect" id="lblLang">I want subtitles in</label>
+      <div class="select-wrap">
+        <select id="langSelect"></select>
+      </div>
+    </div>
+
+    <button id="joinBtn" class="btn-primary" onclick="joinSession()">
+      <span id="joinBtnLabel">Join the session →</span>
+    </button>
+
+    <div class="hint" id="joinHint">
+      You'll be able to listen, see live subtitles in your language, and raise your hand to speak.
+    </div>
+  </div>
+
+</div>
+
+<div class="footer">
+  <a href="/">translatetheworld.com</a>
+</div>
+
+<script>
+// ══════════════════════════════════════════════════════════════
+// CONFIG & I18N
+// ══════════════════════════════════════════════════════════════
+const FB_CFG = {
+  apiKey:"AIzaSyCQZ_htYiPyUv50oIObwN3eGSJ9SneO7sI",
+  databaseURL:"https://sogevoxreunion-default-rtdb.europe-west1.firebasedatabase.app",
+  projectId:"sogevoxreunion"
+};
+
+const FLAGS      = {fr:'fr',en:'gb',de:'de',it:'it',es:'es',pt:'pt',ar:'lb',ru:'ru',zh:'cn',he:'il',nl:'nl',pl:'pl',uk:'ua',tr:'tr',ja:'jp',ko:'kr',sv:'se',cs:'cz'};
+const LANG_NAMES = {fr:'Français',en:'English',de:'Deutsch',it:'Italiano',es:'Español',pt:'Português',ar:'العربية',ru:'Русский',zh:'中文',he:'עברית',nl:'Nederlands',pl:'Polski',uk:'Українська',tr:'Türkçe',ja:'日本語',ko:'한국어',sv:'Svenska',cs:'Čeština'};
+
+const I18N = {
+  en: {
+    title_page:        'TranslateTheWorld — Join Session',
+    loading:           'Loading session…',
+    err_no_room:       'This invitation link is invalid (missing session ID).',
+    err_not_found:     'This session does not exist or has not started yet. Please check your invitation link.',
+    err_expired:       'This invitation link has expired.',
+    err_ended:         'This session has already ended.',
+    err_title_unavail: 'Session unavailable',
+    err_title_expired: 'Link expired',
+    err_title_ended:   'Session ended',
+    form_title:        'Join the session',
+    form_subtitle:     'Choose your language and enter your name to receive live subtitles.',
+    host_anon:         'Live multilingual session',
+    lbl_name:          'Your name',
+    placeholder_name:  'e.g. Marie Dupont',
+    lbl_lang:          'I want subtitles in',
+    btn_join:          'Join the session →',
+    btn_joining:       'Joining…',
+    join_hint:         'You\'ll be able to listen, see live subtitles in your language, and raise your hand to speak.',
+    err_name_required: 'Please enter your name.',
+    err_lang_required: 'Please choose a language.',
+    back_home:         '← Back to home',
+  },
+  fr: {
+    title_page:        'TranslateTheWorld — Rejoindre la session',
+    loading:           'Chargement de la session…',
+    err_no_room:       'Ce lien d\'invitation n\'est pas valide (identifiant de session manquant).',
+    err_not_found:     'Cette session n\'existe pas ou n\'a pas encore démarré. Vérifiez votre lien d\'invitation.',
+    err_expired:       'Ce lien d\'invitation a expiré.',
+    err_ended:         'Cette session est déjà terminée.',
+    err_title_unavail: 'Session indisponible',
+    err_title_expired: 'Lien expiré',
+    err_title_ended:   'Session terminée',
+    form_title:        'Rejoindre la session',
+    form_subtitle:     'Choisissez votre langue et entrez votre prénom pour recevoir les sous-titres en direct.',
+    host_anon:         'Session multilingue en direct',
+    lbl_name:          'Votre prénom',
+    placeholder_name:  'ex. Marie Dupont',
+    lbl_lang:          'Je veux les sous-titres en',
+    btn_join:          'Rejoindre la session →',
+    btn_joining:       'Connexion…',
+    join_hint:         'Vous pourrez écouter, voir les sous-titres dans votre langue, et lever la main pour prendre la parole.',
+    err_name_required: 'Merci d\'entrer votre prénom.',
+    err_lang_required: 'Merci de choisir une langue.',
+    back_home:         '← Retour à l\'accueil',
+  }
+};
+
+let uiLang = 'en';
+function t(k){ return (I18N[uiLang]||I18N.en)[k] || k; }
+
+// Auto-detect UI language from browser, with localStorage override
+(function initUiLang(){
+  let lang = 'en';
+  try {
+    const saved = localStorage.getItem('ttw-ui-lang');
+    if(saved === 'fr' || saved === 'en'){ lang = saved; }
+    else {
+      const browser = (navigator.language || 'en').toLowerCase();
+      if(browser.startsWith('fr')) lang = 'fr';
+    }
+  } catch(e){}
+  uiLang = lang;
+})();
+
+function setUiLang(l){
+  if(l !== 'fr' && l !== 'en') l = 'en';
+  uiLang = l;
+  try { localStorage.setItem('ttw-ui-lang', l); } catch(e){}
+  document.documentElement.lang = l;
+  document.getElementById('btnLangFr').classList.toggle('active', l==='fr');
+  document.getElementById('btnLangEn').classList.toggle('active', l==='en');
+  applyTranslations();
+}
+
+function applyTranslations(){
+  document.title = t('title_page');
+  const setTxt = (id, s)=>{ const el = document.getElementById(id); if(el) el.textContent = s; };
+  setTxt('loadingText',  t('loading'));
+  setTxt('formTitle',    t('form_title'));
+  setTxt('formSubtitle', t('form_subtitle'));
+  setTxt('lblName',      t('lbl_name'));
+  setTxt('lblLang',      t('lbl_lang'));
+  setTxt('joinBtnLabel', t('btn_join'));
+  setTxt('joinHint',     t('join_hint'));
+  setTxt('errorBackLink',t('back_home'));
+  const nameInput = document.getElementById('nameInput');
+  if(nameInput) nameInput.placeholder = t('placeholder_name');
+}
+
+// ══════════════════════════════════════════════════════════════
+// PARAMS
+// ══════════════════════════════════════════════════════════════
+function getP(n){ return new URLSearchParams(window.location.search).get(n)||''; }
+
+const room = getP('room');
+const exp  = parseInt(getP('exp'))||0;
+
+let sessionLanguages = [];   // populated from Firebase config
+let hostName         = '';
+let hostOrg          = '';
+
+// ══════════════════════════════════════════════════════════════
+// VIEW HELPERS
+// ══════════════════════════════════════════════════════════════
+function showLoading(){
+  document.getElementById('loadingView').style.display = 'flex';
+  document.getElementById('errorView').style.display   = 'none';
+  document.getElementById('formView').style.display    = 'none';
+}
+function showError(titleKey, messageKey, icon){
+  document.getElementById('loadingView').style.display = 'none';
+  document.getElementById('formView').style.display    = 'none';
+  document.getElementById('errorView').style.display   = 'block';
+  document.getElementById('errorIcon').textContent     = icon || '⚠️';
+  document.getElementById('errorTitle').textContent    = t(titleKey);
+  document.getElementById('errorMessage').textContent  = t(messageKey);
+}
+function showForm(){
+  document.getElementById('loadingView').style.display = 'none';
+  document.getElementById('errorView').style.display   = 'none';
+  document.getElementById('formView').style.display    = 'block';
+}
+
+// ══════════════════════════════════════════════════════════════
+// LANGUAGE PICKER
+// ══════════════════════════════════════════════════════════════
+function pickDefaultLanguage(available){
+  // 1) Try previously chosen language
+  try {
+    const saved = localStorage.getItem('ttw-participant-lang');
+    if(saved && available.includes(saved)) return saved;
+  } catch(e){}
+  // 2) Try browser language
+  const browser = (navigator.language || 'en').toLowerCase().slice(0,2);
+  if(available.includes(browser)) return browser;
+  // 3) First in list
+  return available[0];
+}
+
+function buildLanguageSelect(languages){
+  const select = document.getElementById('langSelect');
+  select.innerHTML = '';
+  const defaultLang = pickDefaultLanguage(languages);
+  languages.forEach(code=>{
+    const opt = document.createElement('option');
+    opt.value = code;
+    opt.textContent = (LANG_NAMES[code] || code.toUpperCase());
+    if(code === defaultLang) opt.selected = true;
+    select.appendChild(opt);
+  });
+}
+
+// ══════════════════════════════════════════════════════════════
+// LOAD SESSION CONFIG FROM FIREBASE
+// ══════════════════════════════════════════════════════════════
+function loadSession(){
+  // 1) Validate URL params
+  if(!room){
+    showError('err_title_unavail', 'err_no_room', '⚠️');
+    return;
+  }
+  // 2) Validate expiration (if provided)
+  if(exp > 0 && Math.floor(Date.now()/1000) > exp){
+    showError('err_title_expired', 'err_expired', '⏰');
+    return;
+  }
+  // 3) Initialize Firebase and fetch session config
+  try {
+    if(!firebase.apps.length) firebase.initializeApp(FB_CFG);
+  } catch(e){
+    console.error('Firebase init failed:', e);
+    showError('err_title_unavail', 'err_not_found', '⚠️');
+    return;
+  }
+  const db = firebase.database();
+  db.ref('sessions/'+room+'/config').once('value', snap=>{
+    const cfg = snap.val();
+    if(!cfg){
+      showError('err_title_unavail', 'err_not_found', '🔍');
+      return;
+    }
+    if(cfg.ended === true){
+      showError('err_title_ended', 'err_ended', '⏹');
+      return;
+    }
+    // Session exists — populate the form
+    sessionLanguages = Array.isArray(cfg.languages) && cfg.languages.length
+      ? cfg.languages
+      : ['en']; // safety fallback
+    hostName = cfg.hostName || '';
+    hostOrg  = cfg.hostOrg  || '';
+
+    // Header info
+    const hostLabel = (hostOrg && hostOrg !== '—') ? hostOrg
+                     : (hostName ? hostName : t('host_anon'));
+    document.getElementById('hostNameLabel').textContent = hostLabel;
+    document.getElementById('roomLabel').textContent     = '🔑 '+room;
+
+    buildLanguageSelect(sessionLanguages);
+
+    // Restore last used name if any
+    try {
+      const savedName = localStorage.getItem('ttw-participant-name');
+      if(savedName) document.getElementById('nameInput').value = savedName;
+    } catch(e){}
+
+    showForm();
+    // Focus name field on desktop, NOT on mobile (avoids keyboard popping up)
+    if(!('ontouchstart' in window)){
+      setTimeout(()=>{ document.getElementById('nameInput').focus(); }, 100);
+    }
+  }, err=>{
+    console.error('Firebase read failed:', err);
+    showError('err_title_unavail', 'err_not_found', '⚠️');
+  });
+}
+
+// ══════════════════════════════════════════════════════════════
+// JOIN SUBMIT
+// ══════════════════════════════════════════════════════════════
+function joinSession(){
+  const nameInput = document.getElementById('nameInput');
+  const langSel   = document.getElementById('langSelect');
+  const name      = nameInput.value.trim();
+  const lang      = langSel.value;
+
+  if(!name){
+    nameInput.focus();
+    nameInput.style.borderColor = 'var(--red)';
+    setTimeout(()=>{ nameInput.style.borderColor=''; }, 1500);
+    alert(t('err_name_required'));
+    return;
+  }
+  if(!lang){
+    alert(t('err_lang_required'));
+    return;
+  }
+
+  // Save preferences for next time
+  try {
+    localStorage.setItem('ttw-participant-name', name);
+    localStorage.setItem('ttw-participant-lang', lang);
+  } catch(e){}
+
+  // Disable button to prevent double-click
+  const btn = document.getElementById('joinBtn');
+  btn.disabled = true;
+  document.getElementById('joinBtnLabel').textContent = t('btn_joining');
+
+  // Build redirect URL to participant-session.html
+  const params = new URLSearchParams();
+  params.set('room', room);
+  params.set('lang', lang);
+  params.set('name', name);
+  if(exp > 0) params.set('exp', String(exp));
+
+  // Use replace() so the user can't accidentally come back to this form
+  // and re-register as a duplicate participant.
+  window.location.replace('/participant-session.html?'+params.toString());
+}
+
+// Submit on Enter key in name field
+document.addEventListener('DOMContentLoaded', ()=>{
+  const nameInput = document.getElementById('nameInput');
+  if(nameInput){
+    nameInput.addEventListener('keydown', (e)=>{
+      if(e.key === 'Enter'){ e.preventDefault(); joinSession(); }
+    });
+  }
+});
+
+// ══════════════════════════════════════════════════════════════
+// BOOT
+// ══════════════════════════════════════════════════════════════
+document.getElementById('btnLangFr').classList.toggle('active', uiLang==='fr');
+document.getElementById('btnLangEn').classList.toggle('active', uiLang==='en');
+applyTranslations();
+loadSession();
+</script>
+</body>
+</html>

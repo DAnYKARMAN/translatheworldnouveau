@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <rect width="512" height="512" rx="80" fill="#0d1f1a"/>
+  <circle cx="256" cy="256" r="160" fill="none" stroke="#2dd4bf" stroke-width="18"/>
+  <ellipse cx="256" cy="256" rx="70" ry="160" fill="none" stroke="#2dd4bf" stroke-width="14"/>
+  <line x1="96" y1="256" x2="416" y2="256" stroke="#2dd4bf" stroke-width="14"/>
+  <line x1="120" y1="176" x2="392" y2="176" stroke="#2dd4bf" stroke-width="10" stroke-dasharray="0"/>
+  <line x1="120" y1="336" x2="392" y2="336" stroke="#2dd4bf" stroke-width="10"/>
+  <text x="256" y="292" font-family="Arial,sans-serif" font-weight="900" font-size="88" fill="#f5c842" text-anchor="middle">TTW</text>
+</svg>

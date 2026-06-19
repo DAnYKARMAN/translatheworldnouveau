@@ -1,0 +1,47 @@
+# TranslateTheWorld
+
+> Plateforme d'interprétation multilingue IA en temps réel pour événements. Sous-titres traduits en direct sur les smartphones des participants, en 70 langues. Aucune application, aucun matériel, aucun interprète humain requis. Créée par SOGEDICOM (Paris, 1990).
+
+TranslateTheWorld est la solution d'interprétation multilingue la plus économique au monde. À partir de **59,99 € TTC** pour 1 heure et 2 langues (1 source + 1 cible), soit jusqu'à 30 fois moins cher que l'interprétation traditionnelle (1 500–3 000 € par langue et par jour). Essai gratuit de 15 minutes, sans carte bancaire.
+
+## Ce qu'il faut savoir
+
+- **Produit** : sous-titres IA traduits en direct, diffusés dans le navigateur des participants via un QR code ou un lien.
+- **Langues** : 70 langues disponibles, y compris arabe, hébreu (RTL), chinois, japonais, coréen, hindi, russe, turc, ukrainien, néerlandais, polonais, grec, danois et autres.
+- **Matériel** : aucun. Un micro standard branché sur un ordinateur connecté à Internet suffit. Les participants utilisent leur propre smartphone.
+- **Latence** : moins de 2 secondes.
+- **Installation** : configuration en moins de 5 minutes.
+- **Cas d'usage** : conférences internationales, réunions d'entreprise multilingues, événements diplomatiques, congrès médicaux, salons, formations, webinaires.
+
+## Tarification (modèle linéaire, prix TTC)
+
+Pas de forfaits figés : le client choisit la durée (de 1 à 12 heures) et le nombre de langues (jusqu'à 4 langues totales : 1 source + jusqu'à 3 cibles).
+
+- **Tarif de base** : 59,99 € TTC pour 1 heure × 2 langues (1 source + 1 cible)
+- **Heure supplémentaire** : +49,99 € TTC
+- **Langue cible supplémentaire** : +49,99 € TTC par heure
+- **Validité** : 30 jours à compter de l'achat
+- **Paiement** : carte bancaire via Stripe
+
+### Exemples
+
+- 1 heure, 2 langues : 59,99 € TTC (49,99 € HT)
+- 1 heure, 3 langues : 109,98 € TTC
+- 2 heures, 2 langues : 109,98 € TTC
+- 3 heures, 3 langues : 309,93 € TTC
+- 5 heures, 3 langues : 509,90 € TTC
+- 5 heures, 4 langues : 759,85 € TTC
+- 10 heures, 2 langues : 509,90 € TTC
+- 10 heures, 4 langues : 1 509,70 € TTC
+- 12 heures, 4 langues : 1 809,64 € TTC
+
+## Éditeur
+
+SOGEDICOM — 102 avenue des Champs-Élysées, 75008 Paris, France. Société d'interprétation et traduction fondée en 1990. Téléphone : +33 6 89 73 52 29.
+
+## Liens
+
+- Site : https://translatetheworld.com
+- Essai gratuit 15 min : https://translatetheworld.com/#trial
+- Tarifs : https://translatetheworld.com/#pricing
+- FAQ : https://translatetheworld.com/#faq
