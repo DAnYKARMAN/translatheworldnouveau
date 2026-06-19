@@ -78,6 +78,11 @@ nav{position:fixed;top:0;left:0;right:0;z-index:200;display:flex;align-items:cen
 @media(max-width:480px){.flag-item .fn{display:none}.flag-strip{gap:8px}}
 /* Hero padding-top pour laisser la place au bandeau */
 .hero{position:relative;min-height:100vh;background:#fff;display:flex;align-items:center;justify-content:center;padding:170px 32px 60px}
+/* Sur mobile, le smartphone passe en dessous du texte */
+@media(max-width:760px){
+  .hero-text-block{grid-template-columns:1fr !important;gap:28px !important}
+  .hero-text-block img{max-width:200px !important}
+}
 /* Bannière de drapeaux featured */
 .flag-banner{position:absolute;bottom:0;left:0;right:0;z-index:1;pointer-events:none;display:flex;align-items:flex-end;justify-content:center;gap:0;overflow:hidden}
 .flag-banner-inner{display:flex;gap:12px;padding:0 24px 0;align-items:flex-end;flex-wrap:nowrap}
@@ -632,51 +637,116 @@ footer a{color:rgba(255,255,255,.42);text-decoration:none}
   </div>
 
   <!-- Hero compact -->
-  <div style="max-width:960px;margin:0 auto;text-align:center;position:relative;z-index:2">
+  <div style="max-width:1080px;margin:0 auto;position:relative;z-index:2">
 
-    <!-- Titre principal -->
-    <h1 class="hero-h1" style="text-align:center;margin-bottom:12px">
-      <span class="grd"
-        data-fr="Vos événements multilingues."
-        data-en="Your multilingual events."
-        data-es="Sus eventos multilingües."
-        data-it="I tuoi eventi multilingua."
-        data-de="Ihre mehrsprachigen Events."
-        data-pt="Os seus eventos multilingues."
-        data-ar="فعالياتك متعددة اللغات."
-        data-ru="Ваши многоязычные мероприятия."
-        data-zh="您的多语言活动。"
-        data-ja="あなたの多言語イベント。"
-        data-ko="귀하의 다국어 이벤트."
-        data-nl="Uw meertalige evenementen."
-        data-he="האירועים הרב-לשוניים שלך."
-      >Vos événements multilingues.</span>
-    </h1>
+    <!-- Bloc en 2 colonnes : texte à gauche, smartphone à droite -->
+    <div style="display:grid;grid-template-columns:1fr 220px;gap:40px;align-items:center;margin-bottom:36px" class="hero-text-block">
 
-    <!-- Accroche -->
-    <p style="font-size:clamp(16px,2vw,22px);color:#444;font-weight:400;line-height:1.6;margin-bottom:10px;max-width:720px;margin-left:auto;margin-right:auto"
-      data-fr="Sous-titrage en temps réel · 70 langues · Sur le smartphone de chaque participant · Sans application · Sans matériel"
-      data-en="Real-time subtitles · 70 languages · On each attendee's smartphone · No app · No hardware"
-    >Sous-titrage en temps réel · 70 langues · Sur le smartphone de chaque participant · Sans application · Sans matériel</p>
+      <!-- COLONNE GAUCHE : TEXTES -->
+      <div style="text-align:center">
 
-    <p style="font-size:clamp(17px,2.2vw,24px);color:#157a6e;font-weight:700;line-height:1.4;margin-bottom:10px;max-width:720px;margin-left:auto;margin-right:auto"
-      data-fr="Parlez votre langue, échangez avec votre public en 3 langues"
-      data-en="Speak your language, connect with your audience in 3 languages"
-    >Parlez votre langue, échangez avec votre public en 3 langues</p>
+        <!-- Titre principal -->
+        <h1 class="hero-h1" style="text-align:center;margin-bottom:18px">
+          <span class="grd"
+            data-fr="Vos événements multilingues."
+            data-en="Your multilingual events."
+            data-es="Sus eventos multilingües."
+            data-it="I tuoi eventi multilingua."
+            data-de="Ihre mehrsprachigen Events."
+            data-pt="Os seus eventos multilingues."
+            data-ar="فعالياتك متعددة اللغات."
+            data-ru="Ваши многоязычные мероприятия."
+            data-zh="您的多语言活动。"
+            data-ja="あなたの多言語イベント。"
+            data-ko="귀하의 다국어 이벤트."
+            data-nl="Uw meertalige evenementen."
+            data-he="האירועים הרב-לשוניים שלך."
+            data-da="Dine flersprogede arrangementer."
+            data-hi="आपके बहुभाषी कार्यक्रम।"
+            data-el="Οι πολύγλωσσες εκδηλώσεις σας."
+          >Vos événements multilingues.</span>
+        </h1>
 
-    <!-- Aperçu smartphone + prix inline -->
-    <div style="display:flex;align-items:center;justify-content:center;gap:20px;margin-bottom:36px;flex-wrap:wrap">
-      <img src="/smartphone-demo.jpg" alt="TranslateTheWorld" style="width:56px;border-radius:10px;box-shadow:0 6px 18px rgba(0,0,0,.18)">
-      <div style="text-align:left">
-        <div style="font-size:13px;color:#157a6e;font-weight:700"
-          data-fr="✓ La solution la plus économique du marché"
-          data-en="✓ The most affordable solution on the market"
-        >✓ La solution la plus économique du marché</div>
-        <div style="font-size:13px;color:#157a6e;font-weight:700"
-          data-fr="✓ À partir de 59,99 € TTC · Prêt en 2 minutes"
-          data-en="✓ From €59.99 incl. VAT · Ready in 2 minutes"
-        >✓ À partir de 59,99 € TTC · Prêt en 2 minutes</div>
+        <!-- Accroche principale (verte) - ligne 1 -->
+        <p style="font-size:clamp(17px,2.2vw,24px);color:#157a6e;font-weight:700;line-height:1.4;margin-bottom:4px"
+          data-fr="Parlez votre langue"
+          data-en="Speak your language"
+          data-pt="Fale a sua língua"
+          data-es="Habla tu idioma"
+          data-it="Parla la tua lingua"
+          data-de="Sprechen Sie Ihre Sprache"
+          data-nl="Spreek uw taal"
+          data-ar="تحدث بلغتك"
+          data-he="דברו בשפתכם"
+          data-zh="说您的语言"
+          data-ru="Говорите на своём языке"
+          data-ja="あなたの言語で話してください"
+          data-ko="당신의 언어로 말하세요"
+          data-da="Tal dit eget sprog"
+          data-hi="अपनी भाषा में बोलें"
+          data-el="Μιλήστε τη γλώσσα σας"
+        >Parlez votre langue</p>
+
+        <!-- Accroche principale (verte) - ligne 2 -->
+        <p style="font-size:clamp(17px,2.2vw,24px);color:#157a6e;font-weight:700;line-height:1.4;margin-bottom:14px"
+          data-fr="Échangez avec votre public en trois autres langues !"
+          data-en="Connect with your audience in three other languages!"
+          data-pt="Comunique com o seu público em três outras línguas!"
+          data-es="¡Comuníquese con su audiencia en otros tres idiomas!"
+          data-it="Comunica con il tuo pubblico in altre tre lingue!"
+          data-de="Kommunizieren Sie mit Ihrem Publikum in drei weiteren Sprachen!"
+          data-nl="Communiceer met uw publiek in drie andere talen!"
+          data-ar="تواصل مع جمهورك بثلاث لغات أخرى!"
+          data-he="תקשרו עם הקהל שלכם בשלוש שפות נוספות!"
+          data-zh="用其他三种语言与您的听众交流！"
+          data-ru="Общайтесь с аудиторией ещё на трёх языках!"
+          data-ja="他の3言語で聴衆とコミュニケーションを取りましょう！"
+          data-ko="다른 3개 언어로 청중과 소통하세요!"
+          data-da="Kommunikér med dit publikum på tre andre sprog!"
+          data-hi="अपने दर्शकों से तीन अन्य भाषाओं में संवाद करें!"
+          data-el="Επικοινωνήστε με το κοινό σας σε τρεις άλλες γλώσσες!"
+        >Échangez avec votre public en trois autres langues !</p>
+
+        <!-- Sous-accroche (grise) -->
+        <p style="font-size:clamp(14px,1.6vw,18px);color:#444;font-weight:400;line-height:1.6;margin-bottom:20px"
+          data-fr="Sous-titrage en temps réel · 70 langues · Sur le smartphone de chaque participant · Sans application · Sans matériel"
+          data-en="Real-time subtitles · 70 languages · On each attendee's smartphone · No app · No hardware"
+          data-pt="Legendagem em tempo real · 70 línguas · No smartphone de cada participante · Sem aplicação · Sem equipamento"
+          data-es="Subtitulado en tiempo real · 70 idiomas · En el smartphone de cada participante · Sin aplicación · Sin equipo"
+          data-it="Sottotitolazione in tempo reale · 70 lingue · Sullo smartphone di ogni partecipante · Senza app · Senza attrezzatura"
+          data-de="Echtzeit-Untertitelung · 70 Sprachen · Auf dem Smartphone jedes Teilnehmers · Ohne App · Ohne Ausrüstung"
+          data-nl="Realtime ondertiteling · 70 talen · Op de smartphone van elke deelnemer · Geen app · Geen apparatuur"
+        >Sous-titrage en temps réel · 70 langues · Sur le smartphone de chaque participant · Sans application · Sans matériel</p>
+
+        <!-- Checkmarks (prix + économique) -->
+        <div style="display:inline-block;text-align:left">
+          <div style="font-size:clamp(14px,1.5vw,17px);color:#157a6e;font-weight:700;margin-bottom:4px"
+            data-fr="✓ La solution la plus économique du marché"
+            data-en="✓ The most affordable solution on the market"
+            data-pt="✓ A solução mais económica do mercado"
+            data-es="✓ La solución más económica del mercado"
+            data-it="✓ La soluzione più economica del mercato"
+            data-de="✓ Die günstigste Lösung am Markt"
+            data-nl="✓ De voordeligste oplossing op de markt"
+          >✓ La solution la plus économique du marché</div>
+          <div style="font-size:clamp(14px,1.5vw,17px);color:#157a6e;font-weight:700"
+            data-fr="✓ À partir de 59,99 € TTC · Prêt en 2 minutes"
+            data-en="✓ From €59.99 incl. VAT · Ready in 2 minutes"
+            data-pt="✓ A partir de 59,99 € c/IVA · Pronto em 2 minutos"
+            data-es="✓ Desde 59,99 € IVA incluido · Listo en 2 minutos"
+            data-it="✓ Da 59,99 € IVA inclusa · Pronto in 2 minuti"
+            data-de="✓ Ab 59,99 € inkl. MwSt. · In 2 Minuten startklar"
+            data-nl="✓ Vanaf € 59,99 incl. btw · Klaar in 2 minuten"
+          >✓ À partir de 59,99 € TTC · Prêt en 2 minutes</div>
+        </div>
+
       </div>
+
+      <!-- COLONNE DROITE : SMARTPHONE -->
+      <div style="display:flex;justify-content:center;align-items:center">
+        <img src="/smartphone-sous-titrage.jpg" alt="Smartphone avec sous-titrage en direct - TranslateTheWorld" style="width:100%;max-width:200px;height:auto">
+      </div>
+
     </div>
 
     <!-- 3 BOUTONS PRINCIPAUX -->
@@ -1765,81 +1835,149 @@ function getLangLabel(code){
   return l?l.label:code;
 }
  
+// Flag pour empêcher les doubles clics (plus fiable que btn.disabled)
+let _submitInProgress = false;
+
 async function handleSubmit(){
-  const btn=document.querySelector('.hfc-submit');
-  // SÉCURITÉ ANTI-DOUBLE-CLIC : on désactive le bouton tout de suite
-  if(btn.disabled) return;
-  btn.disabled=true;
+  // ⛔ Sécurité anti-double-clic
+  if(_submitInProgress) return;
+  _submitInProgress = true;
 
-  const name  = document.getElementById('f-name').value.trim();
-  const org   = document.getElementById('f-org').value.trim();
-  const email = document.getElementById('f-email').value.trim();
-  const phone = document.getElementById('f-phone').value.trim();
-  const room  = nameToRoom(name);
-  document.getElementById('f-room').value=room;
-  const src = document.getElementById('f-lang-src').value;
-  const p1  = document.getElementById('f-lang-p1').value;
-  const p2  = document.getElementById('f-lang-p2').value;
-  const p3  = document.getElementById('f-lang-p3').value;
-  const errEl = document.getElementById('room-error');
+  const btn = document.querySelector('.hfc-submit');
+  const originalBtnText = btn ? btn.textContent : '';
 
-  // En cas d'erreur de validation, on réactive le bouton avant de sortir
-  if(!name||!email){alert(currentLang==='fr'?'Merci de remplir votre nom et email.':'Please fill in your name and email.');btn.disabled=false;return;}
-  if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){alert(currentLang==='fr'?'Adresse email invalide.':'Invalid email address.');btn.disabled=false;return;}
-  if(!p1){alert(currentLang==='fr'?'Choisissez au moins une langue participant.':'Please select at least one participant language.');btn.disabled=false;return;}
-  if(usedRooms.has(room)){errEl.style.display='block';btn.disabled=false;return;}
-  errEl.style.display='none';
-  // On N'AJOUTE PLUS le nom à la liste noire — seuls les noms réservés restent bloqués
- 
-  const targets=[p1,p2,p3].filter(Boolean).join(',');
-  const exp=new Date();exp.setDate(exp.getDate()+3);
-  const expTs=Math.floor(exp.getTime()/1000);
-  const baseUrl=window.location.origin;
-  const hostLink=baseUrl+'/host-setup.html?room='+room+'&lang='+src+'&to='+targets+'&dur=15&exp='+expTs;
-  const participantLink=baseUrl+'/join.html?room='+room+'&exp='+expTs;
-  const expDate=exp.toLocaleDateString('fr-FR',{day:'numeric',month:'long',year:'numeric'});
- 
-  // Le bouton est déjà désactivé depuis le début de la fonction, on met juste à jour le texte
-  btn.textContent='⏳ Envoi en cours…';
- 
-  const qr_url='https://quickchart.io/qr?size=300&text='+encodeURIComponent(participantLink);
-  const params={
-    to_email:email, to_name:name, organisation:org||'—', phone:phone||'—',
-    link:hostLink, host_link:hostLink, participant_link:participantLink,
-    room:room,
-    lang_src:getLangLabel(src),
-    lang_p1:getLangLabel(p1),
-    lang_p2:p2?getLangLabel(p2):'—',
-    lang_p3:p3?getLangLabel(p3):'—',
-    exp_date:expDate, duration:'15 minutes',
-    qr_url:qr_url
-  };
- 
-  function showModal(emailOk){
-    document.getElementById('modal-email').textContent=email;
-    document.getElementById('modal-host-link').textContent=hostLink;
-    document.getElementById('modal-participant-link').textContent=participantLink;
-    const qEl=document.getElementById('modal-qr');qEl.innerHTML='';
-    new QRCode(qEl,{text:participantLink,width:140,height:140,colorDark:'#0a0a0a',colorLight:'#fff',correctLevel:QRCode.CorrectLevel.M});
-    document.getElementById('modal').classList.add('active');
-    if(!emailOk){
-      setTimeout(()=>{
-        const p=document.querySelector('.modal-card>p');
-        if(p) p.innerHTML='<span style="color:#ffb3b3;font-size:12px">⚠️ Email non envoyé. Copiez vos liens ci-dessous :</span>';
-      },80);
+  // Fonction utilitaire pour TOUJOURS remettre le bouton à zéro et libérer le flag
+  function resetButton(){
+    _submitInProgress = false;
+    if(btn){
+      btn.disabled = false;
+      btn.textContent = originalBtnText || '✉️ Recevoir mon lien & QR code gratuitement';
     }
   }
- 
-  try{
-    await emailjs.send(EJS_SERVICE, EJS_TEMPLATE, params);
-    btn.textContent='✅ Email envoyé !';
-    setTimeout(()=>{btn.textContent='✉️ Recevoir mon lien & QR code gratuitement';btn.disabled=false;},3000);
-    showModal(true);
-  }catch(err){
-    console.error('EmailJS error:', err);
-    btn.textContent='✉️ Recevoir mon lien & QR code gratuitement';
-    btn.disabled=false;
-    showModal(false);
+
+  // Fonction utilitaire pour afficher une erreur lisible
+  function showError(label, err){
+    const msg = (err && err.message) ? err.message : (err ? String(err) : 'erreur inconnue');
+    alert('⚠️ ' + label + '\n\n' + msg);
+    resetButton();
+  }
+
+  try {
+    // ── 1. Lecture des champs ──
+    const fName = document.getElementById('f-name');
+    const fEmail = document.getElementById('f-email');
+    const fOrg = document.getElementById('f-org');
+    const fPhone = document.getElementById('f-phone');
+    const fLangSrc = document.getElementById('f-lang-src');
+    const fLangP1 = document.getElementById('f-lang-p1');
+    const fLangP2 = document.getElementById('f-lang-p2');
+    const fLangP3 = document.getElementById('f-lang-p3');
+    const fRoom = document.getElementById('f-room');
+    const errEl = document.getElementById('room-error');
+
+    if(!fName || !fEmail || !fLangP1){
+      showError('Erreur structure formulaire', new Error('Un champ du formulaire est introuvable. Rechargez la page.'));
+      return;
+    }
+
+    const name  = (fName.value || '').trim();
+    const org   = fOrg ? (fOrg.value || '').trim() : '';
+    const email = (fEmail.value || '').trim();
+    const phone = fPhone ? (fPhone.value || '').trim() : '';
+    const src   = fLangSrc ? fLangSrc.value : '';
+    const p1    = fLangP1.value || '';
+    const p2    = fLangP2 ? fLangP2.value : '';
+    const p3    = fLangP3 ? fLangP3.value : '';
+    const room  = nameToRoom(name);
+    if(fRoom) fRoom.value = room;
+
+    // ── 2. Validations ──
+    if(!name || !email){
+      alert(currentLang==='fr' ? 'Merci de remplir votre nom et email.' : 'Please fill in your name and email.');
+      resetButton(); return;
+    }
+    if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){
+      alert(currentLang==='fr' ? 'Adresse email invalide.' : 'Invalid email address.');
+      resetButton(); return;
+    }
+    if(!p1){
+      alert(currentLang==='fr' ? 'Choisissez au moins une langue participant.' : 'Please select at least one participant language.');
+      resetButton(); return;
+    }
+    if(usedRooms.has(room)){
+      if(errEl) errEl.style.display = 'block';
+      resetButton(); return;
+    }
+    if(errEl) errEl.style.display = 'none';
+    // ⚠️ On N'AJOUTE PLUS le nom à usedRooms — seuls les noms réservés au démarrage restent bloqués
+
+    // ── 3. Construction des liens et paramètres ──
+    const targets = [p1, p2, p3].filter(Boolean).join(',');
+    const exp = new Date(); exp.setDate(exp.getDate() + 3);
+    const expTs = Math.floor(exp.getTime() / 1000);
+    const baseUrl = window.location.origin;
+    const hostLink = baseUrl + '/host-setup.html?room=' + room + '&lang=' + src + '&to=' + targets + '&dur=15&exp=' + expTs;
+    const participantLink = baseUrl + '/join.html?room=' + room + '&exp=' + expTs;
+    const expDate = exp.toLocaleDateString('fr-FR', {day:'numeric', month:'long', year:'numeric'});
+
+    // ── 4. Affichage "envoi en cours" ──
+    btn.textContent = '⏳ Envoi en cours…';
+    btn.disabled = true;
+
+    // ── 5. Vérification que EmailJS est bien chargé ──
+    if(typeof emailjs === 'undefined' || !emailjs || typeof emailjs.send !== 'function'){
+      showError('EmailJS non chargé', new Error('Le service email n\'a pas pu être chargé. Vérifiez votre connexion internet.'));
+      return;
+    }
+
+    const qr_url = 'https://quickchart.io/qr?size=300&text=' + encodeURIComponent(participantLink);
+    const params = {
+      to_email:email, to_name:name, organisation:org||'—', phone:phone||'—',
+      link:hostLink, host_link:hostLink, participant_link:participantLink,
+      room:room,
+      lang_src:getLangLabel(src),
+      lang_p1:getLangLabel(p1),
+      lang_p2:p2?getLangLabel(p2):'—',
+      lang_p3:p3?getLangLabel(p3):'—',
+      exp_date:expDate, duration:'15 minutes',
+      qr_url:qr_url
+    };
+
+    function showModal(emailOk){
+      try{
+        document.getElementById('modal-email').textContent = email;
+        document.getElementById('modal-host-link').textContent = hostLink;
+        document.getElementById('modal-participant-link').textContent = participantLink;
+        const qEl = document.getElementById('modal-qr'); qEl.innerHTML = '';
+        new QRCode(qEl, {text:participantLink, width:140, height:140, colorDark:'#0a0a0a', colorLight:'#fff', correctLevel:QRCode.CorrectLevel.M});
+        document.getElementById('modal').classList.add('active');
+        if(!emailOk){
+          setTimeout(()=>{
+            const p = document.querySelector('.modal-card>p');
+            if(p) p.innerHTML = '<span style="color:#ffb3b3;font-size:12px">⚠️ Email non envoyé. Copiez vos liens ci-dessous :</span>';
+          }, 80);
+        }
+      }catch(modalErr){
+        alert('Liens générés mais affichage modal en erreur :\n\nLien hôte : ' + hostLink + '\n\nLien participant : ' + participantLink);
+      }
+    }
+
+    // ── 6. Envoi de l'email ──
+    try {
+      await emailjs.send(EJS_SERVICE, EJS_TEMPLATE, params);
+      btn.textContent = '✅ Email envoyé !';
+      showModal(true);
+      setTimeout(()=>{ resetButton(); }, 3000);
+    } catch(err) {
+      console.error('EmailJS error:', err);
+      showModal(false);
+      resetButton();
+      const errMsg = (err && err.text) ? err.text : ((err && err.message) ? err.message : 'envoi email échoué');
+      alert('⚠️ L\'email n\'a pas pu être envoyé : ' + errMsg + '\n\nMais vos liens sont affichés à l\'écran, copiez-les.');
+    }
+
+  } catch(globalErr) {
+    showError('Erreur inattendue', globalErr);
   }
 }
 
