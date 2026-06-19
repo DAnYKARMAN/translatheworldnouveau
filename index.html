@@ -1620,6 +1620,7 @@ const MAIN_LANGS=[
   {code:'de', country:'de', label:'Allemand',  labelEn:'German'},
   {code:'it', country:'it', label:'Italien',   labelEn:'Italian'},
   {code:'es', country:'es', label:'Espagnol',  labelEn:'Spanish'},
+  {code:'pt', country:'pt', label:'Portugais', labelEn:'Portuguese'},
   {code:'ar', country:'lb', label:'Arabe',     labelEn:'Arabic'},
   {code:'ru', country:'ru', label:'Russe',     labelEn:'Russian'},
   {code:'zh', country:'cn', label:'Chinois',   labelEn:'Chinese'},
@@ -1944,21 +1945,45 @@ async function handleSubmit(){
     };
 
     function showModal(emailOk){
-      try{
-        document.getElementById('modal-email').textContent = email;
-        document.getElementById('modal-host-link').textContent = hostLink;
-        document.getElementById('modal-participant-link').textContent = participantLink;
-        const qEl = document.getElementById('modal-qr'); qEl.innerHTML = '';
-        new QRCode(qEl, {text:participantLink, width:140, height:140, colorDark:'#0a0a0a', colorLight:'#fff', correctLevel:QRCode.CorrectLevel.M});
+      // On affiche le modal et on remplit les champs un par un, indépendamment.
+      // Si un élément échoue, on continue avec les autres pour que le client voie au moins ses liens.
+      let modalOpened = false;
+
+      // 1) Remplir les champs texte
+      try { document.getElementById('modal-email').textContent = email; } catch(e){}
+      try { document.getElementById('modal-host-link').textContent = hostLink; } catch(e){}
+      try { document.getElementById('modal-participant-link').textContent = participantLink; } catch(e){}
+
+      // 2) Afficher le modal (le plus important)
+      try {
         document.getElementById('modal').classList.add('active');
-        if(!emailOk){
-          setTimeout(()=>{
+        modalOpened = true;
+      } catch(e){
+        // Modal introuvable : on bascule sur alerte texte avec les liens
+        alert('Vos liens :\n\n🎙️ Lien hôte (à garder) :\n' + hostLink + '\n\n👥 Lien participants (à partager) :\n' + participantLink + '\n\nUn email vous a aussi été envoyé.');
+        return;
+      }
+
+      // 3) Générer le QR code (optionnel - si ça plante on s'en fiche, on a déjà les liens à l'écran)
+      try {
+        const qEl = document.getElementById('modal-qr');
+        if(qEl && typeof QRCode !== 'undefined'){
+          qEl.innerHTML = '';
+          new QRCode(qEl, {text:participantLink, width:140, height:140, colorDark:'#0a0a0a', colorLight:'#fff', correctLevel:QRCode.CorrectLevel.M});
+        }
+      } catch(qrErr) {
+        console.warn('QR code generation failed (non-bloquant):', qrErr);
+        // Pas grave, on continue sans QR
+      }
+
+      // 4) Si l'email n'a pas pu être envoyé, on remplace le message du haut
+      if(!emailOk){
+        setTimeout(()=>{
+          try{
             const p = document.querySelector('.modal-card>p');
             if(p) p.innerHTML = '<span style="color:#ffb3b3;font-size:12px">⚠️ Email non envoyé. Copiez vos liens ci-dessous :</span>';
-          }, 80);
-        }
-      }catch(modalErr){
-        alert('Liens générés mais affichage modal en erreur :\n\nLien hôte : ' + hostLink + '\n\nLien participant : ' + participantLink);
+          }catch(e){}
+        }, 80);
       }
     }
 
