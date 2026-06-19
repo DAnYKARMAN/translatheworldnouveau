@@ -94,17 +94,6 @@ nav{position:sticky;top:0;z-index:100;background:rgba(255,255,255,.92);backdrop-
 .btn-join{background:var(--teal);color:#fff;border:none;border-radius:8px;padding:7px 14px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;transition:background .2s;white-space:nowrap}
 .btn-join:hover{background:var(--teal-dark)}
 .btn-add-time{background:#7c3aed;color:#fff;border:none;border-radius:8px;padding:7px 14px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;white-space:nowrap}
-.btn-share{background:var(--teal);color:#fff;border:none;border-radius:8px;padding:7px 14px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;white-space:nowrap}
-.btn-share:hover{background:var(--teal-dark)}
-.share-link-box{background:#f5f5f5;border:1px solid var(--border);border-radius:8px;padding:10px 14px;font-family:monospace;font-size:11px;word-break:break-all;color:#333;margin:12px 0;cursor:pointer;transition:background .2s}
-.share-link-box:hover{background:#e8f5f0}
-.share-btns{display:flex;gap:10px;flex-wrap:wrap;margin-top:14px}
-.share-btn-wa{background:#25D366;color:#fff;border:none;border-radius:8px;padding:10px 18px;font-size:13px;font-weight:700;cursor:pointer;flex:1;min-width:120px}
-.share-btn-sms{background:#007AFF;color:#fff;border:none;border-radius:8px;padding:10px 18px;font-size:13px;font-weight:700;cursor:pointer;flex:1;min-width:120px}
-.share-btn-email{background:#333;color:#fff;border:none;border-radius:8px;padding:10px 18px;font-size:13px;font-weight:700;cursor:pointer;flex:1;min-width:120px}
-.share-qr{text-align:center;margin:14px 0}
-.share-qr img{border-radius:8px;border:1px solid var(--border)}
-.copy-toast{display:none;background:var(--teal);color:#fff;text-align:center;padding:6px;border-radius:6px;font-size:12px;margin-top:6px}
 .btn-add-time:hover{background:#6d28d9}
 
 /* ── MODAL ── */
@@ -278,54 +267,12 @@ nav{position:sticky;top:0;z-index:100;background:rgba(255,255,255,.92);backdrop-
     <p class="modal-sub" id="topupSub"></p>
     <div id="alertTopup" class="alert-modal"></div>
 
-    <!-- Sélecteur heures -->
-    <div style="margin-bottom:16px">
-      <label style="font-size:12px;font-weight:700;color:var(--muted);letter-spacing:.08em;text-transform:uppercase;display:block;margin-bottom:8px">Nombre d&#39;heures</label>
-      <div style="display:flex;align-items:center;gap:12px">
-        <button onclick="changeTopupHours(-1)" style="width:36px;height:36px;border-radius:50%;border:2px solid var(--border);background:#fff;font-size:18px;cursor:pointer;font-weight:700">−</button>
-        <span id="topupHoursVal" style="font-size:28px;font-weight:900;min-width:40px;text-align:center">1</span>
-        <button onclick="changeTopupHours(1)" style="width:36px;height:36px;border-radius:50%;border:2px solid var(--teal);background:var(--teal);color:#fff;font-size:18px;cursor:pointer;font-weight:700">+</button>
-        <span style="font-size:13px;color:var(--muted)">heure(s)</span>
-      </div>
-    </div>
+    <div style="display:grid;gap:10px;margin-bottom:20px" id="topupPlans"></div>
 
-    <!-- Prix calculé -->
-    <div style="background:var(--teal-light);border:1.5px solid var(--teal);border-radius:12px;padding:14px 16px;margin-bottom:16px;display:flex;justify-content:space-between;align-items:center">
-      <div>
-        <div style="font-size:12px;color:var(--teal);font-weight:600" id="topupDesc">1h · 2 langues</div>
-        <div style="font-size:11px;color:var(--muted)" id="topupHT">50,00 € HT</div>
-      </div>
-      <div style="font-size:28px;font-weight:900;color:var(--teal)" id="topupPrice">59,99 €</div>
-    </div>
-
-    <button class="btn-full pur" id="btnTopup" onclick="doTopup()">
-      <span class="btn-label">💳 Payer →</span>
+    <button class="btn-full pur" id="btnTopup" onclick="doTopup()" style="display:none">
+      <span class="btn-label">Payer →</span>
       <div class="spinner"></div>
     </button>
-  </div>
-</div>
-
-<!-- ── MODAL : PARTAGER ── -->
-<div class="overlay" id="overlayShare" onclick="closeIfBg(event,'overlayShare')">
-  <div class="modal">
-    <button class="modal-close" onclick="closeModal('overlayShare')">✕</button>
-    <h2 class="modal-title">📤 Partager la conférence</h2>
-    <p class="modal-sub" id="shareSub"></p>
-
-    <div class="share-qr">
-      <img id="shareQrImg" src="" width="160" height="160" alt="QR Code">
-    </div>
-
-    <div class="share-link-box" id="shareLink" onclick="copyShareLink()" title="Cliquer pour copier">
-      —
-    </div>
-    <div class="copy-toast" id="copyToast">✅ Lien copié !</div>
-
-    <div class="share-btns">
-      <button class="share-btn-wa"    onclick="shareVia('whatsapp')">💬 WhatsApp</button>
-      <button class="share-btn-sms"   onclick="shareVia('sms')">📱 SMS</button>
-      <button class="share-btn-email" onclick="shareVia('email')">✉️ Email</button>
-    </div>
   </div>
 </div>
 
@@ -350,22 +297,19 @@ var LANGS = {
 };
 
 // ══ TARIFS ══
-var BASE_TTC   = 59.99;  // 1h, 2 langues incluses
-var EXTRA_H    = 49.99;  // par heure supplémentaire
-var EXTRA_LANG = 49.99;  // par langue supplémentaire par heure
-
-function calcTotal(hours, extraLangs){
-  return BASE_TTC + (hours-1)*EXTRA_H + extraLangs*hours*EXTRA_LANG;
-}
+var PLANS = {
+  '2H':{minutes:120,  basePrice:119, extraPrice:99,  label:'2 heures'},
+  '5H':{minutes:300,  basePrice:238, extraPrice:198, label:'5 heures'},
+  '10H':{minutes:600, basePrice:456, extraPrice:376, label:'10 heures'}
+};
 
 // ══ STATE ══
 var currentUser = null;
 var rooms       = {};
 var timers      = {};
 var editingRoom = null;
-var topupRoom    = null;
-var topupHours   = 1;
-var selectedHours = 1;
+var topupRoom   = null;
+var topupPlan   = null;
 var selectedTgt = [];
 var editTgt     = [];
 
@@ -483,7 +427,6 @@ function buildRoomCard(roomId, r){
     '<div class="room-foot">'+
       '<div class="lang-pill-list">'+pillsHTML+'</div>'+
       '<button class="btn-icon" title="Modifier les langues" onclick="openEdit(\''+roomId+'\')">✏️</button>'+
-      '<button class="btn-share" onclick="openShare(\''+roomId+'\')">📤 Partager</button>'+
       '<button class="btn-add-time" onclick="openTopup(\''+roomId+'\')">+ Heures</button>'+
       '<button class="btn-join" onclick="joinRoom(\''+roomId+'\')">▶ Ouvrir la salle</button>'+
     '</div>';
@@ -517,49 +460,6 @@ function joinRoom(roomId){
   var url = 'https://translatetheworld.com/r/?room='+encodeURIComponent(roomId)
     +'&lang='+(r.lang||'fr')+'&to='+(r.to||'en')+'&dur='+Math.max(1,Math.round(((r.minutesAllowed||0)-(r.minutesUsed||0))));
   window.open(url,'_blank');
-}
-
-var shareUrl = '';
-
-function buildRoomUrl(roomId){
-  var r = rooms[roomId];
-  if(!r) return '';
-  return 'https://translatetheworld.com/r/?room='+encodeURIComponent(roomId)
-    +'&lang='+(r.lang||'fr')+'&to='+(r.to||'en')+'&dur='+Math.max(1,Math.round(((r.minutesAllowed||0)-(r.minutesUsed||0))));
-}
-
-function openShare(roomId){
-  var r = rooms[roomId];
-  if(!r) return;
-  shareUrl = buildRoomUrl(roomId);
-  var langs = [r.lang||'fr'].concat((r.to||'').split(',').filter(Boolean));
-  document.getElementById('shareSub').textContent = roomId+' · '+langs.length+' langue'+(langs.length>1?'s':'');
-  document.getElementById('shareLink').textContent = shareUrl;
-  document.getElementById('shareQrImg').src = 'https://quickchart.io/qr?size=160&text='+encodeURIComponent(shareUrl);
-  document.getElementById('copyToast').style.display='none';
-  openModal('overlayShare');
-}
-
-function copyShareLink(){
-  if(!shareUrl) return;
-  navigator.clipboard.writeText(shareUrl).then(function(){
-    var t = document.getElementById('copyToast');
-    t.style.display='block';
-    setTimeout(function(){ t.style.display='none'; }, 2000);
-  });
-}
-
-function shareVia(channel){
-  if(!shareUrl) return;
-  var msg = 'Rejoignez ma conférence TranslateTheWorld en temps réel : '+shareUrl;
-  var encoded = encodeURIComponent(msg);
-  if(channel==='whatsapp'){
-    window.open('https://wa.me/?text='+encoded,'_blank');
-  } else if(channel==='sms'){
-    window.location.href = 'sms:?body='+encoded;
-  } else if(channel==='email'){
-    window.location.href = 'mailto:?subject='+encodeURIComponent('Votre lien de conférence TranslateTheWorld')+'&body='+encoded;
-  }
 }
 
 function escH(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
@@ -718,41 +618,43 @@ function saveLangs(){
 }
 
 // ══ MODAL : AJOUTER HEURES ══
-function changeTopupHours(delta){
-  var r = rooms[topupRoom];
-  var n = ((r.to||'').split(',').filter(Boolean).length)+1;
-  var extraLangs = Math.max(0, n-2);
-  topupHours = Math.max(1, Math.min(20, topupHours+delta));
-  document.getElementById('topupHoursVal').textContent = topupHours;
-  var total = calcTotal(topupHours, extraLangs);
-  var ht    = (total/1.2).toFixed(2).replace('.',',');
-  document.getElementById('topupPrice').textContent = total.toFixed(2).replace('.',',')+' €';
-  document.getElementById('topupHT').textContent    = ht+' € HT';
-  document.getElementById('topupDesc').textContent  = topupHours+'h · '+n+' langue'+(n>1?'s':'');
-}
-
 function openTopup(roomId){
-  topupRoom  = roomId;
-  topupHours = 1;
+  topupRoom = roomId; topupPlan = null;
   var r = rooms[roomId];
-  var n = ((r.to||'').split(',').filter(Boolean).length)+1;
-  var extraLangs = Math.max(0, n-2);
   document.getElementById('topupSub').textContent = 'Salle : '+roomId+' — '+fmtH((r.minutesAllowed||0)-(r.minutesUsed||0))+' restantes';
   document.getElementById('alertTopup').className='alert-modal';
-  document.getElementById('topupHoursVal').textContent = '1';
-  var total = calcTotal(1, extraLangs);
-  document.getElementById('topupPrice').textContent = total.toFixed(2).replace('.',',')+' €';
-  document.getElementById('topupHT').textContent    = (total/1.2).toFixed(2).replace('.',',')+' € HT';
-  document.getElementById('topupDesc').textContent  = '1h · '+n+' langue'+(n>1?'s':'');
+  document.getElementById('btnTopup').style.display='none';
+
+  var n = ((r.to||'').split(',').filter(Boolean).length)+1; // nb langues
+  var plansDiv = document.getElementById('topupPlans');
+  plansDiv.innerHTML='';
+
+  Object.keys(PLANS).forEach(function(k){
+    var p=PLANS[k];
+    var total = p.basePrice + Math.max(0,n-2)*p.extraPrice;
+    var ht    = (total/1.2).toFixed(2);
+    var div=document.createElement('div');
+    div.style.cssText='border:2px solid var(--border);border-radius:12px;padding:14px 16px;cursor:pointer;transition:all .2s';
+    div.innerHTML='<strong>'+p.label+'</strong> <span style="color:var(--muted);font-size:13px">(+'+p.minutes+' min)</span><br>'
+      +'<span style="font-size:20px;font-weight:800">'+total+'€ TTC</span> <span style="font-size:12px;color:var(--muted)">'+ht+'€ HT · '+n+' langue'+(n>1?'s':'')+'</span>';
+    div.onclick=function(){
+      document.querySelectorAll('#topupPlans > div').forEach(function(d){ d.style.border='2px solid var(--border)'; d.style.background=''; });
+      div.style.border='2px solid #7c3aed'; div.style.background='rgba(124,58,237,.05)';
+      topupPlan=k;
+      document.getElementById('btnTopup').style.display='flex';
+    };
+    plansDiv.appendChild(div);
+  });
+
   openModal('overlayTopup');
 }
 
 function doTopup(){
-  if(!topupRoom) return;
+  if(!topupPlan || !topupRoom) return;
   var r = rooms[topupRoom];
   var allLangs = [r.lang||'fr'].concat((r.to||'').split(',').filter(Boolean));
   callStripe({
-    hours:      topupHours,
+    plan:       topupPlan,
     room:       topupRoom,
     ownerUid:   currentUser.uid,
     ownerEmail: currentUser.email,
@@ -781,48 +683,34 @@ function openPlanChooser(roomId, src, tgtArr){
   document.getElementById('planModalSub').textContent = 'Salle : '+roomId+' · '+pendingLangs.length+' langue'+(pendingLangs.length>1?'s':'');
 
   var n = pendingLangs.length;
-  var extraLangs = Math.max(0, n-2);
-  selectedHours = 1;
-
-  // Injecter le sélecteur d'heures dans planChoices
   var div = document.getElementById('planChoices');
-  div.innerHTML =
-    '<div style="margin-bottom:16px">'+
-      '<label style="font-size:12px;font-weight:700;color:var(--muted);letter-spacing:.08em;text-transform:uppercase;display:block;margin-bottom:8px">Nombre d&#39;heures</label>'+
-      '<div style="display:flex;align-items:center;gap:12px">'+
-        '<button onclick="changeNewHours(-1)" style="width:36px;height:36px;border-radius:50%;border:2px solid var(--border);background:#fff;font-size:18px;cursor:pointer;font-weight:700">−</button>'+
-        '<span id="newHoursVal" style="font-size:28px;font-weight:900;min-width:40px;text-align:center">1</span>'+
-        '<button onclick="changeNewHours(1)" style="width:36px;height:36px;border-radius:50%;border:2px solid var(--teal);background:var(--teal);color:#fff;font-size:18px;cursor:pointer;font-weight:700">+</button>'+
-        '<span style="font-size:13px;color:var(--muted)">heure(s)</span>'+
-      '</div>'+
-    '</div>'+
-    '<div style="background:var(--teal-light);border:1.5px solid var(--teal);border-radius:12px;padding:14px 16px;display:flex;justify-content:space-between;align-items:center">'+
-      '<div>'+
-        '<div style="font-size:12px;color:var(--teal);font-weight:600" id="newPlanDesc">1h · '+n+' langue'+(n>1?'s':'')+'</div>'+
-        '<div style="font-size:11px;color:var(--muted)" id="newPlanHT">'+(calcTotal(1,extraLangs)/1.2).toFixed(2).replace('.',',')+' € HT</div>'+
-      '</div>'+
-      '<div style="font-size:28px;font-weight:900;color:var(--teal)" id="newPlanPrice">'+calcTotal(1,extraLangs).toFixed(2).replace('.',',')+'€</div>'+
-    '</div>';
-
-  document.getElementById('btnPay').style.display = 'flex';
+  div.innerHTML = '';
+  Object.keys(PLANS).forEach(function(k){
+    var p = PLANS[k];
+    var total = p.basePrice + Math.max(0, n-2)*p.extraPrice;
+    var ht    = (total/1.2).toFixed(2);
+    var card  = document.createElement('div');
+    card.style.cssText = 'border:2px solid var(--border);border-radius:12px;padding:16px;cursor:pointer;transition:all .2s';
+    card.innerHTML =
+      '<div style="display:flex;justify-content:space-between;align-items:center">'+
+        '<div><strong style="font-size:15px">'+p.label+'</strong> <span style="color:var(--muted);font-size:12px">· '+p.minutes/60+'h · '+n+' langue'+(n>1?'s':'')+'</span></div>'+
+        '<div style="text-align:right"><span style="font-size:20px;font-weight:800">'+total+'€</span><br><span style="font-size:11px;color:var(--muted)">TTC · '+ht+'€ HT</span></div>'+
+      '</div>';
+    card.onclick = function(){
+      document.querySelectorAll('#planChoices > div').forEach(function(d){ d.style.border='2px solid var(--border)'; d.style.background=''; });
+      card.style.border='2px solid var(--teal)'; card.style.background='var(--teal-light)';
+      selectedPlan = k;
+      document.getElementById('btnPay').style.display = 'flex';
+    };
+    div.appendChild(card);
+  });
   openModal('overlayPlan');
 }
 
-function changeNewHours(delta){
-  var n = pendingLangs.length;
-  var extraLangs = Math.max(0, n-2);
-  selectedHours = Math.max(1, Math.min(20, selectedHours+delta));
-  document.getElementById('newHoursVal').textContent = selectedHours;
-  var total = calcTotal(selectedHours, extraLangs);
-  document.getElementById('newPlanPrice').textContent = total.toFixed(2).replace('.',',')+' €';
-  document.getElementById('newPlanHT').textContent    = (total/1.2).toFixed(2).replace('.',',')+' € HT';
-  document.getElementById('newPlanDesc').textContent  = selectedHours+'h · '+n+' langue'+(n>1?'s':'');
-}
-
 function doPay(){
-  if(!pendingRoomId) return;
+  if(!selectedPlan || !pendingRoomId) return;
   callStripe({
-    hours:      selectedHours,
+    plan:       selectedPlan,
     room:       pendingRoomId,
     ownerUid:   currentUser.uid,
     ownerEmail: currentUser.email,
@@ -832,13 +720,6 @@ function doPay(){
 }
 
 // ══ APPEL STRIPE ══
-function setLoading(btnId,on){
-  var btn=document.getElementById(btnId);
-  if(!btn) return;
-  btn.classList.toggle('loading',on);
-  btn.disabled=on;
-}
-
 function callStripe(payload, btnId, alertId){
   setLoading(btnId, true);
   fetch('/.netlify/functions/create-checkout', {

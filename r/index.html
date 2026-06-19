@@ -1,0 +1,892 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0">
+<title>Live Subtitles — TranslateTheWorld</title>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/microsoft-cognitiveservices-speech-sdk/distrib/browser/microsoft.cognitiveservices.speech.sdk.bundle-min.js" defer></script>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;font-family:system-ui,sans-serif;overflow:hidden;background:#fff;color:#1a1a1a}
+body.dark{background:#000;color:#eee}
+.hidden{display:none!important}
+
+/* ── Expiration ── */
+#exp{display:none;position:fixed;inset:0;z-index:9999;align-items:center;justify-content:center;background:rgba(255,255,255,.97);padding:24px}
+#exp.show{display:flex}
+.ecard{max-width:500px;width:100%;border-radius:20px;padding:32px;background:#fff;border:1px solid #ddd;box-shadow:0 18px 60px rgba(0,0,0,.12);text-align:center}
+.ecard h2{font-size:22px;margin-bottom:14px}
+.ecard p{font-size:15px;line-height:1.7;margin-bottom:8px}
+.ecard a{color:#157a6e;font-weight:700;text-decoration:none}
+.back-btn{display:inline-block;margin-top:16px;background:#157a6e;color:#fff;padding:10px 24px;border-radius:999px;font-weight:700;font-size:14px}
+
+/* ── Écran 1 : Choix du mode ── */
+#screen-mode{position:fixed;inset:0;z-index:30;display:flex;align-items:center;justify-content:center;background:#fff;padding:24px}
+body.dark #screen-mode{background:#0a0a0a}
+#screen-mode.hidden{display:none}
+.mode-card{width:min(680px,96vw);border-radius:24px;padding:36px 32px;background:#fff;border:1px solid #e5e5e5;box-shadow:0 20px 60px rgba(0,0,0,.1)}
+body.dark .mode-card{background:#111827;border-color:#333}
+.mode-card .logo{font-size:13px;font-weight:700;color:#157a6e;letter-spacing:.08em;text-transform:uppercase;margin-bottom:20px}
+.mode-card h1{font-size:24px;font-weight:800;margin-bottom:6px}
+.mode-card .sub{font-size:13px;color:#888;margin-bottom:28px;line-height:1.5}
+.mode-meta{font-size:13px;color:#555;background:#f0faf7;border-radius:10px;padding:12px 16px;border:1px solid rgba(21,122,110,.2);margin-bottom:24px;line-height:1.7}
+body.dark .mode-meta{background:rgba(255,255,255,.05);color:#aaa}
+.mode-meta strong{color:#157a6e}
+.mode-choices{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+@media(max-width:500px){.mode-choices{grid-template-columns:1fr}}
+.mode-btn{border:2px solid #e5e5e5;border-radius:18px;padding:24px 20px;background:#fff;cursor:pointer;text-align:left;transition:all .2s;position:relative}
+body.dark .mode-btn{background:#1a2438;border-color:#333}
+.mode-btn:hover{border-color:#157a6e;box-shadow:0 8px 24px rgba(21,122,110,.15)}
+.mode-btn .icon{font-size:32px;margin-bottom:12px;display:block}
+.mode-btn .name{font-size:16px;font-weight:800;color:#0a0a0a;margin-bottom:6px}
+body.dark .mode-btn .name{color:#fff}
+.mode-btn .desc{font-size:12px;color:#888;line-height:1.55}
+.mode-btn .badge{position:absolute;top:14px;right:14px;background:#157a6e;color:#fff;font-size:10px;font-weight:700;padding:3px 8px;border-radius:999px;letter-spacing:.05em}
+.mode-btn.conf .badge{background:#7c3aed}
+
+/* ── Écran 2 : Saisie nom (Conference mode) ── */
+#screen-name{position:fixed;inset:0;z-index:29;display:flex;align-items:center;justify-content:center;background:#fff;padding:24px}
+body.dark #screen-name{background:#0a0a0a}
+#screen-name.hidden{display:none}
+.name-card{width:min(480px,96vw);border-radius:24px;padding:36px 32px;background:#fff;border:1px solid #e5e5e5;box-shadow:0 20px 60px rgba(0,0,0,.1)}
+body.dark .name-card{background:#111827;border-color:#333}
+.name-card h2{font-size:20px;font-weight:800;margin-bottom:8px}
+.name-card p{font-size:13px;color:#888;margin-bottom:24px;line-height:1.5}
+.name-card input{width:100%;border:2px solid #e5e5e5;border-radius:10px;padding:14px 16px;font-size:16px;font-family:inherit;outline:none;transition:border-color .2s;margin-bottom:16px}
+.name-card input:focus{border-color:#157a6e}
+body.dark .name-card input{background:#1a2438;border-color:#333;color:#fff}
+.name-card input::placeholder{color:#bbb}
+.name-submit{width:100%;border:none;border-radius:10px;padding:14px;font-size:15px;font-weight:700;cursor:pointer;background:#7c3aed;color:#fff;font-family:inherit;transition:opacity .2s}
+.name-submit:hover{opacity:.88}
+.name-back{display:block;text-align:center;margin-top:14px;font-size:13px;color:#888;cursor:pointer;text-decoration:underline}
+
+/* ── Écran 3 : Choix rôle (Free mode) ── */
+#screen-role{position:fixed;inset:0;z-index:28;display:flex;align-items:center;justify-content:center;background:rgba(255,255,255,.95);padding:20px}
+body.dark #screen-role{background:rgba(0,0,0,.92)}
+#screen-role.hidden{display:none}
+.role-card{width:min(660px,94vw);border-radius:20px;padding:28px;background:#fff;border:1px solid #ddd;box-shadow:0 18px 60px rgba(0,0,0,.1)}
+body.dark .role-card{background:#111827;border-color:#333}
+.role-card h1{font-size:20px;font-weight:800;margin-bottom:10px}
+.role-meta{font-size:13px;color:#555;margin-bottom:18px;line-height:1.7;background:#f0faf7;border-radius:10px;padding:12px 16px;border:1px solid rgba(21,122,110,.2)}
+body.dark .role-meta{background:rgba(255,255,255,.06);color:#aaa}
+.role-meta strong{color:#157a6e}
+.role-acts{display:flex;flex-wrap:wrap;gap:12px}
+.rbb{border:none;border-radius:14px;padding:15px 20px;font-size:15px;font-weight:700;cursor:pointer;flex:1;min-width:150px;font-family:inherit}
+.rbb.spk{background:#157a6e;color:#fff}
+.rbb.att{background:#0ea5e9;color:#fff}
+
+/* ── Zone texte ── */
+#zone{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(115px + env(safe-area-inset-bottom));width:min(720px,92vw);max-height:calc(100vh - 135px);overflow-y:auto;padding:16px 18px;border-radius:16px;border:1px solid rgba(0,0,0,.12);background:rgba(255,255,255,.96);font-size:20px;line-height:1.65;white-space:pre-wrap}
+body.dark #zone{background:rgba(0,0,0,.7);border-color:rgba(255,255,255,.2)}
+
+/* ── Footer ── */
+#footer{position:fixed;left:0;right:0;bottom:0;min-height:110px;padding:8px 12px env(safe-area-inset-bottom);background:#fff;border-top:1px solid #eee;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px}
+body.dark #footer{background:#000;border-top-color:#333}
+#btns{display:flex;flex-wrap:nowrap;overflow-x:auto;gap:8px;width:100%;max-width:980px;padding:0 2px}
+.btn{flex:0 0 auto;border:none;border-radius:999px;padding:9px 16px;font-size:13px;font-weight:600;cursor:pointer;white-space:nowrap;background:#e5e7eb;color:#111;font-family:inherit}
+.btn.go{background:#16a34a;color:#fff}
+.btn.stp{background:#dc2626;color:#fff}
+.btn.bl{background:#2563eb;color:#fff}
+.btn.sky{background:#0ea5e9;color:#fff}
+.btn.pur{background:#7c3aed;color:#fff}
+.btn.org{background:#ea580c;color:#fff}
+.btn:disabled{opacity:.5;cursor:not-allowed}
+select{padding:8px 12px;border-radius:999px;border:1px solid #ccc;background:#fff;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit}
+body.dark select{background:#222;color:#eee;border-color:#555}
+#st{font-size:12px;text-align:center;padding:0 10px;opacity:.8}
+
+/* ── FAB ── */
+#fab{position:fixed;top:14px;right:14px;z-index:9999;border:none;border-radius:999px;padding:11px 16px;font-size:13px;font-weight:700;box-shadow:0 8px 24px rgba(0,0,0,.2);cursor:pointer;font-family:inherit}
+
+/* ── Floor request banner (Conference) ── */
+#floorBanner{position:fixed;top:0;left:0;right:0;z-index:500;padding:14px 20px;background:#7c3aed;color:#fff;display:flex;align-items:center;justify-content:space-between;gap:12px;font-size:14px;font-weight:600;box-shadow:0 4px 16px rgba(0,0,0,.2)}
+#floorBanner.hidden{display:none}
+#floorBanner .fbname{flex:1}
+.floor-grant{border:none;border-radius:999px;padding:8px 18px;background:#fff;color:#7c3aed;font-size:13px;font-weight:700;cursor:pointer;white-space:nowrap;font-family:inherit}
+.floor-dismiss{border:none;background:rgba(255,255,255,.2);color:#fff;border-radius:999px;padding:8px 14px;font-size:13px;cursor:pointer;font-family:inherit}
+
+/* ── Request floor btn (Attendee in Conference) ── */
+#reqFloorBtn{position:fixed;bottom:calc(120px + env(safe-area-inset-bottom));left:50%;transform:translateX(-50%);z-index:100;border:none;border-radius:999px;padding:12px 28px;font-size:14px;font-weight:700;cursor:pointer;box-shadow:0 8px 24px rgba(0,0,0,.15);font-family:inherit;white-space:nowrap}
+#reqFloorBtn.idle{background:#7c3aed;color:#fff}
+#reqFloorBtn.waiting{background:#f59e0b;color:#fff}
+#reqFloorBtn.hidden{display:none}
+
+/* ── Quota warning banner ── */
+#quotaBanner{display:none;position:fixed;top:0;left:0;right:0;z-index:600;padding:10px 20px;font-size:13px;font-weight:700;text-align:center;color:#fff}
+#quotaBanner.warn{display:block;background:#ea580c}
+#quotaBanner.block{display:block;background:#dc2626}
+
+#spellOverlay{display:none;position:fixed;inset:0;z-index:800;background:rgba(0,0,0,.45)}
+#spellOverlay.open{display:block}
+#spellPanel{position:fixed;left:0;right:0;bottom:0;z-index:801;background:#1a1a2e;border-radius:20px 20px 0 0;padding:20px 20px 32px;max-height:82vh;overflow-y:auto;transform:translateY(100%);transition:transform .3s cubic-bezier(.4,0,.2,1)}
+#spellOverlay.open #spellPanel{transform:translateY(0)}
+.sp-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
+.sp-title{font-size:15px;font-weight:800;color:#fff}
+.sp-close{border:none;background:rgba(255,255,255,.12);color:#fff;border-radius:999px;width:30px;height:30px;cursor:pointer;font-size:16px;line-height:1}
+.sp-note{font-size:11.5px;color:rgba(100,220,180,.9);font-weight:600;margin-bottom:6px}
+.sp-desc{font-size:11px;color:rgba(255,255,255,.55);line-height:1.55;margin-bottom:14px}
+.sp-toggle{display:flex;align-items:center;gap:8px;font-size:12px;color:rgba(255,255,255,.8);margin-bottom:10px;cursor:pointer}
+.sp-toggle input{width:14px;height:14px;cursor:pointer}
+.sp-cols{display:grid;grid-template-columns:1fr 1fr;gap:3px 8px;margin-bottom:6px}
+.sp-col-lbl{font-size:10px;color:rgba(255,255,255,.35);padding:0 2px;margin-bottom:2px}
+.sp-pair{display:contents}
+.sp-pair input{background:rgba(255,255,255,.09);border:1px solid rgba(255,255,255,.14);border-radius:7px;padding:7px 9px;font-size:12px;color:#fff;font-family:inherit;outline:none;width:100%}
+.sp-pair input::placeholder{color:rgba(255,255,255,.3)}
+.sp-pair input:focus{border-color:rgba(100,220,180,.6);background:rgba(255,255,255,.13)}
+.sp-footer-note{font-size:10.5px;color:rgba(255,255,255,.35);margin-top:12px;line-height:1.5}
+</style>
+</head>
+<body>
+
+<!-- Quota warning banner -->
+<div id="quotaBanner"></div>
+
+<!-- Expiration -->
+<div id="exp">
+  <div class="ecard">
+    <h2>🙏 Session expired</h2>
+    <p>This link is no longer valid.<br>
+    Contact us for your next event:<br>
+    <a href="/cdn-cgi/l/email-protection#284c464a685b474f4d4c414b4745064b4745"><span class="__cf_email__" data-cfemail="eb8f8589ab98848c8e8f82888486c5888486">[email&#160;protected]</span></a><br>
+    <a href="tel:+33689735229">+33 6 89 73 52 29</a></p>
+    <a class="back-btn" href="https://translatetheworld.com">← Create a new link</a>
+  </div>
+</div>
+
+<!-- Floor request banner (visible to Host only) -->
+<div id="floorBanner" class="hidden">
+  <span>🙋 Floor request from <strong class="fbname" id="fbName">—</strong></span>
+  <button class="floor-grant" id="grantBtn">Grant the floor</button>
+  <button class="floor-dismiss" id="dismissBtn">✕</button>
+</div>
+
+<!-- Request floor button (visible to Attendee in Conference mode) -->
+<button id="reqFloorBtn" class="hidden idle">🙋 Request the floor</button>
+
+<!-- SCREEN 1 : Mode selection -->
+<div id="screen-mode">
+  <div class="mode-card">
+    <div class="logo">🌍 TranslateTheWorld</div>
+    <h1>Choose your mode</h1>
+    <p class="sub">How would you like to use this session?</p>
+    <div class="mode-meta" id="modeMeta">Loading…</div>
+    <div class="mode-choices">
+      <button class="mode-btn" id="btnFree">
+        <span class="badge">FREE</span>
+        <span class="icon">💬</span>
+        <div class="name">Free mode</div>
+        <div class="desc">Anyone can be Speaker or Attendee. Switch roles freely at any time.</div>
+      </button>
+      <button class="mode-btn conf" id="btnConf">
+        <span class="badge">CONFERENCE</span>
+        <span class="icon">🎙️</span>
+        <div class="name">Conference mode</div>
+        <div class="desc">One Host controls the floor. Attendees can request to speak.</div>
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- SCREEN 2 : Name entry (Conference mode) -->
+<div id="screen-name" class="hidden">
+  <div class="name-card">
+    <h2>🎙️ Conference mode</h2>
+    <p>Enter your name or alias to join the session.</p>
+    <input type="text" id="nameInput" placeholder="Your name or alias…" maxlength="30" autocomplete="off">
+    <button class="name-submit" id="nameSubmit">Join the conference →</button>
+    <span class="name-back" id="nameBack">← Back</span>
+  </div>
+</div>
+
+<!-- SCREEN 3 : Role selection (Free mode only) -->
+<div id="screen-role" class="hidden">
+  <div class="role-card">
+    <h1>🎙️ Free mode</h1>
+    <div class="role-meta" id="roleMeta">Loading…</div>
+    <div class="role-acts">
+      <button class="rbb spk" id="bSpk">🎤 Speaker</button>
+      <button class="rbb att" id="bAtt">👥 Attendee</button>
+    </div>
+  </div>
+</div>
+
+<!-- Main zone -->
+<div id="zone">Waiting…</div>
+
+<!-- FAB -->
+<button id="fab" class="hidden"></button>
+
+<!-- Footer -->
+<div id="footer">
+  <div id="btns">
+    <button class="btn sky" id="run">START</button>
+    <select id="sSrc" class="hidden"></select>
+    <select id="sTgt" class="hidden"></select>
+    <button class="btn bl hidden" id="dl">⬇ Export</button>
+    <button class="btn bl" id="clr">🗑 Clear</button>
+    <button class="btn pur" id="thm">🌙</button>
+    <button class="btn hidden" id="spellBtn" style="background:#0f766e;color:#fff">✏ Names</button>
+  </div>
+  <div id="st">Select your mode above</div>
+</div>
+
+<!-- Spell-check panel (Host/Speaker only) -->
+<div id="spellOverlay">
+  <div id="spellPanel">
+    <div class="sp-header">
+      <span class="sp-title">📝 Proper Names &amp; Terminology</span>
+      <button class="sp-close" id="spellClose">✕</button>
+    </div>
+    <div class="sp-note">✅ Corrections apply to all languages (FR, EN, ES, AR…)</div>
+    <div class="sp-desc">If the AI mispronounces a proper name, enter what it says on the left and the correct spelling on the right. Set up before the meeting.</div>
+    <label class="sp-toggle"><input type="checkbox" id="spCaps" checked><span>Auto-capitalize sentence starts</span></label>
+    <label class="sp-toggle"><input type="checkbox" id="spNames" checked><span>Enable proper name corrections</span></label>
+    <div class="sp-cols">
+      <div class="sp-col-lbl">AI says (wrong)</div>
+      <div class="sp-col-lbl">Should be (correct)</div>
+      <div class="sp-pair"><input id="spW1" placeholder="e.g. Bernard Pommel"><input id="spC1" placeholder="e.g. Bertrand Paumel"></div>
+      <div class="sp-pair"><input id="spW2" placeholder="e.g. Marc Dupond"><input id="spC2" placeholder="e.g. Marc Dupont"></div>
+      <div class="sp-pair"><input id="spW3" placeholder="Wrong name 3"><input id="spC3" placeholder="Correct name 3"></div>
+      <div class="sp-pair"><input id="spW4" placeholder="Wrong name 4"><input id="spC4" placeholder="Correct name 4"></div>
+      <div class="sp-pair"><input id="spW5" placeholder="Wrong name 5"><input id="spC5" placeholder="Correct name 5"></div>
+      <div class="sp-pair"><input id="spW6" placeholder="Wrong name 6"><input id="spC6" placeholder="Correct name 6"></div>
+      <div class="sp-pair"><input id="spW7" placeholder="Wrong name 7"><input id="spC7" placeholder="Correct name 7"></div>
+      <div class="sp-pair"><input id="spW8" placeholder="Wrong name 8"><input id="spC8" placeholder="Correct name 8"></div>
+      <div class="sp-pair"><input id="spW9" placeholder="Wrong name 9"><input id="spC9" placeholder="Correct name 9"></div>
+      <div class="sp-pair"><input id="spW10" placeholder="Wrong name 10"><input id="spC10" placeholder="Correct name 10"></div>
+    </div>
+    <div class="sp-footer-note">💡 Settings are saved automatically in your browser.</div>
+  </div>
+</div>
+
+<script>
+
+// ══ URL PARAMS ══
+var P    = new URLSearchParams(window.location.search);
+var ROOM = P.get('room') || P.get('r') || 'demo';
+var SL   = P.get('lang') || 'fr';
+var TL   = (P.get('to') || 'en').split(',').filter(function(x){return x.length>0;});
+var DUR  = parseInt(P.get('dur') || '15');
+var EXP  = parseInt(P.get('exp') || '0');
+
+// ══ FIREBASE ══
+firebase.initializeApp({
+  apiKey:'AIzaSyCQZ_htYiPyUv50oIObwN3eGSJ9SneO7sI',
+  authDomain:'sogevoxreunion.firebaseapp.com',
+  databaseURL:'https://sogevoxreunion-default-rtdb.europe-west1.firebasedatabase.app',
+  projectId:'sogevoxreunion',
+  storageBucket:'sogevoxreunion.appspot.com',
+  messagingSenderId:'719780110234',
+  appId:'1:719780110234:web:02766642e9cfedd9446423'
+});
+var db = firebase.database();
+
+// ══ AZURE ══
+var AZK = 'BfBydAOdsonrVXY68xadxIWn9EwQWoJPUzZc2OOcC4gA0IATC2O9JQQJ99BDAC5T7U2XJ3w3AAAYACOGqosg';
+var AZR = 'francecentral';
+
+// ══ LABELS ══
+var LBLS = {fr:'Français',en:'English',de:'Deutsch',es:'Español',it:'Italiano',pt:'Português',ru:'Русский',ar:'العربية',zh:'中文',ja:'日本語',ko:'한국어',uk:'Українська',el:'Ελληνικά',tr:'Türkçe',he:'עברית',hi:'हिन्दी',nl:'Nederlands',pl:'Polski'};
+var AZMAP = {fr:'fr-FR',en:'en-US',de:'de-DE',es:'es-ES',it:'it-IT',pt:'pt-PT',ru:'ru-RU',ar:'ar-SA',zh:'zh-CN',ja:'ja-JP',ko:'ko-KR',uk:'uk-UA',el:'el-GR',tr:'tr-TR',he:'he-IL',hi:'hi-IN',nl:'nl-NL',pl:'pl-PL'};
+
+function lbl(c){return LBLS[c]||c;}
+function pathSpk(l){return 'rooms/'+ROOM+'/'+l;}
+function pathConf(k){return 'rooms/'+ROOM+'/conf/'+k;}
+function expired(){return EXP>0 && Date.now()/1000>EXP;}
+
+// ══ DOM ══
+var expDiv      = document.getElementById('exp');
+var scrMode     = document.getElementById('screen-mode');
+var scrName     = document.getElementById('screen-name');
+var scrRole     = document.getElementById('screen-role');
+var zone        = document.getElementById('zone');
+var run         = document.getElementById('run');
+var sSrc        = document.getElementById('sSrc');
+var sTgt        = document.getElementById('sTgt');
+var dl          = document.getElementById('dl');
+var clr         = document.getElementById('clr');
+var thm         = document.getElementById('thm');
+var fab         = document.getElementById('fab');
+var spellBtn    = document.getElementById('spellBtn');
+var spellOverlay= document.getElementById('spellOverlay');
+var spellClose  = document.getElementById('spellClose');
+var spCaps      = document.getElementById('spCaps');
+var spNames     = document.getElementById('spNames');
+
+var SP_STORAGE  = 'ttw_spell_v1';
+var spPairs     = [];
+for(var _i=1;_i<=10;_i++){
+  spPairs.push({w:document.getElementById('spW'+_i), c:document.getElementById('spC'+_i)});
+}
+
+// ── Spell-check functions ──
+function escRx(s){return s.replace(/[.*+?^${}()|[\]\\]/g,'\\$&');}
+function flexPat(t){return escRx((t||'').trim()).replace(/\\ /g,'\\s+').replace(/\\-/g,'[-\\s]?');}
+
+function getSpPairs(){
+  return spPairs.map(function(p){return{w:(p.w.value||'').trim(),c:(p.c.value||'').trim()};})
+    .filter(function(p){return p.w&&p.c;})
+    .sort(function(a,b){return b.w.length-a.w.length;});
+}
+
+function capSentences(t){
+  if(!t)return t;
+  t=t.trim();
+  t=t.charAt(0).toUpperCase()+t.slice(1);
+  return t.replace(/([.!?…]\s+)([a-zàâäæçéèêëîïôöùûüÿœ])/g,function(m,p1,p2){return p1+p2.toUpperCase();});
+}
+
+function applyNames(t){
+  if(!t)return t;
+  var r=t;
+  getSpPairs().forEach(function(pair){
+    var rx=new RegExp('(^|[^\\p{L}])('+flexPat(pair.w)+')(?=[^\\p{L}]|$)','giu');
+    r=r.replace(rx,function(m,pre){return pre+pair.c;});
+  });
+  return r;
+}
+
+function postProcess(t){
+  var s=(t||'').replace(/\s+/g,' ').trim();
+  if(spCaps.checked) s=capSentences(s);
+  if(spNames.checked) s=applyNames(s);
+  return s;
+}
+
+function saveSpell(){
+  localStorage.setItem(SP_STORAGE,JSON.stringify({
+    caps:spCaps.checked, names:spNames.checked,
+    pairs:spPairs.map(function(p){return{w:p.w.value||'',c:p.c.value||''};})
+  }));
+}
+
+function loadSpell(){
+  try{
+    var d=JSON.parse(localStorage.getItem(SP_STORAGE)||'{}');
+    if(d.caps!==undefined)spCaps.checked=d.caps;
+    if(d.names!==undefined)spNames.checked=d.names;
+    if(Array.isArray(d.pairs)){
+      d.pairs.forEach(function(p,i){if(spPairs[i]){spPairs[i].w.value=p.w||'';spPairs[i].c.value=p.c||'';}});
+    }
+  }catch(e){}
+}
+
+// Open / close panel
+spellBtn.addEventListener('click',function(){spellOverlay.classList.add('open');});
+spellClose.addEventListener('click',function(){spellOverlay.classList.remove('open');});
+spellOverlay.addEventListener('click',function(e){if(e.target===spellOverlay)spellOverlay.classList.remove('open');});
+
+// Auto-save on any input change
+[spCaps,spNames].forEach(function(el){el.addEventListener('change',saveSpell);});
+spPairs.forEach(function(p){
+  p.w.addEventListener('input',saveSpell);
+  p.c.addEventListener('input',saveSpell);
+});
+
+loadSpell();
+
+// ══════════════════════════════════════════
+// ══ QUOTA SYSTEM ══
+// ══════════════════════════════════════════
+var quota        = null;   // données lues depuis Firebase
+var quotaTmr     = null;   // interval 60s qui incrémente minutesUsed
+var quotaSeconds = 0;      // compteur interne secondes depuis dernier incrément
+var quotaBanner  = document.getElementById('quotaBanner');
+
+function pathQuota(){ return 'subscriptions/'+ROOM; }
+
+function showQuotaBanner(msg, level){
+  quotaBanner.textContent = msg;
+  quotaBanner.className   = level; // 'warn' ou 'block'
+}
+function hideQuotaBanner(){ quotaBanner.className=''; quotaBanner.textContent=''; }
+
+// Charge la subscription depuis Firebase (appelé une fois au démarrage du speaker)
+function loadQuota(cb){
+  db.ref(pathQuota()).once('value', function(snap){
+    quota = snap.val();
+    cb(quota);
+  }, function(){ quota=null; cb(null); });
+}
+
+// Vérifie si l'usage est autorisé — retourne null si OK, sinon un message d'erreur
+function quotaCheck(){
+  if(!quota) return null; // pas de subscription → session libre (timer DUR)
+  // Si pas encore activé (avant paiement) → session libre
+  if(!quota.active && !(quota.minutesAllowed > 0)) return null;
+  // Si désactivé manuellement après avoir eu des minutes → bloquer
+  if(!quota.active && quota.minutesAllowed > 0) return '🚫 This session has been deactivated. Please contact us.';
+  if(quota.expiresAt && Date.now() > quota.expiresAt){
+    return '⏰ Your plan has expired ('+new Date(quota.expiresAt).toLocaleDateString()+').';
+  }
+  var left = (quota.minutesAllowed||0) - (quota.minutesUsed||0);
+  if(left <= 0) return '🚫 Your quota of '+quota.minutesAllowed+' minutes is exhausted.';
+  return null;
+}
+
+// Incrémente minutesUsed dans Firebase toutes les 60 secondes de parole active
+function startQuotaCounter(){
+  if(!quota) return; // mode libre, pas de comptage
+  stopQuotaCounter();
+  quotaSeconds = 0;
+  quotaTmr = setInterval(function(){
+    quotaSeconds++;
+    if(quotaSeconds % 60 !== 0) return; // incrément toutes les 60s seulement
+
+    // Incrément atomique dans Firebase
+    db.ref(pathQuota()+'/minutesUsed').transaction(function(cur){
+      return (cur||0) + 1;
+    }, function(err, committed, snap){
+      if(err || !committed) return;
+      quota.minutesUsed = snap.val();
+      var left = (quota.minutesAllowed||0) - quota.minutesUsed;
+
+      if(left <= 0){
+        // Quota épuisé → couper la session
+        showQuotaBanner('🚫 Quota exhausted ('+quota.minutesAllowed+' min used). Session stopped.', 'block');
+        stopAll();
+        setTimeout(function(){ showExp(); }, 2500);
+      } else if(left <= 5){
+        // Avertissement 5 dernières minutes
+        showQuotaBanner('⚠️ Only '+left+' minute'+(left>1?'s':'')+' remaining in your plan.', 'warn');
+      } else {
+        hideQuotaBanner();
+        setStatus('🟢 Speaking — '+lbl(SL)+' · '+left+' min remaining');
+      }
+    });
+  }, 1000); // tick chaque seconde pour précision
+}
+
+function stopQuotaCounter(){
+  if(quotaTmr){ clearInterval(quotaTmr); quotaTmr=null; }
+  quotaSeconds = 0;
+}
+
+// ══════════════════════════════════════════
+
+
+var grantBtn    = document.getElementById('grantBtn');
+var dismissBtn  = document.getElementById('dismissBtn');
+var reqFloorBtn = document.getElementById('reqFloorBtn');
+
+function setStatus(m){st.textContent=m;}
+function showExp(){expDiv.classList.add('show');}
+
+// ══ META ══
+function metaHTML(){
+  var ed = EXP>0 ? new Date(EXP*1000).toLocaleDateString('en-GB',{day:'numeric',month:'long',year:'numeric'}) : '—';
+  return 'Room: <strong>'+ROOM+'</strong> &nbsp;·&nbsp; Speaker lang: <strong>'+lbl(SL)+'</strong> &nbsp;·&nbsp; Attendee lang(s): <strong>'+TL.map(lbl).join(', ')+'</strong><br>Duration: <strong>'+DUR+' min</strong> &nbsp;·&nbsp; Expires: <strong>'+ed+'</strong>';
+}
+document.getElementById('modeMeta').innerHTML = metaHTML();
+document.getElementById('roleMeta').innerHTML = metaHTML();
+
+// ══ SELECTS ══
+(function(){
+  var o=document.createElement('option');o.value=SL;o.textContent=lbl(SL);sSrc.appendChild(o);sSrc.value=SL;
+  TL.forEach(function(l){var o=document.createElement('option');o.value=l;o.textContent=lbl(l);sTgt.appendChild(o);});
+  if(TL.length)sTgt.value=TL[0];
+})();
+
+// ══ STATE ══
+var appMode    = null; // 'free' | 'conference'
+var role       = null; // 'speaker' | 'attendee' | 'host'
+var myName     = '';
+var recog      = null;
+var mic        = null;
+var pRef       = null;
+var pOn        = false;
+var tmr        = null;
+var log        = [];
+var floorState = 'idle'; // 'idle' | 'waiting' | 'speaking'
+var floorRef   = null;
+var confRefs   = [];
+
+// ══ TIMER ══
+function startTimer(){
+  clearInterval(tmr);
+  var s=DUR*60;
+  tmr=setInterval(function(){
+    s--;
+    setStatus('⏱ '+Math.floor(s/60)+':'+String(s%60).padStart(2,'0')+' remaining');
+    if(s<=0){clearInterval(tmr);stopAll();showExp();}
+  },1000);
+}
+
+// ══ UI UPDATE ══
+function updateUI(){
+  // Selects
+  sSrc.classList.toggle('hidden', role!=='speaker' && role!=='host');
+  sTgt.classList.toggle('hidden', role!=='attendee');
+  dl.classList.toggle('hidden',   role!=='speaker' && role!=='host');
+
+  // FAB
+  if(appMode==='free'){
+    fab.classList.remove('hidden');
+    fab.textContent = (role==='speaker') ? '👥 Switch to Attendee' : '🎤 Switch to Speaker';
+    fab.className = 'btn '+(role==='speaker'?'sky':'org');
+  } else if(appMode==='conference'){
+    if(role==='host'){
+      fab.classList.remove('hidden');
+      fab.textContent = recog ? '🎤 Reclaim the floor' : '🎤 I am the Host';
+      fab.className = 'btn org';
+    } else {
+      fab.classList.add('hidden');
+    }
+  } else {
+    fab.classList.add('hidden');
+  }
+
+  // Run button
+  var active = recog || pOn;
+  run.textContent = active ? '⏹ STOP' : '▶ START';
+  run.className   = 'btn '+(active?'stp':'go');
+
+  // Spell button — host & speaker only
+  spellBtn.classList.toggle('hidden', role!=='speaker' && role!=='host');
+}
+
+// ══ SCREEN NAVIGATION ══
+function showScreen(id){
+  scrMode.classList.toggle('hidden', id!=='mode');
+  scrName.classList.toggle('hidden', id!=='name');
+  scrRole.classList.toggle('hidden', id!=='role');
+}
+
+// ── Screen 1 : mode buttons ──
+document.getElementById('btnFree').addEventListener('click', function(){
+  if(expired()){showExp();return;}
+  appMode = 'free';
+  showScreen('role');
+});
+
+document.getElementById('btnConf').addEventListener('click', function(){
+  if(expired()){showExp();return;}
+  appMode = 'conference';
+  showScreen('name');
+});
+
+// ── Screen 2 : name entry ──
+document.getElementById('nameSubmit').addEventListener('click', submitName);
+document.getElementById('nameInput').addEventListener('keydown', function(e){if(e.key==='Enter')submitName();});
+document.getElementById('nameBack').addEventListener('click', function(){showScreen('mode');});
+
+function submitName(){
+  var n = document.getElementById('nameInput').value.trim();
+  if(!n){document.getElementById('nameInput').focus();return;}
+  myName = n;
+  enterConference();
+}
+
+// ── Screen 3 : role (Free mode) ──
+document.getElementById('bSpk').addEventListener('click', function(){ enterFree('speaker'); });
+document.getElementById('bAtt').addEventListener('click', function(){ enterFree('attendee'); });
+
+// ══ FREE MODE ══
+function enterFree(r){
+  role = r;
+  showScreen(null);
+  zone.textContent = r==='speaker' ? '🎤 Ready — press START to speak' : '👥 Ready — press START to listen';
+  updateUI();
+  setStatus(r==='speaker' ? 'Speaker mode — press START' : 'Attendee mode — press START');
+}
+
+fab.addEventListener('click', function(){
+  if(appMode==='free'){
+    if(role==='speaker'){ stopSpk(false); enterFree('attendee'); }
+    else { stopAtt(); enterFree('speaker'); }
+  } else if(appMode==='conference' && role==='host'){
+    if(!recog) startSpk();
+  }
+});
+
+// ══ CONFERENCE MODE ══
+function enterConference(){
+  showScreen(null);
+
+  // Check if a host already exists
+  db.ref(pathConf('host')).once('value', function(snap){
+    var existingHost = snap.val();
+    if(!existingHost){
+      // First to join → becomes Host
+      role = 'host';
+      db.ref(pathConf('host')).set({name:myName, active:true});
+      db.ref(pathConf('host')).onDisconnect().remove();
+      zone.textContent = '🎙️ You are the Host — press START to open the session';
+      setStatus('Host: '+myName+' — press START to speak');
+      listenForFloorRequests();
+    } else {
+      // Host exists → Attendee
+      role = 'attendee';
+      db.ref(pathConf('attendees/'+sanitize(myName))).set({name:myName, requestFloor:false});
+      db.ref(pathConf('attendees/'+sanitize(myName))).onDisconnect().remove();
+      zone.textContent = '👥 Welcome '+myName+' — press START to receive subtitles';
+      setStatus('Attendee: '+myName);
+      listenForFloorGrant();
+      reqFloorBtn.classList.remove('hidden');
+      reqFloorBtn.className = 'idle';
+    }
+    updateUI();
+  });
+}
+
+function sanitize(n){ return n.toLowerCase().replace(/[^a-z0-9]/g,'_').slice(0,20); }
+
+// Host listens for floor requests
+function listenForFloorRequests(){
+  var ref = db.ref(pathConf('attendees'));
+  confRefs.push(ref);
+  ref.on('child_changed', function(snap){
+    var att = snap.val();
+    if(att && att.requestFloor && role==='host'){
+      fbName.textContent = att.name;
+      floorBanner.classList.remove('hidden');
+      // store who is requesting
+      floorBanner.dataset.key = snap.key;
+      floorBanner.dataset.name = att.name;
+    }
+  });
+}
+
+// Attendee listens for floor grant
+function listenForFloorGrant(){
+  var ref = db.ref(pathConf('floor'));
+  confRefs.push(ref);
+  ref.on('value', function(snap){
+    var fl = snap.val();
+    if(fl && fl.granted === sanitize(myName)){
+      // I got the floor!
+      floorState = 'speaking';
+      reqFloorBtn.classList.add('hidden');
+      // Auto start speaker
+      stopAtt();
+      role = 'speaker';
+      updateUI();
+      setStatus('🎤 You have the floor — speak now!');
+      zone.textContent = '🎤 You have the floor — press START to speak';
+      startSpk();
+    } else if(fl && fl.granted && fl.granted !== sanitize(myName)){
+      // Someone else got it — just wait
+      floorState = 'idle';
+      reqFloorBtn.classList.remove('hidden');
+      reqFloorBtn.textContent = '🙋 Request the floor';
+      reqFloorBtn.className = 'idle';
+      // Switch back to attendee
+      if(role==='speaker'){ stopSpk(false); role='attendee'; startAtt(); updateUI(); }
+    } else {
+      // Floor cleared
+      floorState = 'idle';
+      reqFloorBtn.classList.remove('hidden');
+      reqFloorBtn.textContent = '🙋 Request the floor';
+      reqFloorBtn.className = 'idle';
+    }
+  });
+}
+
+// Grant / dismiss floor
+grantBtn.addEventListener('click', function(){
+  var key  = floorBanner.dataset.key;
+  var name = floorBanner.dataset.name;
+  floorBanner.classList.add('hidden');
+  // Stop host speaking
+  stopSpk(false);
+  // Write floor grant
+  db.ref(pathConf('floor')).set({granted: key, name: name});
+  // Clear request flag
+  db.ref(pathConf('attendees/'+key+'/requestFloor')).set(false);
+  setStatus('Floor granted to '+name);
+  role = 'attendee'; // host becomes listener
+  updateUI();
+  startAtt();
+});
+
+dismissBtn.addEventListener('click', function(){
+  var key = floorBanner.dataset.key;
+  floorBanner.classList.add('hidden');
+  db.ref(pathConf('attendees/'+key+'/requestFloor')).set(false);
+});
+
+// Host reclaim floor
+function hostReclaimFloor(){
+  db.ref(pathConf('floor')).set({granted: null});
+  role = 'host';
+  stopAtt();
+  updateUI();
+  setStatus('Floor reclaimed — press START to speak');
+  zone.textContent = '🎤 You reclaimed the floor — press START';
+}
+
+// Request floor button (Attendee)
+reqFloorBtn.addEventListener('click', function(){
+  if(floorState==='idle'){
+    floorState = 'waiting';
+    reqFloorBtn.textContent = '⏳ Waiting for the floor…';
+    reqFloorBtn.className = 'waiting';
+    db.ref(pathConf('attendees/'+sanitize(myName)+'/requestFloor')).set(true);
+  } else if(floorState==='waiting'){
+    // Cancel request
+    floorState = 'idle';
+    reqFloorBtn.textContent = '🙋 Request the floor';
+    reqFloorBtn.className = 'idle';
+    db.ref(pathConf('attendees/'+sanitize(myName)+'/requestFloor')).set(false);
+  }
+});
+
+// ══ SPEAKER ENGINE ══
+async function startSpk(){
+  if(expired()){showExp();return;}
+  if(typeof SpeechSDK==='undefined'){setStatus('❌ Azure SDK not loaded — please refresh');return;}
+
+  // ── Quota check ──
+  setStatus('Checking quota…');
+  await new Promise(function(res){ loadQuota(function(){ res(); }); });
+  var quotaErr = quotaCheck();
+  if(quotaErr){
+    showQuotaBanner(quotaErr, 'block');
+    setStatus('❌ '+quotaErr);
+    return;
+  }
+  // Afficher minutes restantes si plan payant
+  if(quota){
+    var left=(quota.minutesAllowed||0)-(quota.minutesUsed||0);
+    showQuotaBanner('📋 Plan: '+quota.minutesAllowed+' min · '+left+' min remaining · expires '+new Date(quota.expiresAt).toLocaleDateString(), 'warn');
+    setTimeout(hideQuotaBanner, 5000);
+  }
+
+  var az = AZMAP[SL]||(SL+'-'+SL.toUpperCase());
+  setStatus('Requesting microphone…');
+  try{mic=await navigator.mediaDevices.getUserMedia({audio:{echoCancellation:true,noiseSuppression:true}});}
+  catch(e){setStatus('❌ Mic denied: '+e.message);return;}
+  var cfg=SpeechSDK.SpeechTranslationConfig.fromSubscription(AZK,AZR);
+  cfg.speechRecognitionLanguage=az;
+  TL.forEach(function(t){cfg.addTargetLanguage(t);});
+  try{
+    cfg.setProperty(SpeechSDK.PropertyId.SpeechServiceConnection_InitialSilenceTimeoutMs,'8000');
+    cfg.setProperty(SpeechSDK.PropertyId.SpeechServiceConnection_EndSilenceTimeoutMs,'800');
+  }catch(e){}
+  var ac=SpeechSDK.AudioConfig.fromDefaultMicrophoneInput();
+  recog=new SpeechSDK.TranslationRecognizer(cfg,ac);
+
+  async function write(src,tMap,fin){
+    var ts=Date.now();
+    var corrSrc=postProcess(src);
+    await db.ref(pathSpk(SL)).set({text:corrSrc,timestamp:ts,final:fin,sourceLang:SL});
+    for(var i=0;i<TL.length;i++){
+      var t=TL[i],tr='';
+      try{tr=tMap.get?(tMap.get(t)||''):(tMap[t]||'');}catch(e){}
+      var corrTr=postProcess(tr);
+      await db.ref(pathSpk(t)).set({text:corrTr,timestamp:ts,final:fin,sourceLang:SL});
+    }
+  }
+  function render(src,tMap){
+    var txt='['+lbl(SL)+']\n'+(src||'');
+    TL.forEach(function(t){var tr='';try{tr=tMap.get?(tMap.get(t)||''):(tMap[t]||'');}catch(e){}txt+='\n\n['+lbl(t)+']\n'+tr;});
+    zone.textContent=txt;
+  }
+  recog.recognizing=async function(s,e){var src=(e.result&&e.result.text||'').trim();if(!src)return;render(src,e.result.translations);await write(src,e.result.translations,false);};
+  recog.recognized=async function(s,e){var src=(e.result&&e.result.text||'').trim();if(!src)return;render(src,e.result.translations);log.push(src);await write(src,e.result.translations,true);};
+  recog.canceled=function(s,e){setStatus('❌ Azure: '+(e.errorDetails||e.reason));};
+  recog.sessionStopped=function(){setStatus('Session stopped');updateUI();};
+  recog.startContinuousRecognitionAsync(
+    function(){
+      setStatus('🟢 Speaking — '+lbl(SL));
+      updateUI();
+      if(!tmr) startTimer();
+      startQuotaCounter(); // ← démarrage du compteur quota
+    },
+    function(err){setStatus('❌ Azure failed to start');console.error(err);recog=null;updateUI();}
+  );
+}
+
+function stopSpk(clrFB){
+  stopQuotaCounter(); // ← arrêt du compteur quota
+  if(recog){var r=recog;recog=null;try{r.stopContinuousRecognitionAsync(function(){try{r.close();}catch(e){}},function(){try{r.close();}catch(e){}});}catch(e){}}
+  if(mic){try{mic.getTracks().forEach(function(t){t.stop()});}catch(e){}mic=null;}
+  if(clrFB)TL.forEach(function(l){db.ref(pathSpk(l)).remove().catch(function(){});});
+  updateUI();
+}
+
+// ══ ATTENDEE ENGINE ══
+function startAtt(){
+  if(expired()){showExp();return;}
+  var lang=sTgt.value; pOn=true;
+  if(pRef){try{pRef.off();}catch(e){}}
+  pRef=db.ref(pathSpk(lang));
+  zone.textContent='Waiting for translation…';
+  pRef.on('value',function(snap){
+    var v=snap.val();if(!v)return;
+    var txt=(v.text||'').trim();if(!txt)return;
+    zone.textContent=txt;
+    var rtl=(lang==='ar'||lang==='he');
+    zone.style.direction=rtl?'rtl':'ltr';
+    zone.style.textAlign=rtl?'right':'left';
+  },function(err){setStatus('❌ Firebase: '+err.message);});
+  setStatus('🟢 Listening — '+lbl(lang));
+  updateUI();
+  if(!tmr) startTimer();
+}
+
+function stopAtt(){
+  if(pRef){try{pRef.off();}catch(e){}pRef=null;}
+  pOn=false; updateUI();
+}
+
+function stopAll(){
+  stopSpk(false); stopAtt(); clearInterval(tmr); stopQuotaCounter();
+  confRefs.forEach(function(r){try{r.off();}catch(e){}});
+}
+
+// ══ RUN BUTTON ══
+run.addEventListener('click', async function(){
+  if(role==='speaker'||role==='host'){
+    if(recog){
+      stopSpk(false);
+      if(role==='host') setStatus('Host — press START to speak again');
+    } else {
+      await startSpk();
+    }
+  } else if(role==='attendee'){
+    if(pOn){ stopAtt(); setStatus('Stopped'); }
+    else { startAtt(); }
+  }
+  updateUI();
+});
+
+// Host FAB : reclaim floor
+fab.addEventListener('click', function(){
+  if(appMode==='free'){
+    if(role==='speaker'){ stopSpk(false); enterFree('attendee'); }
+    else { stopAtt(); enterFree('speaker'); }
+  } else if(appMode==='conference'){
+    if(role==='host'||role==='speaker'){
+      if(!recog){ startSpk(); }
+    } else if(role==='attendee'){
+      hostReclaimFloor();
+    }
+  }
+});
+
+// Lang select change
+sTgt.addEventListener('change',function(){if(pOn){stopAtt();startAtt();}});
+
+// Export
+dl.addEventListener('click',function(){
+  var b=new Blob([log.join('\n')],{type:'text/plain;charset=utf-8'});
+  var u=URL.createObjectURL(b);var a=document.createElement('a');
+  a.href=u;a.download=ROOM+'_transcription.txt';
+  document.body.appendChild(a);a.click();a.remove();
+  setTimeout(function(){URL.revokeObjectURL(u);},1000);
+});
+
+clr.addEventListener('click',function(){
+  zone.textContent='Waiting…';zone.style.direction='ltr';zone.style.textAlign='left';
+});
+
+thm.addEventListener('click',function(){
+  document.body.classList.toggle('dark');
+  thm.textContent = document.body.classList.contains('dark') ? '☀️' : '🌙';
+});
+</script>
+</body>
+</html>

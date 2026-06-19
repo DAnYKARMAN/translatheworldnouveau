@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Thank you — TranslateTheWorld</title>
+<style>
+:root{
+  --ink:#0a0a0a;--paper:#fff;--surface:#f7f5f0;
+  --gold:#d4a843;--gold-bg:#fff8e0;--gold-border:#f5c842;
+  --teal:#157a6e;--teal-dark:#085041;--teal-light:#e3f4f1;
+  --mid:#666;--border:rgba(0,0,0,0.1);
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{font-family:Arial,'Helvetica Neue',Helvetica,sans-serif;background:var(--paper);color:var(--ink);min-height:100vh;display:flex;flex-direction:column}
+
+nav{display:flex;align-items:center;justify-content:space-between;padding:16px 36px;border-bottom:1px solid var(--border);background:#fff}
+.nav-logo{font-size:19px;font-weight:800;color:var(--ink);text-decoration:none;letter-spacing:-.02em}
+.nav-logo span{background:linear-gradient(110deg,#e8690a,#f5c842,#1a9e6e);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+
+main{flex:1;display:flex;align-items:center;justify-content:center;padding:48px 24px}
+.card{max-width:560px;width:100%;text-align:center}
+
+/* Checkmark animé */
+.check-wrap{margin:0 auto 32px;width:80px;height:80px;border-radius:50%;background:var(--teal-light);display:flex;align-items:center;justify-content:center;animation:popIn .5s cubic-bezier(.17,.67,.35,1.3) both}
+@keyframes popIn{from{transform:scale(0);opacity:0}to{transform:scale(1);opacity:1}}
+.check-wrap svg{width:40px;height:40px;stroke:var(--teal);stroke-width:3;fill:none;stroke-linecap:round;stroke-linejoin:round}
+.check-path{stroke-dasharray:50;stroke-dashoffset:50;animation:drawCheck .4s .4s ease forwards}
+@keyframes drawCheck{to{stroke-dashoffset:0}}
+
+h1{font-size:clamp(26px,4vw,38px);font-weight:800;letter-spacing:-.02em;margin-bottom:12px;animation:fadeUp .5s .2s both}
+.sub{font-size:16px;color:var(--mid);line-height:1.7;margin-bottom:32px;animation:fadeUp .5s .3s both}
+.sub strong{color:var(--ink)}
+
+/* Récap d'achat */
+.purchase-recap{display:inline-block;background:var(--gold-bg);border:1.5px solid var(--gold-border);border-radius:14px;padding:18px 28px;margin-bottom:32px;animation:fadeUp .5s .35s both;text-align:left}
+.purchase-recap .recap-title{font-size:11px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:#a07000;margin-bottom:10px}
+.purchase-recap .recap-line{font-size:14px;color:var(--ink);line-height:1.7;display:flex;justify-content:space-between;gap:24px;min-width:240px}
+.purchase-recap .recap-line strong{font-weight:700}
+
+.steps-box{background:var(--surface);border-radius:16px;padding:28px;text-align:left;margin-bottom:32px;animation:fadeUp .5s .4s both}
+.steps-title{font-size:13px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--teal);margin-bottom:18px}
+.steps-list{display:flex;flex-direction:column;gap:14px}
+.step-item{display:flex;align-items:flex-start;gap:14px}
+.step-num{width:26px;height:26px;border-radius:50%;background:var(--teal);color:#fff;font-size:12px;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px}
+.step-text{font-size:14px;color:var(--ink);line-height:1.55}
+.step-text strong{font-weight:700}
+
+.btns{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;animation:fadeUp .5s .5s both}
+.btn-primary{background:var(--teal);color:#fff;border:none;padding:13px 28px;border-radius:999px;font-size:14px;font-weight:700;cursor:pointer;text-decoration:none;display:inline-block;transition:opacity .2s;font-family:Arial,sans-serif}
+.btn-primary:hover{opacity:.85}
+.btn-secondary{background:transparent;color:var(--ink);border:1.5px solid var(--border);padding:13px 28px;border-radius:999px;font-size:14px;font-weight:600;cursor:pointer;text-decoration:none;display:inline-block;transition:border-color .2s;font-family:Arial,sans-serif}
+.btn-secondary:hover{border-color:#999}
+
+footer{padding:24px;text-align:center;font-size:12px;color:var(--mid);border-top:1px solid var(--border)}
+
+@keyframes fadeUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+@media(max-width:480px){nav{padding:14px 18px}}
+</style>
+</head>
+<body>
+
+<nav>
+  <a class="nav-logo" href="/">Translate<span>TheWorld</span></a>
+</nav>
+
+<main>
+  <div class="card">
+
+    <div class="check-wrap">
+      <svg viewBox="0 0 24 24"><polyline class="check-path" points="4,12 9,17 20,6"/></svg>
+    </div>
+
+    <h1 id="main-title">Payment confirmed!</h1>
+    <p class="sub" id="main-sub">Thank you for your purchase. <strong>Check your inbox</strong> — you'll receive your session link and QR code within a few minutes.</p>
+
+    <div class="purchase-recap" id="purchase-recap">
+      <div class="recap-title" id="recap-title">Your purchase</div>
+      <div class="recap-line"><span id="recap-duration-label">Duration</span><strong id="recap-duration">—</strong></div>
+      <div class="recap-line"><span id="recap-langs-label">Languages</span><strong id="recap-langs">—</strong></div>
+      <div class="recap-line"><span id="recap-validity-label">Valid until</span><strong id="recap-validity">30 days</strong></div>
+    </div>
+
+    <div class="steps-box">
+      <div class="steps-title" id="steps-title">What happens next</div>
+      <div class="steps-list">
+        <div class="step-item">
+          <div class="step-num">1</div>
+          <div class="step-text" id="step-1"><strong>Check your email</strong> — your unique session link and QR code are on their way to your inbox (check spam if needed).</div>
+        </div>
+        <div class="step-item">
+          <div class="step-num">2</div>
+          <div class="step-text" id="step-2"><strong>Share the QR code</strong> with your participants before the event — they simply scan it to receive live subtitles.</div>
+        </div>
+        <div class="step-item">
+          <div class="step-num">3</div>
+          <div class="step-text" id="step-3"><strong>On event day</strong>, open the session link on the speaker's computer and press START. The AI starts transcribing and translating instantly.</div>
+        </div>
+        <div class="step-item">
+          <div class="step-num">4</div>
+          <div class="step-text" id="step-4"><strong>Need help?</strong> Contact us at <a href="mailto:contact@translatetheworld.com" style="color:var(--teal);font-weight:600">contact@translatetheworld.com</a> or <a href="tel:+33689735229" style="color:var(--teal);font-weight:600">+33 6 89 73 52 29</a>.</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="btns">
+      <a href="/" class="btn-secondary" id="btn-back">← Back to site</a>
+      <a href="mailto:contact@translatetheworld.com" class="btn-primary" id="btn-contact">✉ Contact us</a>
+    </div>
+
+  </div>
+</main>
+
+<footer>
+  © 2025 SOGEDICOM · TranslateTheWorld · 102 avenue des Champs-Élysées, 75008 Paris
+</footer>
+
+<script>
+// Récupère les paramètres URL renvoyés par Stripe via success_url
+const P = new URLSearchParams(window.location.search);
+const hours      = Math.max(1, Math.min(12, parseInt(P.get('hours')||'1', 10)));
+const extraLangs = Math.max(0, Math.min(2,  parseInt(P.get('extra')||'0', 10)));
+const totalLangs = 2 + extraLangs;
+
+const lang = (navigator.language || 'en').slice(0,2).toLowerCase();
+const isFr = (lang === 'fr');
+
+// Date d'expiration affichée (30 jours)
+const expDate = new Date(Date.now() + 30*24*3600*1000);
+const expDateStr = expDate.toLocaleDateString(isFr?'fr-FR':'en-US', {day:'numeric', month:'long', year:'numeric'});
+
+if(isFr){
+  document.documentElement.lang = 'fr';
+  document.title = 'Merci — TranslateTheWorld';
+  document.getElementById('main-title').textContent = 'Paiement confirmé !';
+  document.getElementById('main-sub').innerHTML = 'Merci pour votre achat. <strong>Consultez votre boîte email</strong> — vous recevrez votre lien de session et votre QR code dans quelques minutes.';
+  document.getElementById('recap-title').textContent = 'Votre achat';
+  document.getElementById('recap-duration-label').textContent = 'Durée';
+  document.getElementById('recap-langs-label').textContent    = 'Langues';
+  document.getElementById('recap-validity-label').textContent = 'Valable jusqu\'au';
+  document.getElementById('recap-duration').textContent       = hours + ' h (' + (hours*60) + ' min)';
+  document.getElementById('recap-langs').textContent          = totalLangs + ' langues';
+  document.getElementById('recap-validity').textContent       = expDateStr;
+  document.getElementById('steps-title').textContent = 'La suite';
+  document.getElementById('step-1').innerHTML = '<strong>Vérifiez votre email</strong> — votre lien de session unique et votre QR code sont en route (vérifiez les spams si nécessaire).';
+  document.getElementById('step-2').innerHTML = '<strong>Partagez le QR code</strong> avec vos participants avant l\'événement — ils le scannent pour recevoir les sous-titres en direct.';
+  document.getElementById('step-3').innerHTML = '<strong>Le jour J</strong>, ouvrez le lien sur l\'ordinateur de l\'orateur et appuyez sur START. L\'IA commence à transcrire et traduire instantanément.';
+  document.getElementById('step-4').innerHTML = '<strong>Besoin d\'aide ?</strong> Contactez-nous à <a href="mailto:contact@translatetheworld.com" style="color:var(--teal);font-weight:600">contact@translatetheworld.com</a> ou au <a href="tel:+33689735229" style="color:var(--teal);font-weight:600">+33 6 89 73 52 29</a>.';
+  document.getElementById('btn-back').textContent    = '← Retour au site';
+  document.getElementById('btn-contact').textContent = '✉ Nous contacter';
+} else {
+  document.getElementById('recap-duration').textContent = hours + ' h (' + (hours*60) + ' min)';
+  document.getElementById('recap-langs').textContent    = totalLangs + ' languages';
+  document.getElementById('recap-validity').textContent = expDateStr;
+}
+</script>
+</body>
+</html>
