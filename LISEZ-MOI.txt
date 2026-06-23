@@ -1,0 +1,75 @@
+===========================================
+  TranslateTheWorld — Système de licences
+  Notice d'installation
+===========================================
+
+Ce dossier contient 3 fichiers à déposer dans votre dossier de site,
+puis à redéployer sur Netlify (glisser-déposer habituel).
+
+MOT DE PASSE des pages admin : 7043
+
+
+-------------------------------------------
+LES 3 FICHIERS
+-------------------------------------------
+
+1) admin-liens.html
+   → Le générateur de liens sur mesure.
+   Vous y créez un lien pour un client en choisissant la durée
+   (en minutes) et la date limite. Chaque lien créé est aussi
+   enregistré automatiquement dans votre base (Firebase), ce qui
+   alimente la page de gestion.
+   Adresse une fois en ligne : votresite.com/admin-liens.html
+
+2) licences-ttw.html
+   → La page de gestion des licences.
+   Vous y voyez toutes les licences : nom du client, durée accordée,
+   temps utilisé, temps restant, date d'expiration, statut.
+   Vous pouvez modifier la durée totale, changer la date d'expiration,
+   révoquer ou supprimer une licence.
+   Adresse une fois en ligne : votresite.com/licences-ttw.html
+
+3) host-session.html
+   → REMPLACE votre page de session actuelle.
+   Une seule chose a changé : la session lit maintenant la durée
+   dans la base (Firebase) au lieu de la lire uniquement dans le lien.
+   C'est ce qui fait que vos modifications de durée (dans la page de
+   gestion) ont un vrai effet pour le client.
+
+   IMPORTANT : ce fichier doit s'appeler exactement host-session.html
+   (c'est le nom que votre site appelle). Il remplace votre ancien
+   fichier host-session.html. Gardez une copie de l'ancien par sécurité.
+
+
+-------------------------------------------
+COMMENT TESTER (5 minutes)
+-------------------------------------------
+
+1. Déposez les 3 fichiers dans votre dossier de site, redéployez sur Netlify.
+
+2. Ouvrez   votresite.com/admin-liens.html   (mot de passe 7043)
+   Créez un lien de test : nom "Client Test", durée 4 minutes,
+   date limite = aujourd'hui ou demain. Copiez le lien HÔTE.
+
+3. Ouvrez   votresite.com/licences-ttw.html   (mot de passe 7043)
+   → "Client Test" doit apparaître avec 4 min accordées, 0 utilisée.
+
+4. Sur la page de gestion, changez la durée de 4 à 6 minutes ("Modifier").
+
+5. Ouvrez le lien HÔTE de test : le compteur doit montrer 6 minutes
+   (la nouvelle durée), pas 4. => tout fonctionne.
+
+
+-------------------------------------------
+BON À SAVOIR
+-------------------------------------------
+
+- Le temps consommé n'est jamais écrasé : modifier la durée de 60 à 90
+  min laisse intact ce que le client a déjà utilisé.
+
+- Révoquer une licence bloque l'accès du client immédiatement
+  (au prochain chargement de sa session).
+
+- Le mot de passe 7043 est court et écrit dans le code. Il protège
+  contre une découverte par hasard, pas contre quelqu'un de déterminé.
+  Pour une vraie sécurité plus tard : variables d'environnement Netlify.

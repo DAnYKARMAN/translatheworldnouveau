@@ -203,67 +203,31 @@ body{font-family:var(--font);background:var(--bg);color:var(--ink);display:flex;
     flex:0 0 auto;
     margin-left:auto;
   }
-
-  /* ── Barre de boutons : HARMONIE + SYMÉTRIE ──
-     Tous les contrôles partagent la même hauteur (34px), le même rythme
-     vertical et le même style. La couleur verte du bouton Partager
-     suffit à hiérarchiser sans casser l'alignement visuel. */
+  /* Force la barre des boutons sur sa propre ligne, centrée */
   .tb-right{
     flex:0 0 100%;
     width:100%;
     display:flex;
     justify-content:center;
     align-items:center;
-    gap:8px;
+    gap:6px;
     flex-wrap:nowrap;
   }
-  /* Hauteur unifiée pour tous les contrôles de la barre */
-  .tb-right .btn,
-  .tb-right .lang-switcher{
-    height:34px !important;
-    min-height:34px !important;
-    box-sizing:border-box;
-    display:inline-flex;
-    align-items:center;
-  }
-  /* Boutons texte/icône : padding & font-size uniformes */
+  /* Tous les boutons d'action ont la même hauteur et un padding cohérent */
   .tb-right .btn{
-    padding:0 12px !important;
+    padding:7px 10px !important;
     font-size:11px !important;
-    gap:5px;
+    gap:4px;
+    min-height:32px;
     flex:0 0 auto;
-    border-radius:10px;
   }
-  /* Partager : même hauteur, mis en valeur uniquement par la couleur */
+  /* Le bouton Invite garde sa couleur verte mais devient cohérent en taille */
   .tb-right #shareBtn{
-    padding:0 14px !important;
+    padding:7px 12px !important;
     font-size:11px !important;
-    font-weight:800;
   }
-  /* Bouton thème (icône seule) : carré régulier */
-  .tb-right #themeToggleBtn{
-    width:40px;
-    min-width:40px;
-    padding:0 !important;
-    justify-content:center;
-  }
-  /* Bouton participants (icône + nombre) : largeur fixe régulière */
-  .tb-right #partToggleTop{
-    min-width:52px;
-    padding:0 10px !important;
-    justify-content:center;
-  }
-  /* Switcher de langue : aligné en hauteur sur les autres boutons */
-  .tb-right .lang-switcher{
-    gap:2px;
-    padding:3px;
-  }
-  .tb-right .lang-btn{
-    padding:4px 10px;
-    font-size:10px;
-    height:auto;
-    min-height:0;
-  }
+  .tb-right .lang-switcher{gap:2px;padding:2px}
+  .tb-right .lang-btn{padding:4px 8px;font-size:10px}
   #themeToggleLabel{display:none}
   .timer{font-size:13px;padding:4px 12px}
 
@@ -1112,9 +1076,32 @@ async function loadRemainingCredit(){
     return;
   }
   try {
+    // ── NOUVEAU : on lit la fiche licence dans Firebase (licenses/{room}).
+    // Si elle existe, sa durée et son expiration FONT FOI (elles peuvent avoir
+    // été modifiées depuis la page de gestion). Sinon, on garde la durée du lien.
+    let effectiveDur = dur;   // par défaut = durée inscrite dans le lien
+    try {
+      const licSnap = await db.ref('licenses/'+room).once('value');
+      const lic = licSnap.val();
+      if(lic){
+        // Licence révoquée → plus aucun crédit
+        if(lic.cancelled === true){ creditExhausted = true; }
+        // Durée modifiée depuis la page de gestion
+        if(typeof lic.dur !== 'undefined' && parseInt(lic.dur) >= 0){
+          effectiveDur = parseInt(lic.dur);
+        }
+        // Date d'expiration dépassée → plus aucun crédit
+        if(lic.expiry && (Math.floor(Date.now()/1000) > parseInt(lic.expiry))){
+          creditExhausted = true;
+        }
+      }
+    } catch(licErr){
+      console.warn('[licence] lecture échouée, on garde la durée du lien:', licErr);
+    }
+
     const snap = await db.ref('subscriptions/'+room+'/minutesUsed').once('value');
     minutesUsedAtStart = parseInt(snap.val()) || 0;
-    remainingMinutes   = Math.max(0, dur - minutesUsedAtStart);
+    remainingMinutes   = Math.max(0, effectiveDur - minutesUsedAtStart);
     durSeconds         = remainingMinutes * 60;
     if(remainingMinutes <= 0){ creditExhausted = true; }
   } catch(err){

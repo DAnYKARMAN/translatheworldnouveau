@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex,nofollow">
+<title>Gestion des licences — TranslateTheWorld</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;padding:24px;background:#f5f7f6;color:#0d1f1a;font-family:'DM Sans',Arial,sans-serif;min-height:100vh}
+.wrap{width:100%;max-width:1000px;margin:0 auto}
+h1{font-size:24px;text-align:center;margin:10px 0 4px;color:#0d1f1a}
+.sub{text-align:center;color:#777;margin:0 0 26px;font-size:14px}
+
+/* Login */
+.card{background:#fff;border:1px solid #e5e5e5;border-radius:12px;padding:24px;margin-bottom:20px;box-shadow:0 4px 14px rgba(0,0,0,.05)}
+label{display:block;color:#555;font-size:13px;margin:14px 0 6px;font-weight:700}
+input{width:100%;background:#fff;border:1.5px solid #ccc;border-radius:8px;padding:12px 14px;color:#0d1f1a;font-size:16px;font-family:inherit}
+input:focus{outline:none;border-color:#2dd4bf}
+input[type="date"]{cursor:pointer}
+.btn{background:#2dd4bf;border:none;color:#0d1f1a;font-size:16px;padding:14px;border-radius:8px;cursor:pointer;font-weight:800;margin-top:18px;width:100%;font-family:inherit}
+.btn:hover{background:#26b8a6}
+.btn:disabled{background:#ddd;cursor:not-allowed}
+.err{background:#fee;border:1px solid #fcc;color:#c33;border-radius:8px;padding:12px;font-size:14px;margin-top:14px;display:none}
+.err.show{display:block}
+
+.toolbar{display:flex;gap:12px;align-items:center;flex-wrap:wrap;margin-bottom:18px}
+.toolbar input{flex:1;min-width:200px;margin:0}
+.btn-sm{width:auto;padding:10px 16px;font-size:14px;margin:0;font-family:inherit;font-weight:700;border:none;border-radius:8px;cursor:pointer}
+.btn-grey{background:#e5e5e5;color:#333}
+.btn-green{background:#2dd4bf;color:#0d1f1a}
+.btn-orange{background:#f0c060;color:#5a4500}
+.btn-red{background:#fee;color:#c33;border:1px solid #fcc}
+
+/* Carte licence */
+.lic{background:#fff;border:1px solid #e5e5e5;border-radius:12px;padding:18px;margin-bottom:16px;box-shadow:0 2px 8px rgba(0,0,0,.04)}
+.lic.invalid{border-color:#fcc;opacity:.9}
+.lic-head{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;flex-wrap:wrap}
+.lic-name{font-size:18px;font-weight:800;color:#0d1f1a}
+.lic-id{font-family:monospace;font-size:12px;color:#999;word-break:break-all;margin-top:2px}
+.badge{font-size:12px;font-weight:700;padding:4px 10px;border-radius:999px;white-space:nowrap}
+.badge.ok{background:#d4f5e9;color:#085c3a;border:1px solid #2dd4bf}
+.badge.ko{background:#fee;color:#c33;border:1px solid #fcc}
+
+/* Barre de progression */
+.bar{height:10px;background:#eee;border-radius:999px;overflow:hidden;margin:12px 0 6px}
+.bar > span{display:block;height:100%;background:#2dd4bf}
+.bar > span.warn{background:#f0c060}
+.bar > span.full{background:#e0685a}
+
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px;margin:12px 0}
+.cell{background:#fafafa;border:1px solid #eee;border-radius:8px;padding:10px}
+.cell .k{color:#999;font-size:11px;text-transform:uppercase;letter-spacing:.04em}
+.cell .v{color:#0d1f1a;font-size:15px;margin-top:3px;font-weight:700}
+
+.lic-meta{color:#666;font-size:13px;margin-top:6px;line-height:1.5}
+.lic-meta b{color:#333}
+.muted{color:#999;font-size:13px}
+
+.actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px;border-top:1px solid #eee;padding-top:14px}
+.actions .grp{display:flex;gap:6px;align-items:center;background:#fafafa;border:1px solid #eee;border-radius:8px;padding:6px 8px}
+.actions .grp span{font-size:12px;color:#666}
+.actions input{width:80px;padding:8px;font-size:14px;margin:0}
+.actions input[type=date]{width:auto}
+.feedback{color:#085c3a;font-size:13px;margin-left:6px;font-weight:600}
+</style>
+</head>
+<body>
+<div class="wrap">
+<h1>🗂️ TranslateTheWorld</h1>
+<p class="sub">Gestion des licences</p>
+
+<!-- Mot de passe -->
+<div class="card" id="loginCard">
+    <label for="pwd">Mot de passe administrateur</label>
+    <input type="password" id="pwd" placeholder="••••••••" autofocus onkeydown="if(event.key==='Enter')doLogin()">
+    <button class="btn" onclick="doLogin()">Entrer</button>
+    <div class="err" id="loginErr"></div>
+</div>
+
+<!-- Tableau de bord -->
+<div id="dash" style="display:none">
+    <div class="toolbar">
+        <input type="text" id="filter" placeholder="🔎 Filtrer par nom, email ou identifiant…" oninput="render()">
+        <button class="btn-sm btn-grey" onclick="loadLicenses()">↻ Rafraîchir</button>
+    </div>
+    <p class="muted" id="count"></p>
+    <div id="list"></div>
+</div>
+
+</div>
+
+<!-- Firebase -->
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+
+<script>
+// ── CONFIGURATION ──
+const ADMIN_PWD = '7043';
+const FB_CFG = {
+  databaseURL: 'https://sogevoxreunion-default-rtdb.europe-west1.firebasedatabase.app'
+};
+
+let db = null;
+let LICENSES = [];   // tableau d'objets licence reconstitués depuis Firebase
+
+// ── LOGIN ──
+function doLogin(){
+  const pwd = document.getElementById('pwd').value;
+  const err = document.getElementById('loginErr');
+  err.classList.remove('show');
+  if(pwd !== ADMIN_PWD){
+    err.textContent = 'Mot de passe incorrect';
+    err.classList.add('show');
+    return;
+  }
+  sessionStorage.setItem('ttw_lic_ok','1');
+  document.getElementById('loginCard').style.display = 'none';
+  document.getElementById('dash').style.display = 'block';
+  initFirebase();
+  loadLicenses();
+}
+// Auto-login dans la même session
+if(sessionStorage.getItem('ttw_lic_ok') === '1'){
+  window.addEventListener('DOMContentLoaded', ()=>{
+    document.getElementById('loginCard').style.display = 'none';
+    document.getElementById('dash').style.display = 'block';
+    initFirebase();
+    loadLicenses();
+  });
+}
+
+function initFirebase(){
+  if(!firebase.apps.length) firebase.initializeApp(FB_CFG);
+  db = firebase.database();
+}
+
+// ── CHARGEMENT DES LICENCES ──
+// On lit deux endroits dans Firebase :
+//   licenses/{room}            → infos saisies à la création (nom, email, durée, expiration…)
+//   subscriptions/{room}/minutesUsed → minutes consommées pendant les sessions
+async function loadLicenses(){
+  const list = document.getElementById('list');
+  list.innerHTML = '<p class="muted">Chargement…</p>';
+  try{
+    const [licSnap, subSnap] = await Promise.all([
+      db.ref('licenses').once('value'),
+      db.ref('subscriptions').once('value')
+    ]);
+    const licData = licSnap.val() || {};
+    const subData = subSnap.val() || {};
+
+    LICENSES = Object.keys(licData).map(room => {
+      const l = licData[room] || {};
+      const used = parseInt((subData[room]||{}).minutesUsed) || 0;
+      const allowed = parseInt(l.dur) || 0;
+      const remaining = Math.max(0, allowed - used);
+      return {
+        room: room,
+        name: l.name || '(sans nom)',
+        email: l.email || '',
+        languages: l.languages || '',
+        allowedMin: allowed,
+        usedMin: used,
+        remainingMin: remaining,
+        createdAt: l.createdAt || 0,
+        expiry: l.expiry || 0,        // timestamp en secondes
+        cancelled: !!l.cancelled
+      };
+    });
+
+    // Tri : plus récentes en premier
+    LICENSES.sort((a,b)=>(b.createdAt||0)-(a.createdAt||0));
+    render();
+  }catch(e){
+    list.innerHTML = '<div class="err show">Erreur de chargement : ' + esc(e.message) + '</div>';
+  }
+}
+
+// ── AFFICHAGE ──
+function render(){
+  const f = (document.getElementById('filter').value || '').toLowerCase();
+  const list = document.getElementById('list');
+  const shown = LICENSES.filter(l =>
+    !f || l.name.toLowerCase().includes(f) || l.room.toLowerCase().includes(f) || l.email.toLowerCase().includes(f)
+  );
+
+  document.getElementById('count').textContent =
+    shown.length + ' licence(s)' + (f ? ' (filtrées sur ' + LICENSES.length + ')' : '');
+
+  if(LICENSES.length === 0){
+    list.innerHTML = '<p class="muted">Aucune licence enregistrée pour le moment.<br>Les licences apparaîtront ici dès que vous créerez des liens via le générateur.</p>';
+    return;
+  }
+  if(shown.length === 0){
+    list.innerHTML = '<p class="muted">Aucun résultat pour ce filtre.</p>';
+    return;
+  }
+
+  const nowSec = Math.floor(Date.now()/1000);
+
+  list.innerHTML = shown.map(l => {
+    const pct = l.allowedMin > 0 ? Math.min(100, Math.round(l.usedMin/l.allowedMin*100)) : 0;
+    const barClass = pct >= 100 ? 'full' : (pct >= 80 ? 'warn' : '');
+
+    const expired = l.expiry > 0 && l.expiry < nowSec;
+    const exhausted = l.allowedMin > 0 && l.remainingMin <= 0;
+
+    let statusBadge, statusText;
+    if(l.cancelled){ statusBadge='ko'; statusText='Révoquée'; }
+    else if(expired){ statusBadge='ko'; statusText='Expirée'; }
+    else if(exhausted){ statusBadge='ko'; statusText='Temps épuisé'; }
+    else { statusBadge='ok'; statusText='Active'; }
+
+    const invalid = l.cancelled || expired || exhausted;
+
+    const metaHtml =
+      (l.email ? '<div class="lic-meta"><b>Email :</b> ' + esc(l.email) + '</div>' : '') +
+      (l.languages ? '<div class="lic-meta"><b>Langues :</b> ' + esc(l.languages) + '</div>' : '');
+
+    return ''+
+    '<div class="lic ' + (invalid ? 'invalid' : '') + '">'+
+      '<div class="lic-head">'+
+        '<div>'+
+          '<div class="lic-name">' + esc(l.name) + '</div>'+
+          '<div class="lic-id">' + esc(l.room) + '</div>'+
+        '</div>'+
+        '<span class="badge ' + statusBadge + '">' + statusText + '</span>'+
+      '</div>'+
+      metaHtml +
+      '<div class="bar"><span class="' + barClass + '" style="width:' + pct + '%"></span></div>'+
+      '<div class="grid">'+
+        '<div class="cell"><div class="k">Temps utilisé</div><div class="v">' + fmtMin(l.usedMin) + '</div></div>'+
+        '<div class="cell"><div class="k">Temps restant</div><div class="v">' + fmtMin(l.remainingMin) + '</div></div>'+
+        '<div class="cell"><div class="k">Total accordé</div><div class="v">' + fmtMin(l.allowedMin) + '</div></div>'+
+        '<div class="cell"><div class="k">Créée le</div><div class="v">' + fmtDateOnly(l.createdAt) + '</div></div>'+
+        '<div class="cell"><div class="k">Expire le</div><div class="v">' + fmtExpiry(l.expiry) + '</div></div>'+
+      '</div>'+
+      '<div class="actions">'+
+        '<div class="grp">'+
+          '<span>Durée totale (min) :</span>'+
+          '<input type="number" step="5" id="dur-' + l.room + '" value="' + l.allowedMin + '">'+
+          '<button class="btn-sm btn-green" onclick="setDuration(\'' + l.room + '\')">Modifier</button>'+
+        '</div>'+
+        '<div class="grp">'+
+          '<span>Expiration :</span>'+
+          '<input type="date" id="exp-' + l.room + '" value="' + toInputDate(l.expiry) + '">'+
+          '<button class="btn-sm btn-green" onclick="setExpiry(\'' + l.room + '\')">Modifier</button>'+
+        '</div>'+
+        (l.cancelled
+          ? '<button class="btn-sm btn-green" onclick="setCancel(\'' + l.room + '\', false)">Réactiver</button>'
+          : '<button class="btn-sm btn-orange" onclick="setCancel(\'' + l.room + '\', true)">Révoquer</button>') +
+        '<button class="btn-sm btn-red" onclick="del(\'' + l.room + '\', \'' + esc(l.name).replace(/'/g,"\\'") + '\')">Supprimer</button>'+
+        '<span class="feedback" id="fb-' + l.room + '"></span>'+
+      '</div>'+
+    '</div>';
+  }).join('');
+}
+
+// ── ACTIONS ──
+function fb(room, msg){
+  const el = document.getElementById('fb-'+room);
+  if(el){ el.textContent = msg; setTimeout(()=>{ if(el) el.textContent=''; }, 2500); }
+}
+
+async function setDuration(room){
+  const v = parseInt(document.getElementById('dur-'+room).value, 10);
+  if(isNaN(v) || v < 0){ fb(room, 'Durée invalide'); return; }
+  try{
+    await db.ref('licenses/'+room+'/dur').set(v);
+    const idx = LICENSES.findIndex(l=>l.room===room);
+    if(idx>=0){
+      LICENSES[idx].allowedMin = v;
+      LICENSES[idx].remainingMin = Math.max(0, v - LICENSES[idx].usedMin);
+    }
+    render();
+    fb(room, 'Durée mise à jour');
+  }catch(e){ fb(room, 'Erreur : ' + e.message); }
+}
+
+async function setExpiry(room){
+  const v = document.getElementById('exp-'+room).value;
+  if(!v){ fb(room, 'Choisissez une date'); return; }
+  const ts = Math.floor(new Date(v + 'T23:59:59').getTime()/1000);
+  try{
+    await db.ref('licenses/'+room+'/expiry').set(ts);
+    const idx = LICENSES.findIndex(l=>l.room===room);
+    if(idx>=0) LICENSES[idx].expiry = ts;
+    render();
+    fb(room, 'Date modifiée');
+  }catch(e){ fb(room, 'Erreur : ' + e.message); }
+}
+
+async function setCancel(room, cancelled){
+  if(cancelled && !confirm('Révoquer cette licence ? L\'accès sera bloqué.')) return;
+  try{
+    await db.ref('licenses/'+room+'/cancelled').set(cancelled);
+    const idx = LICENSES.findIndex(l=>l.room===room);
+    if(idx>=0) LICENSES[idx].cancelled = cancelled;
+    render();
+  }catch(e){ fb(room, 'Erreur : ' + e.message); }
+}
+
+async function del(room, name){
+  if(!confirm('SUPPRIMER définitivement la licence « ' + name + ' » ?\nCette action est irréversible.')) return;
+  try{
+    await db.ref('licenses/'+room).remove();
+    LICENSES = LICENSES.filter(l=>l.room!==room);
+    render();
+  }catch(e){ alert('Erreur : ' + e.message); }
+}
+
+// ── FORMATAGE ──
+function fmtMin(min){
+  min = Math.max(0, Math.round(min));
+  const h = Math.floor(min/60);
+  const m = min%60;
+  if(h>0) return h + 'h' + String(m).padStart(2,'0');
+  return m + ' min';
+}
+function fmtDateOnly(ms){
+  if(!ms) return '—';
+  return new Date(ms).toLocaleDateString('fr-FR');
+}
+function fmtExpiry(sec){
+  if(!sec) return '—';
+  return new Date(sec*1000).toLocaleDateString('fr-FR');
+}
+function toInputDate(sec){
+  if(!sec) return '';
+  const d = new Date(sec*1000);
+  return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
+}
+function esc(s){
+  return String(s||'').replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+}
+</script>
+</body>
+</html>

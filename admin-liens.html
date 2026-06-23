@@ -83,6 +83,11 @@ body{margin:0;font-family:'DM Sans',Arial,sans-serif;background:#f5f7f6;color:#0
         <div class="hint">Identifiant de session généré : <strong id="roomPreview">—</strong></div>
       </div>
 
+      <div class="field">
+        <label>Email du client (optionnel)</label>
+        <input type="email" id="g-email" placeholder="contact@client.fr">
+      </div>
+
       <div class="row">
         <div class="field">
           <label>Langue parlée (orateur)</label>
@@ -151,9 +156,19 @@ body{margin:0;font-family:'DM Sans',Arial,sans-serif;background:#f5f7f6;color:#0
   </div>
 </div>
 
+<!-- Firebase -->
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+
 <script>
 // ── CONFIGURATION ──
 const ADMIN_PWD = '7043';
+
+// Firebase (même base que le reste de TranslateTheWorld)
+const FB_CFG = {
+  databaseURL: 'https://sogevoxreunion-default-rtdb.europe-west1.firebasedatabase.app'
+};
+let db = null;
 
 // L'adresse de votre site. Les liens pointeront vers ce domaine.
 // Laisse tel quel : détecte automatiquement le domaine où la page est ouverte.
@@ -206,6 +221,10 @@ if(sessionStorage.getItem('ttw_admin_ok') === '1'){
 
 // ── INITIALISATION ──
 function initAdmin(){
+  // Démarrer Firebase
+  if(!firebase.apps.length) firebase.initializeApp(FB_CFG);
+  db = firebase.database();
+
   // Remplir les menus déroulants de langues
   fillLangSelect('g-src', false, 'fr');
   fillLangSelect('g-p1',  false, 'en');
@@ -281,6 +300,34 @@ function generate(){
   // Construction des liens — EXACTEMENT le même format que votre site (lignes 2148-2149)
   const hostLink = BASE_URL + '/host-setup.html?room=' + room + '&lang=' + src + '&to=' + targets + '&dur=' + dur + '&exp=' + expTs;
   const partLink = BASE_URL + '/join.html?room=' + room + '&exp=' + expTs;
+
+  // Langues lisibles pour l'enregistrement (ex : "Français → English, Español")
+  const langLabel0 = c => { const l = LANGS.find(x=>x.code===c); return l ? l.label : c; };
+  const langsReadable = langLabel0(src) + ' → ' + [p1,p2,p3].filter(Boolean).map(langLabel0).join(', ');
+
+  // ── ENREGISTREMENT DE LA LICENCE DANS FIREBASE ──
+  // On écrit dans licenses/{room} les infos que la page de gestion lira.
+  // IMPORTANT : on n'écrase PAS createdAt si la licence existe déjà,
+  // et on ne touche jamais au temps consommé (qui vit dans subscriptions/).
+  if(db){
+    const licRef = db.ref('licenses/' + room);
+    licRef.once('value').then(snap => {
+      const existing = snap.val() || {};
+      const record = {
+        name: name,
+        email: document.getElementById('g-email') ? document.getElementById('g-email').value.trim() : '',
+        languages: langsReadable,
+        dur: dur,
+        expiry: expTs,
+        createdAt: existing.createdAt || Date.now(),
+        cancelled: false
+      };
+      return licRef.set(record);
+    }).catch(err => {
+      // Non bloquant : les liens restent valides même si l'enregistrement échoue
+      console.warn('Enregistrement licence échoué :', err);
+    });
+  }
 
   // Affichage
   document.getElementById('hostUrl').textContent = hostLink;
