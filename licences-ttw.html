@@ -63,6 +63,20 @@ input[type="date"]{cursor:pointer}
 .actions input{width:80px;padding:8px;font-size:14px;margin:0}
 .actions input[type=date]{width:auto}
 .feedback{color:#085c3a;font-size:13px;margin-left:6px;font-weight:600}
+
+/* Bloc liens de session */
+.links-block{background:#f0faf8;border:1px solid #c8ebe4;border-radius:10px;padding:12px 14px;margin-top:12px}
+.link-row{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.link-tag{font-size:12px;font-weight:700;color:#0d1f1a;white-space:nowrap}
+.link-tag.host{color:#a07000}
+.link-url{flex:1;min-width:180px;background:#fff;border:1px solid #d0ede8;border-radius:6px;padding:7px 9px;font-family:monospace;font-size:11px;color:#0d1f1a;word-break:break-all;line-height:1.5}
+.send-row{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+.send-btn{display:inline-flex;align-items:center;gap:4px;text-decoration:none;font-size:13px;font-weight:700;padding:8px 14px;border-radius:8px;cursor:pointer;border:none;font-family:inherit}
+.send-btn.email{background:#0d1f1a;color:#fff}
+.send-btn.wa{background:#25d366;color:#fff}
+.send-btn.sms{background:#2dd4bf;color:#0d1f1a}
+.send-btn.copy{background:#e5e5e5;color:#333}
+.send-btn:hover{opacity:.88}
 </style>
 </head>
 <body>
@@ -100,6 +114,9 @@ const ADMIN_PWD = '7043';
 const FB_CFG = {
   databaseURL: 'https://sogevoxreunion-default-rtdb.europe-west1.firebasedatabase.app'
 };
+
+// Domaine du site : détecté automatiquement (les liens pointeront vers lui)
+const BASE_URL = window.location.origin;
 
 let db = null;
 let LICENSES = [];   // tableau d'objets licence reconstitués depuis Firebase
@@ -160,6 +177,8 @@ async function loadLicenses(){
         name: l.name || '(sans nom)',
         email: l.email || '',
         languages: l.languages || '',
+        langSrc: l.langSrc || '',     // code langue orateur
+        langTo: l.langTo || '',       // codes langues participants
         allowedMin: allowed,
         usedMin: used,
         remainingMin: remaining,
@@ -218,6 +237,43 @@ function render(){
       (l.email ? '<div class="lic-meta"><b>Email :</b> ' + esc(l.email) + '</div>' : '') +
       (l.languages ? '<div class="lic-meta"><b>Langues :</b> ' + esc(l.languages) + '</div>' : '');
 
+    // ── LIENS DE SESSION ──
+    // Reconstruits uniquement pour les vraies licences TranslateTheWorld,
+    // c.-à-d. celles qui ont les codes de langue (créées par le générateur).
+    const isTTW = !!l.langSrc && !!l.langTo;
+    let linksHtml = '';
+    if(isTTW){
+      const hostLink = BASE_URL + '/host-setup.html?room=' + l.room + '&lang=' + l.langSrc + '&to=' + l.langTo + '&dur=' + l.allowedMin + '&exp=' + l.expiry;
+      const partLink = BASE_URL + '/join.html?room=' + l.room + '&exp=' + l.expiry;
+
+      // Message tout prêt pour le client (lien participant)
+      const msgText = 'Bonjour,\nVoici votre lien pour rejoindre la session TranslateTheWorld :\n' + partLink + '\n\nÀ bientôt !';
+      const enc = encodeURIComponent(msgText);
+      const encMail = encodeURIComponent('Votre lien de session TranslateTheWorld');
+      const mailto = 'mailto:' + encodeURIComponent(l.email||'') + '?subject=' + encMail + '&body=' + enc;
+      const wa = 'https://wa.me/?text=' + enc;
+      const sms = 'sms:?&body=' + enc;
+
+      linksHtml =
+        '<div class="links-block">'+
+          '<div class="link-row">'+
+            '<span class="link-tag">👥 Lien participants</span>'+
+            '<code class="link-url" id="lp-' + l.room + '">' + esc(partLink) + '</code>'+
+          '</div>'+
+          '<div class="send-row">'+
+            '<a class="send-btn email" href="' + esc(mailto) + '">✉️ Email</a>'+
+            '<a class="send-btn wa" href="' + esc(wa) + '" target="_blank" rel="noopener">💬 WhatsApp</a>'+
+            '<a class="send-btn sms" href="' + esc(sms) + '">📱 SMS</a>'+
+            '<button class="send-btn copy" onclick="copyTxt(\'lp-' + l.room + '\', this)">📋 Copier</button>'+
+          '</div>'+
+          '<div class="link-row" style="margin-top:8px">'+
+            '<span class="link-tag host">🎙️ Lien hôte</span>'+
+            '<code class="link-url" id="lh-' + l.room + '">' + esc(hostLink) + '</code>'+
+            '<button class="send-btn copy" onclick="copyTxt(\'lh-' + l.room + '\', this)">📋 Copier</button>'+
+          '</div>'+
+        '</div>';
+    }
+
     return ''+
     '<div class="lic ' + (invalid ? 'invalid' : '') + '">'+
       '<div class="lic-head">'+
@@ -236,6 +292,7 @@ function render(){
         '<div class="cell"><div class="k">Créée le</div><div class="v">' + fmtDateOnly(l.createdAt) + '</div></div>'+
         '<div class="cell"><div class="k">Expire le</div><div class="v">' + fmtExpiry(l.expiry) + '</div></div>'+
       '</div>'+
+      linksHtml +
       '<div class="actions">'+
         '<div class="grp">'+
           '<span>Durée totale (min) :</span>'+
@@ -258,6 +315,23 @@ function render(){
 }
 
 // ── ACTIONS ──
+function copyTxt(elId, btn){
+  const el = document.getElementById(elId);
+  if(!el) return;
+  const text = el.textContent;
+  navigator.clipboard.writeText(text).then(()=>{
+    const old = btn.textContent;
+    btn.textContent = '✓ Copié';
+    setTimeout(()=>{ btn.textContent = old; }, 1600);
+  }).catch(()=>{
+    const range = document.createRange();
+    range.selectNodeContents(el);
+    const sel = window.getSelection();
+    sel.removeAllRanges(); sel.addRange(range);
+    alert('Sélectionnez le lien puis copiez (Ctrl+C).');
+  });
+}
+
 function fb(room, msg){
   const el = document.getElementById('fb-'+room);
   if(el){ el.textContent = msg; setTimeout(()=>{ if(el) el.textContent=''; }, 2500); }

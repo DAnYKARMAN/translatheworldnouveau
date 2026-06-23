@@ -317,6 +317,8 @@ function generate(){
         name: name,
         email: document.getElementById('g-email') ? document.getElementById('g-email').value.trim() : '',
         languages: langsReadable,
+        langSrc: src,          // code langue orateur (ex: "pt")
+        langTo: targets,       // codes langues participants (ex: "en,fr,de")
         dur: dur,
         expiry: expTs,
         createdAt: existing.createdAt || Date.now(),
