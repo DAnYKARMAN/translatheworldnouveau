@@ -27,6 +27,14 @@ LES 3 FICHIERS
    temps utilisé, temps restant, date d'expiration, statut.
    Vous pouvez modifier la durée totale, changer la date d'expiration,
    révoquer ou supprimer une licence.
+
+   NOUVEAU : pour chaque licence TranslateTheWorld, la page affiche
+   le lien participants et le lien hôte, avec des boutons pour les
+   envoyer directement par Email, WhatsApp ou SMS, ou les copier.
+   (Ces boutons n'apparaissent que pour les licences créées via le
+   générateur. Les licences venant de votre autre application, en
+   "lic_...", n'ont pas de lien et s'afficheront sans ces boutons.)
+
    Adresse une fois en ligne : votresite.com/licences-ttw.html
 
 3) host-session.html
