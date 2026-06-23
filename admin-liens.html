@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex,nofollow">
+<title>TTW Admin — Générateur de liens</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;font-family:'DM Sans',Arial,sans-serif;background:#f5f7f6;color:#0d1f1a;padding:20px}
+.container{max-width:760px;margin:0 auto}
+.header{background:#0d1f1a;color:#fff;padding:24px 28px;border-radius:14px 14px 0 0;display:flex;justify-content:space-between;align-items:center}
+.header h1{margin:0;font-size:20px;font-weight:800}
+.header .sub{color:#2dd4bf;font-size:12px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;margin-bottom:4px}
+.btn-logout{background:rgba(255,255,255,.1);border:none;color:#fff;padding:8px 14px;border-radius:8px;cursor:pointer;font-size:13px;font-weight:700}
+.body{background:#fff;border-radius:0 0 14px 14px;padding:28px;box-shadow:0 4px 14px rgba(0,0,0,.05);margin-bottom:30px}
+.section{margin-bottom:26px}
+.section h2{font-size:16px;font-weight:800;margin:0 0 14px;color:#0d1f1a}
+.field{margin-bottom:16px}
+.field label{font-size:11px;font-weight:700;color:#666;letter-spacing:.06em;text-transform:uppercase;display:block;margin-bottom:6px}
+.field input,.field select{width:100%;padding:11px 13px;border-radius:8px;border:1.5px solid #ccc;font-size:15px;font-family:inherit;outline:none;background:#fff}
+.field input:focus,.field select:focus{border-color:#2dd4bf}
+.field .hint{font-size:11px;color:#999;margin-top:5px;line-height:1.4}
+.row{display:flex;gap:14px;flex-wrap:wrap}
+.row .field{flex:1;min-width:150px}
+.btn-primary{background:#2dd4bf;color:#0d1f1a;border:none;padding:14px 22px;border-radius:8px;font-size:15px;font-weight:800;cursor:pointer;font-family:inherit;width:100%}
+.btn-primary:hover{background:#26b8a6}
+.btn-primary:disabled{opacity:.5;cursor:not-allowed}
+.result{margin-top:24px;background:#f0faf8;border:1.5px solid #2dd4bf;border-radius:12px;padding:20px;display:none}
+.result.show{display:block}
+.result h3{margin:0 0 14px;font-size:15px;font-weight:800;color:#0d1f1a}
+.result-summary{background:#fff;border:1px solid #d0ede8;border-radius:8px;padding:12px 14px;font-size:13px;color:#0d1f1a;margin-bottom:16px;line-height:1.6}
+.link-block{margin-bottom:16px}
+.link-block .link-label{font-size:11px;font-weight:700;color:#666;letter-spacing:.06em;text-transform:uppercase;margin-bottom:6px;display:flex;align-items:center;gap:6px}
+.link-box{display:flex;gap:8px;align-items:stretch}
+.link-box .url{flex:1;background:#fff;border:1px solid #ccc;border-radius:8px;padding:10px 12px;font-size:12px;font-family:monospace;word-break:break-all;color:#0d1f1a;line-height:1.5}
+.btn-copy{background:#0d1f1a;color:#fff;border:none;border-radius:8px;padding:0 16px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;white-space:nowrap}
+.btn-copy:hover{background:#1a3530}
+.btn-copy.copied{background:#2dd4bf;color:#0d1f1a}
+.warn{background:#fff5e0;border:1px solid #f0c060;color:#a07000;border-radius:8px;padding:10px 14px;font-size:12px;margin-top:14px;line-height:1.5}
+.error-msg{background:#fee;color:#c33;border:1px solid #fcc;border-radius:8px;padding:10px 14px;font-size:13px;font-weight:600;margin-top:14px;display:none}
+
+/* Login */
+.login-screen{position:fixed;inset:0;background:linear-gradient(180deg,#0d1f1a 0%,#1a3530 100%);display:flex;align-items:center;justify-content:center;padding:20px;z-index:9999}
+.login-box{background:#fff;border-radius:16px;padding:30px 28px;max-width:380px;width:100%;text-align:center;box-shadow:0 10px 40px rgba(0,0,0,.3)}
+.login-box h2{margin:0 0 8px;font-size:20px;color:#0d1f1a}
+.login-box p{margin:0 0 20px;color:#666;font-size:13px}
+.login-box input{width:100%;padding:12px 14px;border-radius:8px;border:1.5px solid #ccc;font-size:15px;font-family:inherit;outline:none;margin-bottom:14px}
+.login-box input:focus{border-color:#2dd4bf}
+.login-error{color:#c33;font-size:13px;margin-top:8px;display:none}
+</style>
+</head>
+<body>
+
+<!-- Écran de connexion -->
+<div id="loginScreen" class="login-screen">
+  <div class="login-box">
+    <h2>🔐 Générateur de liens</h2>
+    <p>TranslateTheWorld — Accès réservé</p>
+    <input type="password" id="pwd" placeholder="Mot de passe" autofocus onkeydown="if(event.key==='Enter')checkPwd()">
+    <button class="btn-primary" onclick="checkPwd()" style="width:100%">Se connecter</button>
+    <div class="login-error" id="loginError">Mot de passe incorrect</div>
+  </div>
+</div>
+
+<!-- Interface admin -->
+<div class="container" id="adminApp" style="display:none">
+  <div class="header">
+    <div>
+      <div class="sub">TranslateTheWorld Admin</div>
+      <h1>🔗 Générateur de liens sur mesure</h1>
+    </div>
+    <button class="btn-logout" onclick="logout()">Déconnexion</button>
+  </div>
+
+  <div class="body">
+    <div class="section">
+      <h2>Créer un lien gratuit pour un client</h2>
+
+      <div class="field">
+        <label>Nom du client (ou de la session)</label>
+        <input type="text" id="g-name" placeholder="Marie Dupont" oninput="updateRoomPreview()">
+        <div class="hint">Identifiant de session généré : <strong id="roomPreview">—</strong></div>
+      </div>
+
+      <div class="row">
+        <div class="field">
+          <label>Langue parlée (orateur)</label>
+          <select id="g-src"></select>
+        </div>
+        <div class="field">
+          <label>Langue participant 1</label>
+          <select id="g-p1"></select>
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="field">
+          <label>Langue participant 2 (optionnel)</label>
+          <select id="g-p2"></select>
+        </div>
+        <div class="field">
+          <label>Langue participant 3 (optionnel)</label>
+          <select id="g-p3"></select>
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="field">
+          <label>Durée de la session (minutes)</label>
+          <input type="number" id="g-dur" value="60" min="1" max="720" step="1">
+          <div class="hint">Exemples : 15, 60, 120…</div>
+        </div>
+        <div class="field">
+          <label>Date limite d'utilisation</label>
+          <input type="date" id="g-exp">
+          <div class="hint">Le lien cessera de fonctionner après cette date.</div>
+        </div>
+      </div>
+
+      <button class="btn-primary" onclick="generate()">Générer les liens</button>
+      <div class="error-msg" id="errMsg"></div>
+    </div>
+
+    <!-- Résultat -->
+    <div class="result" id="result">
+      <h3>✅ Liens générés</h3>
+      <div class="result-summary" id="summary"></div>
+
+      <div class="link-block">
+        <div class="link-label">🎙️ Lien HÔTE — à garder, pour celui qui parle</div>
+        <div class="link-box">
+          <div class="url" id="hostUrl"></div>
+          <button class="btn-copy" onclick="copyLink('hostUrl',this)">Copier</button>
+        </div>
+      </div>
+
+      <div class="link-block">
+        <div class="link-label">👥 Lien PARTICIPANTS — à partager avec le public</div>
+        <div class="link-box">
+          <div class="url" id="partUrl"></div>
+          <button class="btn-copy" onclick="copyLink('partUrl',this)">Copier</button>
+        </div>
+      </div>
+
+      <div class="warn">
+        ⚠️ Le lien <strong>hôte</strong> sert à démarrer et piloter la session : ne le donnez qu'à la personne qui parle.
+        Le lien <strong>participants</strong> est celui à diffuser largement.
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+// ── CONFIGURATION ──
+const ADMIN_PWD = '7043';
+
+// L'adresse de votre site. Les liens pointeront vers ce domaine.
+// Laisse tel quel : détecte automatiquement le domaine où la page est ouverte.
+const BASE_URL = window.location.origin;
+
+// Liste des langues — identique à celle de votre site (MAIN_LANGS).
+const LANGS = [
+  {code:'fr', label:'Français'},
+  {code:'en', label:'English'},
+  {code:'de', label:'Deutsch'},
+  {code:'it', label:'Italiano'},
+  {code:'es', label:'Español'},
+  {code:'pt', label:'Português'},
+  {code:'nl', label:'Nederlands'},
+  {code:'pl', label:'Polski'},
+  {code:'tr', label:'Türkçe'},
+  {code:'da', label:'Dansk'},
+  {code:'el', label:'Ελληνικά · Greek'},
+  {code:'ar', label:'العربية · Arabic'},
+  {code:'he', label:'עברית · Hebrew'},
+  {code:'ru', label:'Русский · Russian'},
+  {code:'uk', label:'Українська · Ukrainian'},
+  {code:'zh', label:'中文 · Chinese'},
+  {code:'ja', label:'日本語 · Japanese'},
+  {code:'ko', label:'한국어 · Korean'},
+  {code:'hi', label:'हिन्दी · Hindi'},
+];
+
+// ── LOGIN ──
+function checkPwd(){
+  const pwd = document.getElementById('pwd').value;
+  if(pwd === ADMIN_PWD){
+    document.getElementById('loginScreen').style.display = 'none';
+    document.getElementById('adminApp').style.display = 'block';
+    sessionStorage.setItem('ttw_admin_ok','1');
+    initAdmin();
+  } else {
+    document.getElementById('loginError').style.display = 'block';
+  }
+}
+function logout(){
+  sessionStorage.removeItem('ttw_admin_ok');
+  location.reload();
+}
+if(sessionStorage.getItem('ttw_admin_ok') === '1'){
+  document.getElementById('loginScreen').style.display = 'none';
+  document.getElementById('adminApp').style.display = 'block';
+  setTimeout(initAdmin, 50);
+}
+
+// ── INITIALISATION ──
+function initAdmin(){
+  // Remplir les menus déroulants de langues
+  fillLangSelect('g-src', false, 'fr');
+  fillLangSelect('g-p1',  false, 'en');
+  fillLangSelect('g-p2',  true,  '');
+  fillLangSelect('g-p3',  true,  '');
+
+  // Date limite par défaut = dans 3 jours (comme l'essai gratuit actuel)
+  const d = new Date();
+  d.setDate(d.getDate() + 3);
+  document.getElementById('g-exp').value = d.toISOString().slice(0,10);
+}
+
+function fillLangSelect(id, withNone, defaultCode){
+  const sel = document.getElementById(id);
+  sel.innerHTML = '';
+  if(withNone){
+    const o = document.createElement('option');
+    o.value = '';
+    o.textContent = '— Aucune —';
+    sel.appendChild(o);
+  }
+  LANGS.forEach(l => {
+    const o = document.createElement('option');
+    o.value = l.code;
+    o.textContent = l.label;
+    if(l.code === defaultCode) o.selected = true;
+    sel.appendChild(o);
+  });
+}
+
+// Même logique que nameToRoom() sur votre site
+function nameToRoom(name){
+  return name.toLowerCase()
+    .normalize('NFD').replace(/[\u0300-\u036f]/g,'')
+    .replace(/[^a-z0-9]/g,'')
+    .slice(0,40);
+}
+
+function updateRoomPreview(){
+  const name = document.getElementById('g-name').value.trim();
+  document.getElementById('roomPreview').textContent = name ? nameToRoom(name) : '—';
+}
+
+// ── GÉNÉRATION DES LIENS ──
+function generate(){
+  const err = document.getElementById('errMsg');
+  err.style.display = 'none';
+
+  const name = document.getElementById('g-name').value.trim();
+  const src  = document.getElementById('g-src').value;
+  const p1   = document.getElementById('g-p1').value;
+  const p2   = document.getElementById('g-p2').value;
+  const p3   = document.getElementById('g-p3').value;
+  const dur  = parseInt(document.getElementById('g-dur').value, 10);
+  const expDateStr = document.getElementById('g-exp').value;
+
+  // Vérifications
+  if(!name){ return showErr('Merci d\'indiquer le nom du client.'); }
+  if(!p1){ return showErr('Choisissez au moins une langue participant.'); }
+  if(!dur || dur < 1){ return showErr('La durée doit être d\'au moins 1 minute.'); }
+  if(!expDateStr){ return showErr('Choisissez une date limite.'); }
+
+  const room = nameToRoom(name);
+  if(!room){ return showErr('Ce nom ne produit aucun identifiant valide. Utilisez des lettres ou chiffres.'); }
+
+  // Calcul de l'expiration : fin de la journée choisie (23h59)
+  const expDate = new Date(expDateStr + 'T23:59:59');
+  const expTs = Math.floor(expDate.getTime() / 1000);
+
+  // Liste des langues participants (format identique au site : "en,es,it")
+  const targets = [p1,p2,p3].filter(Boolean).join(',');
+
+  // Construction des liens — EXACTEMENT le même format que votre site (lignes 2148-2149)
+  const hostLink = BASE_URL + '/host-setup.html?room=' + room + '&lang=' + src + '&to=' + targets + '&dur=' + dur + '&exp=' + expTs;
+  const partLink = BASE_URL + '/join.html?room=' + room + '&exp=' + expTs;
+
+  // Affichage
+  document.getElementById('hostUrl').textContent = hostLink;
+  document.getElementById('partUrl').textContent = partLink;
+
+  // Récapitulatif lisible
+  const langLabel = c => { const l = LANGS.find(x=>x.code===c); return l ? l.label : c; };
+  const partLabels = [p1,p2,p3].filter(Boolean).map(langLabel).join(', ');
+  const expReadable = expDate.toLocaleDateString('fr-FR',{weekday:'long', day:'numeric', month:'long', year:'numeric'});
+  document.getElementById('summary').innerHTML =
+    '<strong>Client :</strong> ' + escHtml(name) + '<br>' +
+    '<strong>Orateur parle en :</strong> ' + escHtml(langLabel(src)) + '<br>' +
+    '<strong>Traduit vers :</strong> ' + escHtml(partLabels) + '<br>' +
+    '<strong>Durée :</strong> ' + dur + ' minutes<br>' +
+    '<strong>Valable jusqu\'au :</strong> ' + escHtml(expReadable) + ' (fin de journée)';
+
+  document.getElementById('result').classList.add('show');
+  document.getElementById('result').scrollIntoView({behavior:'smooth', block:'start'});
+}
+
+function showErr(msg){
+  const err = document.getElementById('errMsg');
+  err.textContent = '⚠️ ' + msg;
+  err.style.display = 'block';
+}
+
+function copyLink(elId, btn){
+  const text = document.getElementById(elId).textContent;
+  navigator.clipboard.writeText(text).then(()=>{
+    const old = btn.textContent;
+    btn.textContent = '✓ Copié';
+    btn.classList.add('copied');
+    setTimeout(()=>{ btn.textContent = old; btn.classList.remove('copied'); }, 1800);
+  }).catch(()=>{
+    // Repli si le copier-coller automatique est bloqué
+    const range = document.createRange();
+    range.selectNodeContents(document.getElementById(elId));
+    const sel = window.getSelection();
+    sel.removeAllRanges(); sel.addRange(range);
+    alert('Sélectionnez le lien affiché et copiez-le manuellement (Ctrl+C).');
+  });
+}
+
+function escHtml(s){
+  if(!s) return '';
+  return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+</script>
+</body>
+</html>
