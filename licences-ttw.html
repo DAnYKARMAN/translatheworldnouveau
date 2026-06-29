@@ -184,7 +184,9 @@ async function loadLicenses(){
         remainingMin: remaining,
         createdAt: l.createdAt || 0,
         expiry: l.expiry || 0,        // timestamp en secondes
-        cancelled: !!l.cancelled
+        cancelled: !!l.cancelled,
+        langSrc: l.langSrc || '',     // code langue orateur
+        langTo: l.langTo || ''        // codes langues participants
       };
     });
 
@@ -238,12 +240,14 @@ function render(){
       (l.languages ? '<div class="lic-meta"><b>Langues :</b> ' + esc(l.languages) + '</div>' : '');
 
     // ── LIENS DE SESSION ──
-    // Reconstruits uniquement pour les vraies licences TranslateTheWorld,
-    // c.-à-d. celles qui ont les codes de langue (créées par le générateur).
-    const isTTW = !!l.langSrc && !!l.langTo;
+    // On reconstruit toujours les liens. Si les codes de langue manquent
+    // (anciennes licences ou licences SOGEDICOM), on met des valeurs par défaut
+    // pour que les liens restent utilisables et copiables.
     let linksHtml = '';
-    if(isTTW){
-      const hostLink = BASE_URL + '/host-setup.html?room=' + l.room + '&lang=' + l.langSrc + '&to=' + l.langTo + '&dur=' + l.allowedMin + '&exp=' + l.expiry;
+    {
+      const src = l.langSrc || 'fr';
+      const to  = l.langTo  || 'en';
+      const hostLink = BASE_URL + '/host-setup.html?room=' + l.room + '&lang=' + src + '&to=' + to + '&dur=' + l.allowedMin + '&exp=' + l.expiry;
       const partLink = BASE_URL + '/join.html?room=' + l.room + '&exp=' + l.expiry;
 
       // Message tout prêt pour le client (lien participant)
