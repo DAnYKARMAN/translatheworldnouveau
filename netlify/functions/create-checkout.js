@@ -1,9 +1,9 @@
 // netlify/functions/create-checkout.js
 // ─────────────────────────────────────────────────────────────────────
 // Modèle tarifaire LINÉAIRE
-//   Base 1h × 2 langues (1 source + 1 cible) = 59,99 € TTC
-//   + 49,99 € TTC par heure supplémentaire
-//   + 49,99 € TTC par langue cible supplémentaire et par heure
+//   Base 1h × 2 langues (1 source + 1 cible) = 69,99 € TTC
+//   + 69,99 € TTC par heure supplémentaire
+//   + 59,99 € TTC par langue cible supplémentaire et par heure
 // Plage : 1–12 heures · 0–2 langues cibles supplémentaires
 // Sécurité : le MONTANT est recalculé côté serveur à partir de `hours`
 //            et du nombre de cibles. Le total reçu du client n'est jamais
@@ -12,9 +12,9 @@
 
 const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
 
-const BASE_TTC       = 5999;  // 1h, 2 langues (centimes)
-const EXTRA_H_TTC    = 4999;  // par heure supplémentaire
-const EXTRA_LANG_TTC = 4999;  // par langue cible supplémentaire × heure
+const BASE_TTC       = 6999;  // 1h, 2 langues (centimes)
+const EXTRA_H_TTC    = 6999;  // par heure supplémentaire
+const EXTRA_LANG_TTC = 5999;  // par langue cible supplémentaire × heure
 const MIN_HOURS      = 1;
 const MAX_HOURS      = 12;
 const MAX_EXTRA      = 2;     // donc max 3 cibles, 4 langues totales

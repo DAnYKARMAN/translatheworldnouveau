@@ -462,6 +462,33 @@ const AZ_LANG = {
   pl:'pl-PL',uk:'uk-UA',tr:'tr-TR',ja:'ja-JP',ko:'ko-KR',
   sv:'sv-SE',cs:'cs-CZ',el:'el-GR'
 };
+
+// ── MODE CONSÉCUTIF (allemand & japonais) ──
+// Dans ces langues le verbe arrive en FIN de phrase (structure SOV).
+// Une traduction "au fil de l'eau" serait fausse : on attend donc la
+// fin de chaque phrase avant de diffuser la traduction (mode consécutif).
+const CONSECUTIVE_LANGS = new Set(['de','ja']);
+
+// Message d'information affiché une seule fois quand le mode consécutif est actif
+let consecutiveNoticeShown = false;
+function showConsecutiveNotice(lang){
+  if(consecutiveNoticeShown) return;
+  consecutiveNoticeShown = true;
+  const MSGS = {
+    de: 'Konsekutivmodus: Die Übersetzung erscheint am Ende jedes Satzes, da das Verb im Deutschen am Satzende steht.',
+    ja: '逐次通訳モード：日本語は動詞が文末に来るため、翻訳は各文の終わりに表示されます。'
+  };
+  const msg = MSGS[lang] || 'Consecutive mode: translation appears at the end of each sentence.';
+  const container = document.getElementById('subtitles');
+  if(!container) return;
+  const empty = document.getElementById('emptyMsg');
+  if(empty) empty.style.display='none';
+  const el = document.createElement('div');
+  el.style.cssText = 'padding:12px 14px;background:rgba(212,168,67,.08);border:1px solid rgba(212,168,67,.3);border-radius:10px;font-size:13px;color:#d4a843;line-height:1.5;margin-bottom:8px';
+  el.textContent = 'ℹ️ ' + msg;
+  container.appendChild(el);
+}
+
 const FLAGS = {fr:'fr',en:'gb',de:'de',it:'it',es:'es',pt:'pt',ar:'lb',ru:'ru',zh:'cn',he:'il',nl:'nl',pl:'pl',uk:'ua',tr:'tr',ja:'jp',ko:'kr',sv:'se',cs:'cz',el:'gr',da:'dk',hi:'in'};
 const LANG_NAMES = {fr:'Français',en:'English',de:'Deutsch',it:'Italiano',es:'Español',pt:'Português',ar:'العربية',ru:'Русский',zh:'中文',he:'עברית',nl:'Nederlands',pl:'Polski',uk:'Українська',tr:'Türkçe',ja:'日本語',ko:'한국어',sv:'Svenska',cs:'Čeština',el:'Ελληνικά / Greek',da:'Dansk',hi:'हिन्दी'};
 const RTL_LANGS = new Set(['ar','he']);
@@ -676,6 +703,8 @@ window.addEventListener('DOMContentLoaded', ()=>{
   document.getElementById('hFlagImg').src = 'https://flagcdn.com/w40/'+flag+'.png';
   document.getElementById('hLangLabel').textContent = LANG_NAMES[myLang]||myLang;
   if(RTL_LANGS.has(myLang)) document.getElementById('subtitles').setAttribute('dir','rtl');
+  // Mode consécutif : informer les utilisateurs allemand/japonais
+  if(CONSECUTIVE_LANGS.has(myLang)) showConsecutiveNotice(myLang);
 
   // Expiry
   if(exp>0&&Math.floor(Date.now()/1000)>exp){
@@ -1104,7 +1133,9 @@ function startRecognition(){
     // anglais ↔ hébreu qui fonctionnent très bien sans réglage).
     // Exception : russe → 600 ms (élocution plus longue, évite que les
     // phrases soient coupées en morceaux).
-    const SLOW_LANGS = new Set(['ru']);
+    // Allemand & japonais : verbe en fin de phrase → 600 ms pour capter
+    // des phrases COMPLÈTES avant traduction (mode consécutif).
+    const SLOW_LANGS = new Set(['ru','de','ja']);
     const silenceMs = SLOW_LANGS.has(myLang) ? '600' : '300';
     speechConfig.setProperty('SpeechServiceConnection_InitialSilenceTimeoutMs','10000');
     speechConfig.setProperty('Speech_SegmentationSilenceTimeoutMs', silenceMs);
@@ -1137,11 +1168,13 @@ function startRecognition(){
         text: original, fromLang: myLang, speaker: myName, ts: now
       });
 
-      // Traductions en cours pour les autres langues
+      // Traductions en cours pour les autres langues — SAUF en mode
+      // consécutif (de/ja) : traduction diffusée en fin de phrase seulement.
+      if(CONSECUTIVE_LANGS.has(myLang)) return;
       targetLangs.forEach(tl=>{
         const azCode = AZ_LANG[tl] ? AZ_LANG[tl].split('-')[0] : tl;
         const translated = translations.get(azCode) || translations.get(tl) || '';
-        if(translated){
+        if(translated && !CONSECUTIVE_LANGS.has(tl)){
           db.ref('sessions/'+room+'/subtitles_live/'+tl).set({
             text: translated, fromLang: myLang, speaker: myName, ts: now
           });
