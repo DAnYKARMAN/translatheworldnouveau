@@ -194,7 +194,13 @@ let db = null;
 
 // L'adresse de votre site. Les liens pointeront vers ce domaine.
 // Laisse tel quel : détecte automatiquement le domaine où la page est ouverte.
-const BASE_URL = window.location.origin;
+// Adresse de base des liens générés.
+// Si la page est ouverte en ligne (translatetheworld.com ou site de test Netlify),
+// on utilise cette adresse. Si elle est ouverte en local (double-clic sur le
+// fichier → adresse "file://"), on retombe sur le site de production.
+const BASE_URL = window.location.origin.startsWith('http')
+  ? window.location.origin
+  : 'https://translatetheworld.com';
 
 // Liste des langues — identique à celle de votre site (MAIN_LANGS).
 const LANGS = [
