@@ -112,6 +112,28 @@ body{margin:0;font-family:'DM Sans',Arial,sans-serif;background:#f5f7f6;color:#0
 
       <div class="row">
         <div class="field">
+          <label>Langue participant 4 (optionnel)</label>
+          <select id="g-p4"></select>
+        </div>
+        <div class="field">
+          <label>Langue participant 5 (optionnel)</label>
+          <select id="g-p5"></select>
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="field">
+          <label>Langue participant 6 (optionnel)</label>
+          <select id="g-p6"></select>
+        </div>
+        <div class="field">
+          <label>Langue participant 7 (optionnel)</label>
+          <select id="g-p7"></select>
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="field">
           <label>Durée de la session (minutes)</label>
           <input type="number" id="g-dur" value="60" min="1" max="720" step="1">
           <div class="hint">Exemples : 15, 60, 120…</div>
@@ -231,6 +253,10 @@ function initAdmin(){
   fillLangSelect('g-p1',  false, 'en');
   fillLangSelect('g-p2',  true,  '');
   fillLangSelect('g-p3',  true,  '');
+  fillLangSelect('g-p4',  true,  '');
+  fillLangSelect('g-p5',  true,  '');
+  fillLangSelect('g-p6',  true,  '');
+  fillLangSelect('g-p7',  true,  '');
 
   // Date limite par défaut = dans 3 jours (comme l'essai gratuit actuel)
   const d = new Date();
@@ -279,6 +305,14 @@ function generate(){
   const p1   = document.getElementById('g-p1').value;
   const p2   = document.getElementById('g-p2').value;
   const p3   = document.getElementById('g-p3').value;
+  const p4   = document.getElementById('g-p4').value;
+  const p5   = document.getElementById('g-p5').value;
+  const p6   = document.getElementById('g-p6').value;
+  const p7   = document.getElementById('g-p7').value;
+  // Liste complète des langues participants choisies (les vides sont ignorées)
+  const pAll = [p1,p2,p3,p4,p5,p6,p7].filter(Boolean);
+  // Sécurité : on retire les doublons éventuels (ex : anglais choisi deux fois)
+  const pList = [...new Set(pAll)];
   const dur  = parseInt(document.getElementById('g-dur').value, 10);
   const expDateStr = document.getElementById('g-exp').value;
 
@@ -296,7 +330,7 @@ function generate(){
   const expTs = Math.floor(expDate.getTime() / 1000);
 
   // Liste des langues participants (format identique au site : "en,es,it")
-  const targets = [p1,p2,p3].filter(Boolean).join(',');
+  const targets = pList.join(',');
 
   // Construction des liens — EXACTEMENT le même format que votre site (lignes 2148-2149)
   const hostLink = BASE_URL + '/host-setup.html?room=' + room + '&lang=' + src + '&to=' + targets + '&dur=' + dur + '&exp=' + expTs;
@@ -304,7 +338,7 @@ function generate(){
 
   // Langues lisibles pour l'enregistrement (ex : "Français → English, Español")
   const langLabel0 = c => { const l = LANGS.find(x=>x.code===c); return l ? l.label : c; };
-  const langsReadable = langLabel0(src) + ' → ' + [p1,p2,p3].filter(Boolean).map(langLabel0).join(', ');
+  const langsReadable = langLabel0(src) + ' → ' + pList.map(langLabel0).join(', ');
 
   // ── ENREGISTREMENT DE LA LICENCE DANS FIREBASE ──
   // On écrit dans licenses/{room} les infos que la page de gestion lira.
@@ -338,7 +372,7 @@ function generate(){
 
   // Récapitulatif lisible
   const langLabel = c => { const l = LANGS.find(x=>x.code===c); return l ? l.label : c; };
-  const partLabels = [p1,p2,p3].filter(Boolean).map(langLabel).join(', ');
+  const partLabels = pList.map(langLabel).join(', ');
   const expReadable = expDate.toLocaleDateString('fr-FR',{weekday:'long', day:'numeric', month:'long', year:'numeric'});
   document.getElementById('summary').innerHTML =
     '<strong>Client :</strong> ' + escHtml(name) + '<br>' +

@@ -547,13 +547,13 @@ const I18N = {
     chip_langs:       ' langue(s) public',
     chip_langs_edit:  '✏️ Modifier',
     modal_title:      'Langues du public',
-    modal_sub:        'Sélectionnez jusqu\'à 3 langues dans lesquelles vos participants recevront la traduction.',
-    modal_count_lbl:  'sur 3 sélectionnée(s)',
+    modal_sub:        'Sélectionnez jusqu\'à 7 langues dans lesquelles vos participants recevront la traduction.',
+    modal_count_lbl:  'sur 7 sélectionnée(s)',
     modal_cancel:     'Annuler',
     modal_confirm:    'Valider',
-    modal_max_reached:'Limite de 3 langues atteinte. Désélectionnez-en une pour en ajouter une autre.',
+    modal_max_reached:'Limite de 7 langues atteinte. Désélectionnez-en une pour en ajouter une autre.',
     badge_host:       'Votre langue',
-    err_max_langs:    '⚠️ Maximum 3 langues autorisées pour le public.',
+    err_max_langs:    '⚠️ Maximum 7 langues autorisées pour le public.',
   },
   en: {
     page_title:       'TranslateTheWorld — Start your session',
@@ -585,13 +585,13 @@ const I18N = {
     chip_langs:       ' audience language(s)',
     chip_langs_edit:  '✏️ Edit',
     modal_title:      'Audience languages',
-    modal_sub:        'Select up to 3 languages in which your participants will receive the translation.',
-    modal_count_lbl:  'of 3 selected',
+    modal_sub:        'Select up to 7 languages in which your participants will receive the translation.',
+    modal_count_lbl:  'of 7 selected',
     modal_cancel:     'Cancel',
     modal_confirm:    'Confirm',
-    modal_max_reached:'Limit of 3 languages reached. Deselect one to add another.',
+    modal_max_reached:'Limit of 7 languages reached. Deselect one to add another.',
     badge_host:       'Your language',
-    err_max_langs:    '⚠️ Maximum 3 audience languages allowed.',
+    err_max_langs:    '⚠️ Maximum 7 audience languages allowed.',
   }
 };
 
@@ -645,7 +645,7 @@ function applyTranslations(){
 /* ============================================================
    LANGUES DISPONIBLES
    ============================================================ */
-const MAX_AUDIENCE_LANGS = 3;
+const MAX_AUDIENCE_LANGS = 7;
 
 const LANGS = [
   {code:'fr',country:'fr',label:'Français',az:'fr-FR'},
@@ -835,7 +835,7 @@ function toggleLangInModal(code){
   if(idx >= 0){
     modalSelection.splice(idx,1);
   } else {
-    if(modalSelection.length >= MAX_AUDIENCE_LANGS) return; // block at 3
+    if(modalSelection.length >= MAX_AUDIENCE_LANGS) return; // bloque à MAX_AUDIENCE_LANGS (7)
     modalSelection.push(code);
   }
   renderModalList();
