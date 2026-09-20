@@ -587,7 +587,6 @@ footer a{color:rgba(255,255,255,.42);text-decoration:none}
   <ul class="nav-links">
     <li><a href="#how" data-fr="Comment ça marche" data-en="How it works" data-el="Πώς λειτουργεί" data-da="Sådan fungerer det" data-hi="यह कैसे काम करता है">Comment ça marche</a></li>
     <li><a href="#create" data-fr="Créer un lien" data-en="Create a link" data-el="Δημιουργία συνδέσμου" data-da="Opret et link" data-hi="लिंक बनाएं">Créer un lien</a></li>
-    <li><a href="#pricing" data-fr="Tarifs" data-en="Pricing" data-el="Τιμές" data-da="Priser" data-hi="मूल्य">Tarifs</a></li>
   </ul>
   <div class="nav-right">
     <div class="lang-toggle">
@@ -610,7 +609,6 @@ footer a{color:rgba(255,255,255,.42);text-decoration:none}
         <option value="el">🇬🇷 Ελληνικά</option>
       </select>
     </div>
-    <a href="/compte/" style="background:transparent;border:1.5px solid #157a6e;color:#157a6e;padding:8px 18px;border-radius:999px;font-size:13px;font-weight:700;text-decoration:none;transition:all .2s;font-family:Arial,sans-serif" onmouseover="this.style.background='#157a6e';this.style.color='#fff'" onmouseout="this.style.background='transparent';this.style.color='#157a6e'" data-fr="Mon Compte" data-en="My Account" data-el="Ο λογαριασμός μου" data-da="Min konto" data-hi="मेरा खाता">Mon Compte</a>
     <a class="nav-cta" href="#create" data-fr="Essai gratuit" data-en="Free trial" data-el="Δωρεάν δοκιμή" data-da="Gratis prøve" data-hi="निःशुल्क परीक्षण">Essai gratuit</a>
   </div>
 </nav>
@@ -680,12 +678,12 @@ footer a{color:rgba(255,255,255,.42);text-decoration:none}
           >Tester gratuitement</button>
 
           <!-- CTA 2 : Demander une démo (bordure, ouvre mailto) -->
-          <a href="mailto:dnb@sogedicom.com?subject=Demande%20de%20d%C3%A9monstration%20TranslateTheWorld&body=Bonjour%2C%0A%0AJe%20souhaite%20une%20d%C3%A9monstration%20gratuite%20et%20sans%20engagement%20de%20TranslateTheWorld.%0A%0ANom%20%3A%0AOrganisation%20%3A%0AT%C3%A9l%C3%A9phone%20%3A%0ADate%20d%27%C3%A9v%C3%A9nement%20envisag%C3%A9e%20%3A%0ANombre%20de%20langues%20%3A%0A%0AMerci%20de%20me%20recontacter.%0A"
+          <button type="button" onclick="openDemoModal()"
             style="background:#fff;color:#0a2f2a;border:2px solid #157a6e;padding:14px 28px;border-radius:8px;font-size:16px;font-weight:700;cursor:pointer;font-family:inherit;letter-spacing:.01em;text-decoration:none;display:inline-flex;align-items:center;transition:background .18s"
             onmouseover="this.style.background='#e3f4f1'"
             onmouseout="this.style.background='#fff'"
             data-fr="Demander une démonstration gratuite" data-en="Request a free demonstration" data-pt="Solicitar uma demonstração gratuita" data-es="Solicitar una demostración gratuita" data-it="Richiedere una dimostrazione gratuita" data-de="Kostenlose Demo anfragen" data-nl="Gratis demonstratie aanvragen"
-          >Demander une démonstration gratuite</a>
+          >Demander une démonstration gratuite</button>
         </div>
 
         <!-- Small print : sans engagement -->
@@ -708,12 +706,7 @@ footer a{color:rgba(255,255,255,.42);text-decoration:none}
 
     </div>
 
-    <!-- Lien compte discret -->
-    <div style="font-size:12.5px;color:#8a9994;margin-top:24px">
-      <span data-fr="Déjà client ?" data-en="Already a customer?">Déjà client ?</span>
-      <a href="/compte/" style="color:#157a6e;font-weight:600;text-decoration:none;margin-left:5px"
-        data-fr="Accéder à mon compte →" data-en="Go to my account →">Accéder à mon compte →</a>
-    </div>
+    <!-- (Lien compte retiré — pas de fonction 'Mon compte' pour le moment) -->
 
   </div>
 </section>
@@ -790,189 +783,7 @@ footer a{color:rgba(255,255,255,.42);text-decoration:none}
   </div>
 </section>
 
-<!-- ═══════════════════════════════════════════════════════════ -->
-<!--   SECTION 3 PILIERS   Économique / Simple / Fiable           -->
-<!-- ═══════════════════════════════════════════════════════════ -->
-<section style="background:#0a2f2a;color:#fff;padding:80px 24px">
-  <div style="max-width:1080px;margin:0 auto">
-    <div style="text-align:center;margin-bottom:50px">
-      <div style="font-size:12px;font-weight:700;color:#5cc8b8;letter-spacing:.15em;text-transform:uppercase;margin-bottom:12px"
-        data-fr="Nos principes" data-en="Our principles" data-pt="Os nossos princípios" data-es="Nuestros principios" data-it="I nostri principi" data-de="Unsere Prinzipien" data-nl="Onze principes"
-      >Nos principes</div>
-      <h2 style="font-size:clamp(24px,2.8vw,36px);font-weight:700;line-height:1.2;color:#fff;max-width:720px;margin:0 auto"
-        data-fr="Ne payez pas pour ce dont vous n'avez pas besoin."
-        data-en="Don't pay for what you don't need."
-        data-pt="Não pague pelo que não precisa."
-        data-es="No pague por lo que no necesita."
-        data-it="Non pagate per ciò di cui non avete bisogno."
-        data-de="Bezahlen Sie nicht für das, was Sie nicht brauchen."
-        data-nl="Betaal niet voor wat u niet nodig heeft."
-      >Ne payez pas pour ce dont vous n'avez pas besoin.</h2>
-    </div>
-
-    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:28px">
-      <!-- Pilier 1 : Économique -->
-      <div style="text-align:left;padding:8px 4px">
-        <div style="font-size:32px;font-weight:800;color:#5cc8b8;line-height:1;margin-bottom:16px">01</div>
-        <h3 style="font-size:20px;font-weight:700;color:#fff;margin-bottom:12px"
-          data-fr="Économique" data-en="Cost-effective" data-pt="Económica" data-es="Económica" data-it="Economica" data-de="Wirtschaftlich" data-nl="Voordelig"
-        >Économique</h3>
-        <p style="font-size:14.5px;color:rgba(255,255,255,.75);line-height:1.6"
-          data-fr="À partir de 59,99 € HT pour une conférence de 3 heures en deux langues. La solution de traduction simultanée la plus accessible du marché — sans compromis sur la fiabilité."
-          data-en="From €59.99 excl. VAT for a 3-hour conference in two languages. The most accessible simultaneous translation solution on the market — without compromising on reliability."
-          data-pt="A partir de 59,99 € s/IVA para uma conferência de 3 horas em duas línguas. A solução de tradução simultânea mais acessível do mercado — sem comprometer a fiabilidade."
-          data-es="Desde 59,99 € sin IVA para una conferencia de 3 horas en dos idiomas. La solución de traducción simultánea más accesible del mercado — sin comprometer la fiabilidad."
-          data-it="Da 59,99 € IVA esclusa per una conferenza di 3 ore in due lingue. La soluzione di traduzione simultanea più accessibile del mercato — senza compromettere l'affidabilità."
-          data-de="Ab 59,99 € netto für eine 3-stündige Konferenz in zwei Sprachen. Die zugänglichste Simultanübersetzungslösung am Markt — ohne Abstriche bei der Zuverlässigkeit."
-          data-nl="Vanaf € 59,99 excl. btw voor een conferentie van 3 uur in twee talen. De meest toegankelijke oplossing voor simultaanvertaling op de markt — zonder concessies aan betrouwbaarheid."
-        >À partir de 59,99 € HT pour une conférence de 3 heures en deux langues. La solution de traduction simultanée la plus accessible du marché — sans compromis sur la fiabilité.</p>
-      </div>
-
-      <!-- Pilier 2 : Simple -->
-      <div style="text-align:left;padding:8px 4px">
-        <div style="font-size:32px;font-weight:800;color:#5cc8b8;line-height:1;margin-bottom:16px">02</div>
-        <h3 style="font-size:20px;font-weight:700;color:#fff;margin-bottom:12px"
-          data-fr="Simple" data-en="Simple" data-pt="Simples" data-es="Simple" data-it="Semplice" data-de="Einfach" data-nl="Eenvoudig"
-        >Simple</h3>
-        <p style="font-size:14.5px;color:rgba(255,255,255,.75);line-height:1.6"
-          data-fr="Vos participants scannent un QR code et suivent la conférence en sous-titres sur leur propre smartphone. Aucune application à installer, aucun récepteur à distribuer. Prêt en 2 minutes."
-          data-en="Your attendees scan a QR code and follow the conference in subtitles on their own smartphones. No app to install, no receivers to distribute. Ready in 2 minutes."
-          data-pt="Os seus participantes lêem um QR code e seguem a conferência em legendas no seu próprio smartphone. Sem aplicação para instalar, sem receptores para distribuir. Pronto em 2 minutos."
-          data-es="Sus participantes escanean un código QR y siguen la conferencia con subtítulos en su propio smartphone. Sin aplicación que instalar, sin receptores que distribuir. Listo en 2 minutos."
-          data-it="I tuoi partecipanti scansionano un codice QR e seguono la conferenza con sottotitoli sul proprio smartphone. Nessuna app da installare, nessun ricevitore da distribuire. Pronto in 2 minuti."
-          data-de="Ihre Teilnehmer scannen einen QR-Code und verfolgen die Konferenz in Untertiteln auf ihrem eigenen Smartphone. Keine App zu installieren, keine Empfänger zu verteilen. In 2 Minuten startklar."
-          data-nl="Uw deelnemers scannen een QR-code en volgen de conferentie met ondertiteling op hun eigen smartphone. Geen app te installeren, geen ontvangers uit te delen. Klaar in 2 minuten."
-        >Vos participants scannent un QR code et suivent la conférence en sous-titres sur leur propre smartphone. Aucune application à installer, aucun récepteur à distribuer. Prêt en 2 minutes.</p>
-      </div>
-
-      <!-- Pilier 3 : Fiable -->
-      <div style="text-align:left;padding:8px 4px">
-        <div style="font-size:32px;font-weight:800;color:#5cc8b8;line-height:1;margin-bottom:16px">03</div>
-        <h3 style="font-size:20px;font-weight:700;color:#fff;margin-bottom:12px"
-          data-fr="Fiable" data-en="Reliable" data-pt="Fiável" data-es="Fiable" data-it="Affidabile" data-de="Zuverlässig" data-nl="Betrouwbaar"
-        >Fiable</h3>
-        <p style="font-size:14.5px;color:rgba(255,255,255,.75);line-height:1.6"
-          data-fr="Éprouvée en conditions réelles sur des conférences internationales à plusieurs nationalités. Reconnaissance vocale Azure et traduction neuronale — la même technologie que celle utilisée par les grandes organisations."
-          data-en="Battle-tested in real conditions on international multi-nationality conferences. Azure speech recognition and neural translation — the same technology used by major organizations."
-          data-pt="Testada em condições reais em conferências internacionais com várias nacionalidades. Reconhecimento de voz Azure e tradução neural — a mesma tecnologia utilizada pelas grandes organizações."
-          data-es="Probada en condiciones reales en conferencias internacionales con varias nacionalidades. Reconocimiento de voz Azure y traducción neuronal — la misma tecnología utilizada por las grandes organizaciones."
-          data-it="Collaudata in condizioni reali su conferenze internazionali con più nazionalità. Riconoscimento vocale Azure e traduzione neurale — la stessa tecnologia utilizzata dalle grandi organizzazioni."
-          data-de="Bewährt in realen Bedingungen bei internationalen Konferenzen mit mehreren Nationalitäten. Azure-Spracherkennung und neuronale Übersetzung — dieselbe Technologie, die auch von großen Organisationen genutzt wird."
-          data-nl="Bewezen in reële omstandigheden op internationale conferenties met meerdere nationaliteiten. Azure-spraakherkenning en neurale vertaling — dezelfde technologie die door grote organisaties wordt gebruikt."
-        >Éprouvée en conditions réelles sur des conférences internationales à plusieurs nationalités. Reconnaissance vocale Azure et traduction neuronale — la même technologie que celle utilisée par les grandes organisations.</p>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- ═══════════════════════════════════════════════════════════ -->
-<!--   SECTION TARIFS PUBLICS   (repris de conference-interpretation-sg.com/tarifs) -->
-<!-- ═══════════════════════════════════════════════════════════ -->
-<section style="background:#fff;padding:80px 24px">
-  <div style="max-width:900px;margin:0 auto">
-    <div style="text-align:center;margin-bottom:44px">
-      <div style="font-size:12px;font-weight:700;color:#157a6e;letter-spacing:.15em;text-transform:uppercase;margin-bottom:12px"
-        data-fr="Tarifs publics" data-en="Public pricing" data-pt="Tarifas públicas" data-es="Tarifas públicas" data-it="Tariffe pubbliche" data-de="Öffentliche Tarife" data-nl="Openbare tarieven"
-      >Tarifs publics</div>
-      <h2 style="font-size:clamp(24px,2.8vw,34px);font-weight:700;color:#0a2f2a;line-height:1.25;margin-bottom:16px"
-        data-fr="Une solution prête à l'emploi, sans préparation de votre part."
-        data-en="A ready-to-use solution, requiring no preparation on your part."
-        data-pt="Uma solução pronta a usar, sem qualquer preparação da sua parte."
-        data-es="Una solución lista para usar, sin ninguna preparación de su parte."
-        data-it="Una soluzione pronta all'uso, senza alcuna preparazione da parte tua."
-        data-de="Eine gebrauchsfertige Lösung, ohne Vorbereitung Ihrerseits."
-        data-nl="Een kant-en-klare oplossing zonder enige voorbereiding van uw kant."
-      >Une solution prête à l'emploi, sans préparation de votre part.</h2>
-      <p style="font-size:15px;color:#3a4a44;line-height:1.6;max-width:680px;margin:0 auto"
-        data-fr="Vous recevez vos liens d'accès et votre QR code avant l'événement ; le jour J, vous les affichez ou les projetez, et vos participants suivent la conférence dans leur langue en quelques secondes."
-        data-en="You receive your access links and QR code before the event; on the day, you display or project them, and your attendees follow the conference in their own language within seconds."
-        data-pt="Recebe os seus links de acesso e o seu QR code antes do evento; no dia D, exibe-os ou projeta-os, e os seus participantes seguem a conferência na sua língua em alguns segundos."
-        data-es="Recibe sus enlaces de acceso y su código QR antes del evento; el día D, los muestra o los proyecta, y sus participantes siguen la conferencia en su idioma en pocos segundos."
-        data-it="Ricevi i tuoi link di accesso e il tuo QR code prima dell'evento; il giorno stesso, li visualizzi o li proietti, e i tuoi partecipanti seguono la conferenza nella loro lingua in pochi secondi."
-        data-de="Sie erhalten Ihre Zugangslinks und Ihren QR-Code vor der Veranstaltung; am Tag selbst zeigen oder projizieren Sie sie an, und Ihre Teilnehmer folgen der Konferenz binnen Sekunden in ihrer Sprache."
-        data-nl="U ontvangt uw toegangslinks en QR-code vóór het evenement; op de dag zelf toont of projecteert u ze, en uw deelnemers volgen de conferentie binnen enkele seconden in hun eigen taal."
-      >Vous recevez vos liens d'accès et votre QR code avant l'événement ; le jour J, vous les affichez ou les projetez, et vos participants suivent la conférence dans leur langue en quelques secondes.</p>
-    </div>
-
-    <!-- Table tarifs -->
-    <div style="max-width:720px;margin:0 auto;border:1px solid #d5dfdc;border-radius:12px;overflow:hidden">
-      <div style="display:grid;grid-template-columns:1.6fr 1fr 1fr;background:#f0f4f2;padding:14px 18px;font-size:12.5px;font-weight:700;color:#0a2f2a;letter-spacing:.02em;border-bottom:1px solid #d5dfdc">
-        <div></div>
-        <div style="text-align:center" data-fr="Forfait 3 heures" data-en="3-hour package" data-pt="Pacote 3 horas" data-es="Pack 3 horas" data-it="Pacchetto 3 ore" data-de="3-Stunden-Paket" data-nl="Pakket 3 uur">Forfait 3 heures</div>
-        <div style="text-align:center" data-fr="Forfait 8 heures" data-en="8-hour package" data-pt="Pacote 8 horas" data-es="Pack 8 horas" data-it="Pacchetto 8 ore" data-de="8-Stunden-Paket" data-nl="Pakket 8 uur">Forfait 8 heures</div>
-      </div>
-      <div style="display:grid;grid-template-columns:1.6fr 1fr 1fr;padding:16px 18px;border-bottom:1px solid #edf1ef;align-items:center">
-        <div style="font-size:14px;color:#0a2f2a">
-          <div style="font-weight:700;margin-bottom:2px" data-fr="Deux langues" data-en="Two languages" data-pt="Duas línguas" data-es="Dos idiomas" data-it="Due lingue" data-de="Zwei Sprachen" data-nl="Twee talen">Deux langues</div>
-          <div style="font-size:12px;color:#6a7a74" data-fr="par ex. anglais – français" data-en="e.g. English – French" data-pt="por ex. inglês – francês" data-es="p. ej. inglés – francés" data-it="ad es. inglese – francese" data-de="z. B. Englisch – Französisch" data-nl="bijv. Engels – Frans">par ex. anglais – français</div>
-        </div>
-        <div style="text-align:center;font-size:20px;font-weight:800;color:#157a6e">399,99 € <span style="font-size:11px;font-weight:600;color:#6a7a74">HT</span></div>
-        <div style="text-align:center;font-size:20px;font-weight:800;color:#157a6e">599,99 € <span style="font-size:11px;font-weight:600;color:#6a7a74">HT</span></div>
-      </div>
-      <div style="display:grid;grid-template-columns:1.6fr 1fr 1fr;padding:16px 18px;align-items:center;background:#fafcfb">
-        <div style="font-size:14px;color:#3a4a44"
-          data-fr="Chaque langue supplémentaire" data-en="Each additional language" data-pt="Cada língua adicional" data-es="Cada idioma adicional" data-it="Ogni lingua aggiuntiva" data-de="Jede zusätzliche Sprache" data-nl="Elke extra taal"
-        >Chaque langue supplémentaire</div>
-        <div style="text-align:center;font-size:15px;font-weight:700;color:#3a4a44">+ 119,99 € <span style="font-size:11px;font-weight:500;color:#6a7a74">HT</span></div>
-        <div style="text-align:center;font-size:15px;font-weight:700;color:#3a4a44">+ 239,99 € <span style="font-size:11px;font-weight:500;color:#6a7a74">HT</span></div>
-      </div>
-    </div>
-
-    <p style="font-size:13px;color:#6a7a74;text-align:center;margin-top:20px;line-height:1.55;max-width:680px;margin-left:auto;margin-right:auto"
-      data-fr="Tarifs hors taxes. Pour les formats intermédiaires ou les configurations particulières, nous établissons une proposition adaptée. Une conférence d'1 heure en 2 langues à partir de 59,99 € HT est également disponible."
-      data-en="Excluding VAT. For intermediate formats or specific configurations, we prepare a tailored proposal. A 1-hour, 2-language conference from €59.99 excl. VAT is also available."
-      data-pt="Tarifas s/IVA. Para formatos intermédios ou configurações particulares, preparamos uma proposta adaptada. Uma conferência de 1 hora em 2 línguas a partir de 59,99 € s/IVA também está disponível."
-      data-es="Tarifas sin IVA. Para formatos intermedios o configuraciones particulares, preparamos una propuesta adaptada. También hay disponible una conferencia de 1 hora en 2 idiomas desde 59,99 € sin IVA."
-      data-it="Tariffe IVA esclusa. Per formati intermedi o configurazioni particolari, prepariamo una proposta adeguata. È disponibile anche una conferenza di 1 ora in 2 lingue da 59,99 € IVA esclusa."
-      data-de="Tarife netto. Für Zwischenformate oder besondere Konfigurationen erstellen wir ein individuelles Angebot. Eine 1-stündige Konferenz in 2 Sprachen ab 59,99 € netto ist ebenfalls erhältlich."
-      data-nl="Tarieven excl. btw. Voor tussenformaten of bijzondere configuraties stellen we een aangepast voorstel op. Een conferentie van 1 uur in 2 talen vanaf € 59,99 excl. btw is ook beschikbaar."
-    >Tarifs hors taxes. Pour les formats intermédiaires ou les configurations particulières, nous établissons une proposition adaptée. Une conférence d'1 heure en 2 langues à partir de 59,99 € HT est également disponible.</p>
-  </div>
-</section>
-
-<!-- ═══════════════════════════════════════════════════════════ -->
-<!--   BLOC CTA FINAL                                             -->
-<!-- ═══════════════════════════════════════════════════════════ -->
-<section style="background:linear-gradient(180deg,#e3f4f1 0%,#f7f8f7 100%);padding:70px 24px">
-  <div style="max-width:820px;margin:0 auto;text-align:center">
-    <h2 style="font-size:clamp(24px,2.8vw,32px);font-weight:700;color:#0a2f2a;line-height:1.25;margin-bottom:14px"
-      data-fr="Prêt à organiser votre conférence multilingue ?"
-      data-en="Ready to organise your multilingual conference?"
-      data-pt="Pronto para organizar a sua conferência multilíngue?"
-      data-es="¿Listo para organizar su conferencia multilingüe?"
-      data-it="Pronto a organizzare la tua conferenza multilingue?"
-      data-de="Bereit, Ihre mehrsprachige Konferenz zu organisieren?"
-      data-nl="Klaar om uw meertalige conferentie te organiseren?"
-    >Prêt à organiser votre conférence multilingue ?</h2>
-    <p style="font-size:16px;color:#3a4a44;line-height:1.6;margin-bottom:30px;max-width:640px;margin-left:auto;margin-right:auto"
-      data-fr="Testez la solution en 2 minutes, ou demandez une démonstration personnalisée. Sans engagement."
-      data-en="Try the solution in 2 minutes, or request a personalised demonstration. No commitment."
-      data-pt="Teste a solução em 2 minutos, ou solicite uma demonstração personalizada. Sem compromisso."
-      data-es="Pruebe la solución en 2 minutos, o solicite una demostración personalizada. Sin compromiso."
-      data-it="Prova la soluzione in 2 minuti, o richiedi una dimostrazione personalizzata. Senza impegno."
-      data-de="Testen Sie die Lösung in 2 Minuten oder fordern Sie eine persönliche Demo an. Unverbindlich."
-      data-nl="Probeer de oplossing in 2 minuten, of vraag een persoonlijke demonstratie aan. Vrijblijvend."
-    >Testez la solution en 2 minutes, ou demandez une démonstration personnalisée. Sans engagement.</p>
-
-    <div style="display:flex;gap:14px;justify-content:center;flex-wrap:wrap">
-      <button onclick="openFreeModal()"
-        style="background:#157a6e;color:#fff;border:none;padding:16px 30px;border-radius:8px;font-size:16px;font-weight:700;cursor:pointer;font-family:inherit;transition:background .18s;box-shadow:0 4px 14px rgba(21,122,110,.28)"
-        onmouseover="this.style.background='#0e5a52'" onmouseout="this.style.background='#157a6e'"
-        data-fr="Tester gratuitement" data-en="Try for free" data-pt="Testar gratuitamente" data-es="Probar gratis" data-it="Prova gratis" data-de="Kostenlos testen" data-nl="Gratis uitproberen"
-      >Tester gratuitement</button>
-      <a href="mailto:dnb@sogedicom.com?subject=Demande%20de%20d%C3%A9monstration%20TranslateTheWorld&body=Bonjour%2C%0A%0AJe%20souhaite%20une%20d%C3%A9monstration%20gratuite%20et%20sans%20engagement%20de%20TranslateTheWorld.%0A%0ANom%20%3A%0AOrganisation%20%3A%0AT%C3%A9l%C3%A9phone%20%3A%0ADate%20d%27%C3%A9v%C3%A9nement%20envisag%C3%A9e%20%3A%0ANombre%20de%20langues%20%3A%0A%0AMerci%20de%20me%20recontacter.%0A"
-        style="background:#fff;color:#0a2f2a;border:2px solid #157a6e;padding:14px 28px;border-radius:8px;font-size:16px;font-weight:700;font-family:inherit;text-decoration:none;display:inline-flex;align-items:center;transition:background .18s"
-        onmouseover="this.style.background='#e3f4f1'" onmouseout="this.style.background='#fff'"
-        data-fr="Demander une démonstration gratuite" data-en="Request a free demonstration" data-pt="Solicitar uma demonstração gratuita" data-es="Solicitar una demostración gratuita" data-it="Richiedere una dimostrazione gratuita" data-de="Kostenlose Demo anfragen" data-nl="Gratis demonstratie aanvragen"
-      >Demander une démonstration gratuite</a>
-    </div>
-
-    <p style="font-size:12.5px;color:#6a7a74;margin-top:22px">
-      <span data-fr="Ou par téléphone :" data-en="Or by phone:" data-pt="Ou por telefone:" data-es="O por teléfono:" data-it="O per telefono:" data-de="Oder telefonisch:" data-nl="Of telefonisch:">Ou par téléphone :</span>
-      <a href="tel:+33149260526" style="color:#157a6e;font-weight:700;text-decoration:none;margin-left:5px">+33 1 49 26 05 26</a>
-    </p>
-  </div>
-</section>
+<!-- (Sections Piliers, Tarifs, CTA final supprimées — nouveau CTA sobre positionné après la section "Simple comme un lien partagé") -->
 
 <!-- MODAL ESSAI GRATUIT -->
 <div id="freeTrialOverlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:1001;align-items:center;justify-content:center;padding:20px;overflow-y:auto">
@@ -1013,7 +824,7 @@ footer a{color:rgba(255,255,255,.42);text-decoration:none}
         </div>
         <div style="display:flex;gap:10px;align-items:flex-start">
           <div style="background:#157a6e;color:#fff;width:22px;height:22px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;flex-shrink:0;margin-top:1px">4</div>
-          <div><div style="font-size:12px;font-weight:700;color:#0d1f1a;margin-bottom:2px" data-fr="Le monde vous comprend" data-en="The world understands you">Le monde vous comprend</div><div style="font-size:11px;color:#666;line-height:1.4" data-fr="Reconnaissance vocale Azure + IA. Aucune compétence requise." data-en="Azure voice recognition + AI. No technical skills needed.">Reconnaissance vocale Azure + IA. Aucune compétence requise.</div></div>
+          <div><div style="font-size:12px;font-weight:700;color:#0d1f1a;margin-bottom:2px" data-fr="Le monde vous comprend" data-en="The world understands you">Le monde vous comprend</div><div style="font-size:11px;color:#666;line-height:1.4" data-fr="Sous-titres traduits en direct, sans aucune installation." data-en="Live translated subtitles, no installation required.">Sous-titres traduits en direct, sans aucune installation.</div></div>
         </div>
       </div>
     </div>
@@ -1090,99 +901,172 @@ footer a{color:rgba(255,255,255,.42);text-decoration:none}
     </div>
   </div>
 </div>
- 
+
+<!-- ═══════════════════════════════════════════════════════════ -->
+<!--   MODAL DEMANDE DE DÉMONSTRATION                             -->
+<!-- ═══════════════════════════════════════════════════════════ -->
+<div id="demoOverlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:1001;align-items:center;justify-content:center;padding:20px;overflow-y:auto">
+  <div style="background:#fff;border-radius:20px;padding:32px 28px;max-width:520px;width:100%;box-shadow:0 30px 80px rgba(0,0,0,.3);position:relative;max-height:92vh;overflow-y:auto">
+    <button onclick="closeDemoModal()" style="position:absolute;top:16px;right:16px;background:none;border:none;font-size:22px;color:#aaa;cursor:pointer;line-height:1">✕</button>
+
+    <!-- En-tête -->
+    <div style="background:#0a2f2a;border-radius:12px;padding:18px 20px;margin-bottom:22px;color:#fff">
+      <div style="font-size:20px;font-weight:800;line-height:1.2;margin-bottom:6px"
+        data-fr="Demandez votre démonstration"
+        data-en="Request your demonstration"
+        data-pt="Solicite a sua demonstração"
+        data-es="Solicite su demostración"
+        data-it="Richiedete la vostra dimostrazione"
+        data-de="Fordern Sie Ihre Demo an"
+        data-nl="Vraag uw demonstratie aan"
+      >Demandez votre démonstration</div>
+      <div style="font-size:13px;color:rgba(255,255,255,.75);line-height:1.5"
+        data-fr="Gratuite et sans engagement. Nous vous recontactons sous 24h ouvrées."
+        data-en="Free and no commitment. We will get back to you within 24 business hours."
+        data-pt="Gratuita e sem compromisso. Contactamo-lo em 24 horas úteis."
+        data-es="Gratuita y sin compromiso. Le respondemos en 24 horas hábiles."
+        data-it="Gratuita e senza impegno. Vi ricontattiamo entro 24 ore lavorative."
+        data-de="Kostenlos und unverbindlich. Wir melden uns innerhalb von 24 Werkstunden zurück."
+        data-nl="Gratis en vrijblijvend. Wij nemen binnen 24 werkuren contact met u op."
+      >Gratuite et sans engagement. Nous vous recontactons sous 24h ouvrées.</div>
+    </div>
+
+    <!-- Formulaire -->
+    <div class="hfc-section" style="margin-bottom:12px">
+      <div class="hfc-grid cols2">
+        <div class="hfc-field">
+          <label data-fr="Prénom & Nom *" data-en="First & Last Name *" data-pt="Nome próprio e apelido *" data-es="Nombre y apellido *" data-it="Nome e Cognome *" data-de="Vor- & Nachname *" data-nl="Voor- & achternaam *">Prénom & Nom *</label>
+          <input type="text" id="d-name" placeholder="Marie Dupont">
+        </div>
+        <div class="hfc-field">
+          <label data-fr="Organisation" data-en="Organisation" data-pt="Organização" data-es="Organización" data-it="Organizzazione" data-de="Organisation" data-nl="Organisatie">Organisation</label>
+          <input type="text" id="d-org" placeholder="ACME">
+        </div>
+        <div class="hfc-field">
+          <label data-fr="Email *" data-en="Email *">Email *</label>
+          <input type="email" id="d-email" placeholder="marie@acme.fr">
+        </div>
+        <div class="hfc-field">
+          <label data-fr="Téléphone *" data-en="Phone *" data-pt="Telefone *" data-es="Teléfono *" data-it="Telefono *" data-de="Telefon *" data-nl="Telefoon *">Téléphone *</label>
+          <input type="tel" id="d-phone" placeholder="+33 6 00 00 00 00">
+        </div>
+      </div>
+      <div class="hfc-field" style="margin-top:12px">
+        <label data-fr="Décrivez votre besoin *"
+          data-en="Describe your need *"
+          data-pt="Descreva a sua necessidade *"
+          data-es="Describa su necesidad *"
+          data-it="Descrivete la vostra esigenza *"
+          data-de="Beschreiben Sie Ihren Bedarf *"
+          data-nl="Beschrijf uw behoefte *"
+        >Décrivez votre besoin *</label>
+        <textarea id="d-message" rows="4" style="width:100%;padding:10px 12px;border:1px solid #d5dfdc;border-radius:8px;font-family:inherit;font-size:14px;line-height:1.5;resize:vertical;min-height:90px" placeholder="Type d'événement, date envisagée, nombre de participants, langues souhaitées…"></textarea>
+      </div>
+    </div>
+
+    <!-- Bouton envoi -->
+    <button class="hfc-submit" id="demo-submit" onclick="handleDemoSubmit()"
+      data-fr="Envoyer ma demande"
+      data-en="Send my request"
+      data-pt="Enviar o meu pedido"
+      data-es="Enviar mi solicitud"
+      data-it="Invia la mia richiesta"
+      data-de="Anfrage senden"
+      data-nl="Mijn aanvraag versturen"
+    >Envoyer ma demande</button>
+    <div class="hfc-note" style="margin-top:10px">
+      <span data-fr="Sans engagement · Réponse sous 24h ouvrées"
+        data-en="No commitment · Response within 24 business hours"
+        data-pt="Sem compromisso · Resposta em 24 horas úteis"
+        data-es="Sin compromiso · Respuesta en 24 horas hábiles"
+        data-it="Senza impegno · Risposta entro 24 ore lavorative"
+        data-de="Unverbindlich · Antwort innerhalb von 24 Werkstunden"
+        data-nl="Vrijblijvend · Antwoord binnen 24 werkuren"
+      >Sans engagement · Réponse sous 24h ouvrées</span>
+    </div>
+
+    <!-- Message de succès -->
+    <div id="demo-success" style="display:none;margin-top:16px;padding:14px 16px;background:#e3f4f1;border-left:3px solid #157a6e;border-radius:6px;color:#0a2f2a;font-size:14px;line-height:1.5"
+      data-fr="✅ Votre demande a bien été envoyée. Nous vous recontactons rapidement."
+      data-en="✅ Your request has been sent. We will contact you shortly."
+      data-pt="✅ O seu pedido foi enviado. Entraremos em contacto em breve."
+      data-es="✅ Su solicitud ha sido enviada. Le contactaremos pronto."
+      data-it="✅ La vostra richiesta è stata inviata. Vi contatteremo a breve."
+      data-de="✅ Ihre Anfrage wurde gesendet. Wir melden uns in Kürze bei Ihnen."
+      data-nl="✅ Uw aanvraag is verzonden. Wij nemen spoedig contact met u op."
+    >✅ Votre demande a bien été envoyée. Nous vous recontactons rapidement.</div>
+
+  </div>
+</div>
+
 <!-- TICKER -->
 <div class="ticker-wrap"><div class="ticker-inner" id="ticker"></div></div>
  
 <!-- HOW IT WORKS -->
 <div id="how"><div class="section">
-  <div class="section-label" data-fr="Fonctionnement" data-en="How it works">Fonctionnement</div>
-  <h2 class="section-title" data-fr="Simple comme un lien partagé" data-en="As simple as sharing a link">Simple comme un lien partagé</h2>
+  <div class="section-label" data-fr="Fonctionnement" data-en="How it works" data-pt="Funcionamento" data-es="Funcionamiento" data-it="Funzionamento" data-de="Funktionsweise" data-nl="Werking">Fonctionnement</div>
+  <h2 class="section-title" style="margin-bottom:16px"
+    data-fr="Une solution prête à l'emploi, sans préparation de votre part."
+    data-en="A ready-to-use solution, requiring no preparation on your part."
+    data-pt="Uma solução pronta a usar, sem qualquer preparação da sua parte."
+    data-es="Una solución lista para usar, sin ninguna preparación de su parte."
+    data-it="Una soluzione pronta all'uso, senza alcuna preparazione da parte tua."
+    data-de="Eine gebrauchsfertige Lösung, ohne Vorbereitung Ihrerseits."
+    data-nl="Een kant-en-klare oplossing zonder enige voorbereiding van uw kant."
+  >Une solution prête à l'emploi, sans préparation de votre part.</h2>
+  <div style="text-align:center;font-size:14px;font-weight:600;color:#157a6e;letter-spacing:.1em;text-transform:uppercase;margin-bottom:36px"
+    data-fr="Simple comme un lien partagé" data-en="As simple as sharing a link" data-pt="Simples como partilhar um link" data-es="Tan simple como compartir un enlace" data-it="Semplice come condividere un link" data-de="So einfach wie das Teilen eines Links" data-nl="Zo eenvoudig als een gedeelde link"
+  >Simple comme un lien partagé</div>
   <div class="steps">
     <div class="step"><div class="step-num">1</div><h3 data-fr="Remplissez le formulaire" data-en="Fill in the form">Remplissez le formulaire</h3><p data-fr="Votre nom, email, la langue de l'orateur et jusqu'à 3 langues pour vos participants." data-en="Your name, email, the speaker's language and up to 3 languages for your participants.">Votre nom, email, la langue de l'orateur et jusqu'à 3 langues pour vos participants.</p></div>
     <div class="step"><div class="step-num">2</div><h3 data-fr="Lien + QR code par email" data-en="Link + QR code by email">Lien + QR code par email</h3><p data-fr="En quelques secondes, un lien personnalisé et un QR code arrivent dans votre boîte email." data-en="Within seconds, a personalised link and QR code land in your inbox.">En quelques secondes, un lien personnalisé et un QR code arrivent dans votre boîte email.</p></div>
     <div class="step"><div class="step-num">3</div><h3 data-fr="Partagez avec vos participants" data-en="Share with attendees">Partagez avec vos participants</h3><p data-fr="Chaque participant scanne ou clique, choisit sa langue et reçoit les sous-titres en direct." data-en="Each attendee scans or clicks, chooses their language and sees live subtitles.">Chaque participant scanne ou clique, choisit sa langue et reçoit les sous-titres en direct.</p></div>
-    <div class="step"><div class="step-num">4</div><h3 data-fr="Le monde vous comprend" data-en="The world understands you">Le monde vous comprend</h3><p data-fr="Reconnaissance vocale Azure + traduction IA. Aucune compétence technique requise." data-en="Azure voice recognition + AI translation. No technical skills required.">Reconnaissance vocale Azure + traduction IA. Aucune compétence technique requise.</p></div>
+    <div class="step"><div class="step-num">4</div><h3 data-fr="Le monde vous comprend" data-en="The world understands you">Le monde vous comprend</h3><p data-fr="Sous-titres traduits en direct sur chaque smartphone. Aucune installation, aucune compétence technique requise." data-en="Live translated subtitles on each smartphone. No installation, no technical skills required.">Sous-titres traduits en direct sur chaque smartphone. Aucune installation, aucune compétence technique requise.</p></div>
   </div>
 </div></div>
- 
- 
- 
-<!-- SIMULATEUR DE TARIF -->
-<section id="pricing" class="pricing-section">
-<div class="pricing-inner">
-  <div class="section-label" data-fr="Tarification" data-en="Pricing">Tarification</div>
-  <h2 class="section-title" data-fr="Simulez votre tarif" data-en="Simulate your price">Simulez votre tarif</h2>
-  <p style="color:var(--mid);margin-top:14px;font-size:15px"
-    data-fr="Choisissez le nombre d'heures et de langues pour voir votre prix exact."
-    data-en="Choose your number of hours and languages to see your exact price.">
-    Choisissez le nombre d'heures et de langues pour voir votre prix exact.
-  </p>
 
-  <!-- CALCULATEUR -->
-  <div class="calc-box" id="simulateur" style="margin-top:32px">
-    <div class="calc-title" data-fr="Simulez votre tarif" data-en="Simulate your price">Simulate your price</div>
-    <div class="calc-sub"
-      data-fr="Choisissez le nombre d'heures et de langues pour voir votre prix exact."
-      data-en="Choose your number of hours and languages to see your exact price.">
-      Choose your number of hours and languages to see your exact price.
-    </div>
- 
-    <!-- Sélecteur heures -->
-    <div style="margin-bottom:18px">
-      <div style="font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:rgba(0,0,0,.35);margin-bottom:10px"
-        data-fr="Nombre d'heures" data-en="Number of hours">Number of hours</div>
-      <div style="display:flex;gap:8px;flex-wrap:wrap" id="calcHoursGrid"></div>
-    </div>
- 
-    <!-- Sélecteur langues supplémentaires -->
-    <div style="margin-bottom:18px">
-      <div style="font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:rgba(0,0,0,.35);margin-bottom:10px"
-        data-fr="Langues supplémentaires (au-delà des 2 incluses)" data-en="Extra languages (beyond the 2 included)">Extra languages (beyond the 2 included)</div>
-      <div style="display:flex;gap:8px;flex-wrap:wrap" id="calcExtraLangsGrid"></div>
-    </div>
- 
-    <!-- Détail du calcul -->
-    <div class="calc-lines" id="calcLines"></div>
- 
-    <div class="calc-total-row">
-      <span class="calc-total-label" data-fr="Total TTC" data-en="Total incl. VAT">Total incl. VAT</span>
-      <span class="calc-total-val" id="calcTotal">59,99 €</span>
-    </div>
-    <div class="calc-ht-row">
-      <span data-fr="Total HT (TVA 20% — UE)" data-en="Total excl. VAT (20% VAT — EU)">Total excl. VAT (20% VAT — EU)</span>
-      <span id="calcTTC">49,99 €</span>
-    </div>
-    <div class="calc-hue-note" id="calcHueNote"
-      data-fr="Facturation hors UE : exonération de TVA (art. 259 B CGI). Prix facturé hors taxe."
-      data-en="Non-EU billing: VAT exemption (art. 259 B CGI). Price invoiced excluding tax.">
-      Non-EU billing: VAT exemption (art. 259 B CGI). Price invoiced excluding tax.
-    </div>
-    <label class="calc-hue-check">
-      <input type="checkbox" id="calcHue" onchange="calcRender()">
-      <span data-fr="Adresse de facturation hors Union européenne (exonération TVA)" data-en="Billing address outside the EU (VAT exemption)">Billing address outside the EU (VAT exemption)</span>
-    </label>
+<!-- ═══════════════════════════════════════════════════════════ -->
+<!--   BLOC CTA SOBRE   avec email + téléphone visibles           -->
+<!-- ═══════════════════════════════════════════════════════════ -->
+<section style="background:#f7f8f6;padding:60px 24px;border-top:1px solid rgba(0,0,0,.05);border-bottom:1px solid rgba(0,0,0,.05)">
+  <div style="max-width:900px;margin:0 auto;text-align:center">
 
-    <!-- Bouton Commander -->
-    <div style="margin-top:28px;text-align:center">
-      <button id="calcOrderBtn" onclick="launchOrderFromCalc()"
-        style="background:linear-gradient(135deg,#157a6e,#2dd4bf);color:#fff;border:none;border-radius:14px;padding:16px 48px;font-size:17px;font-weight:800;cursor:pointer;font-family:Arial,sans-serif;box-shadow:0 6px 24px rgba(21,122,110,.3);transition:all .2s;letter-spacing:.01em"
-        onmouseover="this.style.transform='translateY(-2px)';this.style.boxShadow='0 10px 32px rgba(21,122,110,.45)'"
-        onmouseout="this.style.transform='translateY(0)';this.style.boxShadow='0 6px 24px rgba(21,122,110,.3)'"
-        data-fr="💳 Commander — Créer mon compte" data-en="💳 Order — Create my account">💳 Commander — Créer mon compte</button>
-      <p style="font-size:12px;color:#aaa;margin-top:10px"
-        data-fr="Paiement sécurisé · Liens envoyés par email immédiatement après paiement"
-        data-en="Secure payment · Links sent by email immediately after payment">
-        Paiement sécurisé · Liens envoyés par email immédiatement après paiement</p>
+    <!-- Deux CTA côte à côte -->
+    <div style="display:flex;gap:14px;justify-content:center;flex-wrap:wrap;margin-bottom:36px">
+      <button onclick="openFreeModal()"
+        style="background:#157a6e;color:#fff;border:none;padding:16px 30px;border-radius:8px;font-size:16px;font-weight:700;cursor:pointer;font-family:inherit;letter-spacing:.01em;transition:background .18s;box-shadow:0 2px 8px rgba(21,122,110,.25)"
+        onmouseover="this.style.background='#0e5a52'" onmouseout="this.style.background='#157a6e'"
+        data-fr="Tester gratuitement" data-en="Try for free" data-pt="Testar gratuitamente" data-es="Probar gratis" data-it="Prova gratis" data-de="Kostenlos testen" data-nl="Gratis uitproberen"
+      >Tester gratuitement</button>
+      <button type="button" onclick="openDemoModal()"
+        style="background:#fff;color:#0a2f2a;border:2px solid #157a6e;padding:14px 28px;border-radius:8px;font-size:16px;font-weight:700;cursor:pointer;font-family:inherit;letter-spacing:.01em;transition:background .18s"
+        onmouseover="this.style.background='#e3f4f1'" onmouseout="this.style.background='#fff'"
+        data-fr="Demander une démonstration gratuite" data-en="Request a free demonstration" data-pt="Solicitar uma demonstração gratuita" data-es="Solicitar una demostración gratuita" data-it="Richiedere una dimostrazione gratuita" data-de="Kostenlose Demo anfragen" data-nl="Gratis demonstratie aanvragen"
+      >Demander une démonstration gratuite</button>
     </div>
+
+    <!-- Coordonnées visibles : email + téléphone -->
+    <div style="font-size:14px;color:#3a4a44;line-height:1.9">
+      <div style="margin-bottom:8px">
+        <span style="color:#6a7a74"
+          data-fr="Une question ? Écrivez-nous à" data-en="A question? Write to us at" data-pt="Uma pergunta? Escreva-nos para" data-es="¿Una pregunta? Escríbanos a" data-it="Una domanda? Scriveteci a" data-de="Eine Frage? Schreiben Sie uns an" data-nl="Een vraag? Schrijf ons naar"
+        >Une question ? Écrivez-nous à</span>
+        <a href="mailto:info@sogedicom.com" style="color:#157a6e;font-weight:700;text-decoration:none;margin-left:6px">info@sogedicom.com</a>
+      </div>
+      <div>
+        <span style="color:#6a7a74"
+          data-fr="Ou appelez-nous au" data-en="Or call us at" data-pt="Ou ligue-nos para" data-es="O llámenos al" data-it="O chiamateci al" data-de="Oder rufen Sie uns an" data-nl="Of bel ons op"
+        >Ou appelez-nous au</span>
+        <a href="tel:+33149260526" style="color:#157a6e;font-weight:700;text-decoration:none;margin-left:6px">+33 1 49 26 05 26</a>
+      </div>
+    </div>
+
   </div>
- 
-  <div class="tva-note">
-    <strong data-fr="🌍 Facturation hors Union européenne — Exonération de TVA" data-en="🌍 Billing outside the EU — VAT exemption">🌍 Billing outside the EU — VAT exemption</strong><br>
-    <span data-fr="Pour les clients hors UE, la TVA n'est pas applicable conformément à l'<strong>article 259 B du Code Général des Impôts (CGI)</strong>. Le prix est facturé hors taxe." data-en="For customers outside the EU, VAT does not apply pursuant to <strong>Article 259 B of the French General Tax Code (CGI)</strong>. The price is invoiced excluding tax.">For customers outside the EU, VAT does not apply pursuant to <strong>Article 259 B of the French General Tax Code (CGI)</strong>. The price is invoiced excluding tax.</span>
-  </div>
-</div>
 </section>
+ 
+ 
+ 
+<!-- (Section Simulateur de tarif supprimée — pas de commande directe pour le moment) -->
  
 <!-- CONTACT COMMERCIAL -->
 <section style="background:#0d1f1a;padding:72px 24px">
@@ -1956,7 +1840,92 @@ function closeFreeModal(){
 document.addEventListener('DOMContentLoaded',function(){
   const ov=document.getElementById('freeTrialOverlay');
   if(ov) ov.addEventListener('click',function(e){if(e.target===this)closeFreeModal();});
+  const dov=document.getElementById('demoOverlay');
+  if(dov) dov.addEventListener('click',function(e){if(e.target===this)closeDemoModal();});
 });
+
+// ═══════════════════════════════════════════════════════════
+//   MODAL DEMANDE DE DÉMONSTRATION
+// ═══════════════════════════════════════════════════════════
+function openDemoModal(){
+  const ov=document.getElementById('demoOverlay');
+  ov.style.display='flex';
+  document.body.style.overflow='hidden';
+  document.getElementById('demo-success').style.display='none';
+  setLang(currentLang);
+}
+function closeDemoModal(){
+  document.getElementById('demoOverlay').style.display='none';
+  document.body.style.overflow='';
+}
+
+let _demoInProgress=false;
+async function handleDemoSubmit(){
+  if(_demoInProgress) return;
+  _demoInProgress=true;
+  const btn=document.getElementById('demo-submit');
+  const originalText=btn.textContent;
+  function resetBtn(){_demoInProgress=false;btn.disabled=false;btn.textContent=originalText;}
+
+  try {
+    const name = (document.getElementById('d-name').value||'').trim();
+    const org = (document.getElementById('d-org').value||'').trim();
+    const email = (document.getElementById('d-email').value||'').trim();
+    const phone = (document.getElementById('d-phone').value||'').trim();
+    const message = (document.getElementById('d-message').value||'').trim();
+
+    if(!name||!email||!phone||!message){
+      alert(currentLang==='fr'?'Merci de remplir tous les champs obligatoires.':'Please fill in all required fields.');
+      resetBtn(); return;
+    }
+    if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){
+      alert(currentLang==='fr'?'Adresse email invalide.':'Invalid email address.');
+      resetBtn(); return;
+    }
+
+    btn.disabled=true;
+    btn.textContent = currentLang==='fr' ? '⏳ Envoi en cours…' : '⏳ Sending…';
+
+    // Appel à la Netlify Function dédiée (retry 3x, mêmes garanties que l'essai gratuit)
+    let lastErr=null;
+    for(let i=1;i<=3;i++){
+      try {
+        if(i>1){
+          btn.textContent = (currentLang==='fr'?'⏳ Nouvelle tentative ':'⏳ Retry ')+i+'/3…';
+          await new Promise(r=>setTimeout(r,800));
+        }
+        const resp = await fetch('/.netlify/functions/send-demo-request',{
+          method:'POST',
+          headers:{'Content-Type':'application/json'},
+          body:JSON.stringify({name,org,email,phone,message})
+        });
+        if(!resp.ok){
+          const errData = await resp.json().catch(()=>({error:'HTTP '+resp.status}));
+          throw new Error(errData.error||('HTTP '+resp.status));
+        }
+        // Succès
+        btn.textContent = currentLang==='fr'?'✅ Demande envoyée !':'✅ Request sent!';
+        document.getElementById('demo-success').style.display='block';
+        setTimeout(()=>{closeDemoModal();resetBtn();},2500);
+        return;
+      } catch(err){
+        lastErr = err;
+        console.warn('Demo request attempt '+i+' failed:',err);
+      }
+    }
+    // Échec après 3 tentatives → fallback mailto
+    resetBtn();
+    const subject = encodeURIComponent('Demande de démonstration TranslateTheWorld');
+    const body = encodeURIComponent('Nom : '+name+'\nOrganisation : '+org+'\nEmail : '+email+'\nTéléphone : '+phone+'\n\nBesoin :\n'+message);
+    alert((currentLang==='fr'?'⚠️ Envoi automatique impossible. Nous allons ouvrir votre application email pour envoyer manuellement.':'⚠️ Automatic sending failed. Opening your email client to send manually.'));
+    window.location.href='mailto:info@sogedicom.com?subject='+subject+'&body='+body;
+
+  } catch(err){
+    console.error('Demo submit error:',err);
+    alert('Erreur : '+(err.message||err));
+    resetBtn();
+  }
+}
 
 function sanitizeRoom(){
   const name=document.getElementById('f-name').value.trim();
