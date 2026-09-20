@@ -587,7 +587,6 @@ footer a{color:rgba(255,255,255,.42);text-decoration:none}
   <ul class="nav-links">
     <li><a href="#how" data-fr="Comment ça marche" data-en="How it works" data-el="Πώς λειτουργεί" data-da="Sådan fungerer det" data-hi="यह कैसे काम करता है">Comment ça marche</a></li>
     <li><a href="#create" data-fr="Créer un lien" data-en="Create a link" data-el="Δημιουργία συνδέσμου" data-da="Opret et link" data-hi="लिंक बनाएं">Créer un lien</a></li>
-    <li><a href="#pricing" data-fr="Tarifs" data-en="Pricing" data-el="Τιμές" data-da="Priser" data-hi="मूल्य">Tarifs</a></li>
   </ul>
   <div class="nav-right">
     <div class="lang-toggle">
@@ -610,7 +609,6 @@ footer a{color:rgba(255,255,255,.42);text-decoration:none}
         <option value="el">🇬🇷 Ελληνικά</option>
       </select>
     </div>
-    <a href="/compte/" style="background:transparent;border:1.5px solid #157a6e;color:#157a6e;padding:8px 18px;border-radius:999px;font-size:13px;font-weight:700;text-decoration:none;transition:all .2s;font-family:Arial,sans-serif" onmouseover="this.style.background='#157a6e';this.style.color='#fff'" onmouseout="this.style.background='transparent';this.style.color='#157a6e'" data-fr="Mon Compte" data-en="My Account" data-el="Ο λογαριασμός μου" data-da="Min konto" data-hi="मेरा खाता">Mon Compte</a>
     <a class="nav-cta" href="#create" data-fr="Essai gratuit" data-en="Free trial" data-el="Δωρεάν δοκιμή" data-da="Gratis prøve" data-hi="निःशुल्क परीक्षण">Essai gratuit</a>
   </div>
 </nav>
@@ -708,12 +706,7 @@ footer a{color:rgba(255,255,255,.42);text-decoration:none}
 
     </div>
 
-    <!-- Lien compte discret -->
-    <div style="font-size:12.5px;color:#8a9994;margin-top:24px">
-      <span data-fr="Déjà client ?" data-en="Already a customer?">Déjà client ?</span>
-      <a href="/compte/" style="color:#157a6e;font-weight:600;text-decoration:none;margin-left:5px"
-        data-fr="Accéder à mon compte →" data-en="Go to my account →">Accéder à mon compte →</a>
-    </div>
+    <!-- (Lien compte retiré — pas de fonction 'Mon compte' pour le moment) -->
 
   </div>
 </section>
@@ -1073,81 +1066,7 @@ footer a{color:rgba(255,255,255,.42);text-decoration:none}
  
  
  
-<!-- SIMULATEUR DE TARIF -->
-<section id="pricing" class="pricing-section">
-<div class="pricing-inner">
-  <div class="section-label" data-fr="Tarification" data-en="Pricing">Tarification</div>
-  <h2 class="section-title" data-fr="Simulez votre tarif" data-en="Simulate your price">Simulez votre tarif</h2>
-  <p style="color:var(--mid);margin-top:14px;font-size:15px"
-    data-fr="Choisissez le nombre d'heures et de langues pour voir votre prix exact."
-    data-en="Choose your number of hours and languages to see your exact price.">
-    Choisissez le nombre d'heures et de langues pour voir votre prix exact.
-  </p>
-
-  <!-- CALCULATEUR -->
-  <div class="calc-box" id="simulateur" style="margin-top:32px">
-    <div class="calc-title" data-fr="Simulez votre tarif" data-en="Simulate your price">Simulate your price</div>
-    <div class="calc-sub"
-      data-fr="Choisissez le nombre d'heures et de langues pour voir votre prix exact."
-      data-en="Choose your number of hours and languages to see your exact price.">
-      Choose your number of hours and languages to see your exact price.
-    </div>
- 
-    <!-- Sélecteur heures -->
-    <div style="margin-bottom:18px">
-      <div style="font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:rgba(0,0,0,.35);margin-bottom:10px"
-        data-fr="Nombre d'heures" data-en="Number of hours">Number of hours</div>
-      <div style="display:flex;gap:8px;flex-wrap:wrap" id="calcHoursGrid"></div>
-    </div>
- 
-    <!-- Sélecteur langues supplémentaires -->
-    <div style="margin-bottom:18px">
-      <div style="font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:rgba(0,0,0,.35);margin-bottom:10px"
-        data-fr="Langues supplémentaires (au-delà des 2 incluses)" data-en="Extra languages (beyond the 2 included)">Extra languages (beyond the 2 included)</div>
-      <div style="display:flex;gap:8px;flex-wrap:wrap" id="calcExtraLangsGrid"></div>
-    </div>
- 
-    <!-- Détail du calcul -->
-    <div class="calc-lines" id="calcLines"></div>
- 
-    <div class="calc-total-row">
-      <span class="calc-total-label" data-fr="Total TTC" data-en="Total incl. VAT">Total incl. VAT</span>
-      <span class="calc-total-val" id="calcTotal">59,99 €</span>
-    </div>
-    <div class="calc-ht-row">
-      <span data-fr="Total HT (TVA 20% — UE)" data-en="Total excl. VAT (20% VAT — EU)">Total excl. VAT (20% VAT — EU)</span>
-      <span id="calcTTC">49,99 €</span>
-    </div>
-    <div class="calc-hue-note" id="calcHueNote"
-      data-fr="Facturation hors UE : exonération de TVA (art. 259 B CGI). Prix facturé hors taxe."
-      data-en="Non-EU billing: VAT exemption (art. 259 B CGI). Price invoiced excluding tax.">
-      Non-EU billing: VAT exemption (art. 259 B CGI). Price invoiced excluding tax.
-    </div>
-    <label class="calc-hue-check">
-      <input type="checkbox" id="calcHue" onchange="calcRender()">
-      <span data-fr="Adresse de facturation hors Union européenne (exonération TVA)" data-en="Billing address outside the EU (VAT exemption)">Billing address outside the EU (VAT exemption)</span>
-    </label>
-
-    <!-- Bouton Commander -->
-    <div style="margin-top:28px;text-align:center">
-      <button id="calcOrderBtn" onclick="launchOrderFromCalc()"
-        style="background:linear-gradient(135deg,#157a6e,#2dd4bf);color:#fff;border:none;border-radius:14px;padding:16px 48px;font-size:17px;font-weight:800;cursor:pointer;font-family:Arial,sans-serif;box-shadow:0 6px 24px rgba(21,122,110,.3);transition:all .2s;letter-spacing:.01em"
-        onmouseover="this.style.transform='translateY(-2px)';this.style.boxShadow='0 10px 32px rgba(21,122,110,.45)'"
-        onmouseout="this.style.transform='translateY(0)';this.style.boxShadow='0 6px 24px rgba(21,122,110,.3)'"
-        data-fr="💳 Commander — Créer mon compte" data-en="💳 Order — Create my account">💳 Commander — Créer mon compte</button>
-      <p style="font-size:12px;color:#aaa;margin-top:10px"
-        data-fr="Paiement sécurisé · Liens envoyés par email immédiatement après paiement"
-        data-en="Secure payment · Links sent by email immediately after payment">
-        Paiement sécurisé · Liens envoyés par email immédiatement après paiement</p>
-    </div>
-  </div>
- 
-  <div class="tva-note">
-    <strong data-fr="🌍 Facturation hors Union européenne — Exonération de TVA" data-en="🌍 Billing outside the EU — VAT exemption">🌍 Billing outside the EU — VAT exemption</strong><br>
-    <span data-fr="Pour les clients hors UE, la TVA n'est pas applicable conformément à l'<strong>article 259 B du Code Général des Impôts (CGI)</strong>. Le prix est facturé hors taxe." data-en="For customers outside the EU, VAT does not apply pursuant to <strong>Article 259 B of the French General Tax Code (CGI)</strong>. The price is invoiced excluding tax.">For customers outside the EU, VAT does not apply pursuant to <strong>Article 259 B of the French General Tax Code (CGI)</strong>. The price is invoiced excluding tax.</span>
-  </div>
-</div>
-</section>
+<!-- (Section Simulateur de tarif supprimée — pas de commande directe pour le moment) -->
  
 <!-- CONTACT COMMERCIAL -->
 <section style="background:#0d1f1a;padding:72px 24px">
